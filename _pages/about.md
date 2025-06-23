@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
+subtitle: University of Cambridge | Lucy Cavendish College | hl667@cam.ac.uk 
 
 profile:
   align: right
