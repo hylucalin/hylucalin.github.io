@@ -23,31 +23,31 @@
   },
   "work": [
     {
-      "name": "Institute for Advanced Study, Princeton University",
-      "position": "Professor of Theoretical Physics",
-      "url": "https://example.com",
-      "startDate": "1933-01-01",
-      "endDate": "1955-01-01",
-      "summary": "Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.",
-      "highlights": ["Relativity"]
+      "name": "Limosaero Ltd.",
+      "position": "Summer Engineering Intern",
+      "url": "https://www.limosaero.co.uk",
+      "startDate": "2024-07-01",
+      "endDate": "2024-09-30",
+      "summary": "Led and contributed to individual and team projects focused on the design, simulation, and manufacture of the company's solar UAV and its payload for low-altitude, long-duration atmospheric monitoring.",
+      "highlights": ["Computational Fluid Dynamics", "Python-based design tool", "Object-Oriented Programming", "SolidWorks"]
     }
   ],
   "volunteer": [
     {
-      "organization": "People's Climate March",
-      "location": "Zurich, Switzerland",
-      "position": "Lead Organizer",
+      "organization": "Amoy Youth Elites Summit",
+      "location": "Xiamen, Chine",
+      "position": "Invited Lecturer",
       "url": "https://example.com",
-      "startDate": "2014-04-01",
-      "endDate": "2015-07-01",
-      "summary": "Lead organizer for the New York City branch of the People's Climate March, the largest climate march in history.",
-      "highlights": ["Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march.", "Men of the year 2014 by Time magazine"]
+      "startDate": "2022-07-14",
+      "endDate": "2022-07-17",
+      "summary": "Invited lecturer for years 2022, 2023, 2024. Delivered engaging and accessible presentations to high school students on STEM topics, including the SIR model for disease transmission, fundamentals of Computational Fluid Dynamics, and principles of structural mechanics.",
+      "highlights": ["SIR dicease transmission model", "Computational Fluid Dynamics", "Structural Mechanics"]
     }
   ],
   "education": [
     {
       "institution": "University of Cambridge",
-      "location": "Cambridge, United Kingdom",
+      "location": "Cambridge, UK",
       "url": "https://www.cam.ac.uk",
       "area": "Aerospace Engineering and Mechanical Engineering",
       "studyType": "MEng",
@@ -88,18 +88,18 @@
       "date": "2024-03-18",
       "awarder": "The University of Hong Kong",
       "url": "https://scholar.aas.hku.hk/?action=showonesscheme&ss_id=725",
-      "summary": "Two scholarships of the value of HK$20,000 each shall be awarded annually to two undergraduate students (one Year 2 and one Year 3) following the B.Eng. degree curriculum in Mechanical Engineering, on the basis of academic merit as shown in the B.Eng. Degree Examinations."
-    },
-    {
-      "title": "Dean's Honours List 2021-2022",
-      "date": "2023-09-15",
-      "awarder": "Faculty of Engineering at The University of Hong Kong",
-      "url": "https://engg.hku.hk",
-      "summary": "Merit-based Award."
+      "summary": "Two scholarships shall be awarded annually to two undergraduate students (one Year 2 and one Year 3) following the B.Eng. degree curriculum in Mechanical Engineering, on the basis of academic merit as shown in the B.Eng. Degree Examinations."
     }, 
     {
       "title": "Dean's Honours List 2022-2023",
       "date": "2024-03-12",
+      "awarder": "Faculty of Engineering at The University of Hong Kong",
+      "url": "https://engg.hku.hk",
+      "summary": "Merit-based Award."
+    },
+    {
+      "title": "Dean's Honours List 2021-2022",
+      "date": "2023-09-15",
       "awarder": "Faculty of Engineering at The University of Hong Kong",
       "url": "https://engg.hku.hk",
       "summary": "Merit-based Award."
