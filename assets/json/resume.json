@@ -183,7 +183,7 @@
     {
       "name": "Autonomous Robot Design, Build and Compete",
       "summary": "Team project to design, build and test an autonomous robot. I did C++ programming and soldering with Arduino.",
-      "highlights": ["Arduino Programming, "Electronics Design and Soldering"],
+      "highlights": ["Arduino Programming", "Electronics Design and Soldering"],
       "startDate": "2024-01-18",
       "endDate": "2024-02-14",
       "url": "https://github.com/hylucalin/IDP107/releases/tag/Documentationv2"
