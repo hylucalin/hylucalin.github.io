@@ -30,6 +30,24 @@
       "endDate": "2024-09-30",
       "summary": "Led and contributed to individual and team projects focused on the design, simulation, and manufacture of the company's solar UAV and its payload for low-altitude, long-duration atmospheric monitoring.",
       "highlights": ["Computational Fluid Dynamics", "Python-based design tool", "Object-Oriented Programming", "SolidWorks"]
+    },
+    {
+      "name": "HKU Weather Drone Design",
+      "position": "Research Assistant",
+      "url": "https://mech.hku.hk/academic-staff/li-ch",
+      "startDate": "2023-07-01",
+      "endDate": "2023-09-30",
+      "summary": "Collaborated with Prof. Chun-Ho LIU (HKU, air pollution lab) on drone application for atmospheric turbulence.",
+      "highlights": ["UAV payload", "Atmosphere Boundary Layer", "Object-Oriented Programming"]
+    },
+    {
+      "name": "HKU Ocean Waves Fluid Dynamics",
+      "position": "Research Helper",
+      "url": "https://www.engineering.hku.hk/bmeengg/staff-members/k-w-chow/",
+      "startDate": "2022-06-25",
+      "endDate": "2022-08-30",
+      "summary": "Worked with Prof. K.W. Chow (HKU) and conducted a study on linear wave behaviour, wave propagation and shallow water and deep water waves",
+      "highlights": ["Delft3D", "Computational Fluid Dynamics", "surface waves"]
     }
   ],
   "volunteer": [
