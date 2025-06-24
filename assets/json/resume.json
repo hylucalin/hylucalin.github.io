@@ -191,6 +191,16 @@
       ]
     }
   ],
+  "projects": [
+    {
+      "name": "Autonomous Robot Design, Build and Compete",
+      "summary": "Team project to design, build and test an autonomous robot. I did C++ programming and soldering with Arduino.",
+      "highlights": ["Arduino Programming", "Electronics Design and Soldering"],
+      "startDate": "2024-01-18",
+      "endDate": "2024-02-14",
+      "url": "https://github.com/hylucalin/IDP107/releases/tag/Documentationv2"
+    }
+  ],
   "references": [
     {
       "name": "Dr Jurgen Becque",
@@ -201,16 +211,6 @@
       "name": "Prof. K.W. Chow",
       "icon": "fa-solid fa-thumbtack",
       "reference": "Faculty of Engineering, The University of Hong Kong, kwchow@hku.hk"
-    }
-  ],
-  "projects": [
-    {
-      "name": "Autonomous Robot Design, Build and Compete",
-      "summary": "Team project to design, build and test an autonomous robot. I did C++ programming and soldering with Arduino.",
-      "highlights": ["Arduino Programming", "Electronics Design and Soldering"],
-      "startDate": "2024-01-18",
-      "endDate": "2024-02-14",
-      "url": "https://github.com/hylucalin/IDP107/releases/tag/Documentationv2"
     }
   ]
 }
