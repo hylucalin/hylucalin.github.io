@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Cloud-bow LUT Explorer
-description: Interactive web app to explore the P12 (RGB) cloud-bow/glory LUT over (r_eff, v_eff).
-img: assets/img/cloudbow_lut_thumb.png
+title: Simulated Light Polarisation Signal from Water Droplet Scattering
+description: Explore the P12 component of the phase scattering matrix as (r_eff, v_eff) is varied.
+img: assets/img/project_thumbnails/cloudbow_lut_thumb.png
 importance: 0
 category: work
 ---
