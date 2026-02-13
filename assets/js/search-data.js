@@ -423,9 +423,9 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-cloud-bow-lut-explorer",
-          title: 'Cloud-bow LUT Explorer',
-          description: "Interactive web app to explore the P12 (RGB) cloud-bow/glory LUT over (r_eff, v_eff).",
+          section: "News",},{id: "projects-simulated-light-polarisation-signal-from-water-droplet-scattering",
+          title: 'Simulated Light Polarisation Signal from Water Droplet Scattering',
+          description: "Explore the P12 component of the phase scattering matrix as (r_eff, v_eff) is varied.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/10_cloudbow_lut/";
             },},{id: "projects-project-1",
