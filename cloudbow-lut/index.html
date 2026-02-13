@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cloud-bow LUT Explorer</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Cloud-bow LUT Explorer</h1>
+      <p class="sub">
+        Interactive viewer for P12 (RGB) LUT over (r<sub>eff</sub>, v<sub>eff</sub>) with Hansen gamma DSD.
+      </p>
+    </div>
+    <div class="topbar-right">
+      <button id="btnLoadSmall" class="btn">Load Small</button>
+      <button id="btnLoadFull" class="btn">Load Full</button>
+      <a id="downloadH5" class="btn ghost" href="data/p12_rgb_lut.h5" download>Download .h5</a>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Left: selector -->
+    <section class="panel">
+      <div class="panel-title">Selector (r<sub>eff</sub>, v<sub>eff</sub>)</div>
+      <canvas id="canvasSel" width="520" height="380"></canvas>
+
+      <div class="row">
+        <label>r<sub>eff</sub> (µm)</label>
+        <input id="inputReff" type="number" step="0.0001"/>
+        <label>v<sub>eff</sub></label>
+        <input id="inputVeff" type="number" step="0.0001"/>
+      </div>
+
+      <div class="row toggles">
+        <label><input id="toggleLogX" type="checkbox" checked/> log x-axis</label>
+        <label><input id="toggleLogInterp" type="checkbox" checked/> log x-interp</label>
+        <label><input id="toggleMulti" type="checkbox"/> multi DSD</label>
+        <button id="btnClear" class="btn danger">Clear</button>
+      </div>
+
+      <div class="hint">
+        Drag the dot or click to pick a new point. In <b>multi DSD</b> mode, clicks/text-entry pin curves (with matching colours in P12).
+      </div>
+    </section>
+
+    <!-- Middle: DSD -->
+    <section class="panel">
+      <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
+      <canvas id="canvasDSD" width="520" height="380"></canvas>
+      <div class="legend" id="legendDSD"></div>
+    </section>
+
+    <!-- Right: P12 -->
+    <section class="panel">
+      <div class="panel-title">
+        P12 LUT (interpolated)
+        <span class="chip" id="chipInterp">interp: log(reff)</span>
+      </div>
+
+      <div class="row channels">
+        <button class="btn channel active" data-ch="1" id="btnG">Green</button>
+        <button class="btn channel" data-ch="0" id="btnR">Red</button>
+        <button class="btn channel" data-ch="2" id="btnB">Blue</button>
+      </div>
+
+      <canvas id="canvasP12" width="520" height="380"></canvas>
+      <div class="legend" id="legendP12"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="status">Loading…</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
