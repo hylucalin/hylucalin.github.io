@@ -28,66 +28,76 @@
     </div>
   </header>
 
-  <main class="grid">
-    <!-- Left: selector -->
-    <section class="panel">
-      <div class="panel-title">Selector (r_eff, v_eff)</div>
-      <canvas id="canvasSel" width="520" height="260"></canvas>
+  <main class="grid" id="panelGrid">
+    <div class="panel-row" data-row="0">
+      <!-- Left: selector -->
+      <section class="panel">
+        <div class="panel-title">Selector (r_eff, v_eff)</div>
+        <canvas id="canvasSel" width="520" height="260"></canvas>
 
-      <div class="row">
-        <label>r<sub>eff</sub> (µm)</label>
-        <input id="inputReff" type="number" step="0.0001"/>
-        <label>v<sub>eff</sub></label>
-        <input id="inputVeff" type="number" step="0.0001"/>
+        <div class="row">
+          <label>r<sub>eff</sub> (µm)</label>
+          <input id="inputReff" type="number" step="0.0001"/>
+          <label>v<sub>eff</sub></label>
+          <input id="inputVeff" type="number" step="0.0001"/>
+        </div>
+
+        <div class="row toggles">
+          <label><input id="toggleLogX" type="checkbox" checked/> log x-axis</label>
+          <label><input id="toggleLogInterp" type="checkbox" checked/> log x-interp</label>
+          <label><input id="toggleMulti" type="checkbox"/> multi DSD</label>
+          <button id="btnClear" class="btn danger">Clear</button>
+        </div>
+
+        <div class="hint">
+          Drag the current dot to preview a new point. In <b>multi DSD</b> mode, click empty selector space to pin a curve; pinned points can be dragged.
+        </div>
+      </section>
+
+      <div class="col-resizer" data-row="0" title="Drag to resize columns"></div>
+
+      <!-- Middle: DSD -->
+      <section class="panel">
+        <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
+        <canvas id="canvasDSD" width="520" height="260"></canvas>
+        <div class="legend" id="legendDSD"></div>
+      </section>
+    </div>
+
+    <div class="row-resizer" title="Drag to resize rows"></div>
+
+    <div class="panel-row" data-row="1">
+      <!-- Right: P12 -->
+      <section class="panel">
+        <div class="panel-title">
+          P12 LUT (interpolated)
+          <span class="chip" id="chipInterp">interp: log(reff)</span>
+        </div>
+
+        <div class="row channels">
+          <button class="btn channel active" data-ch="1" id="btnG">Green</button>
+          <button class="btn channel" data-ch="0" id="btnR">Red</button>
+          <button class="btn channel" data-ch="2" id="btnB">Blue</button>
+        </div>
+
+        <canvas id="canvasP12" width="520" height="260"></canvas>
+        <div class="legend" id="legendP12"></div>
+      </section>
+
+      <div class="col-resizer" data-row="1" title="Drag to resize columns"></div>
+
+      <!-- Bottom-right: DSD visualisation -->
+      <section class="panel">
+        <div class="panel-title">
+          DSD bubble preview
+          <span class="chip" id="chipBubbleMode">single DSD</span>
+        </div>
+        <canvas id="canvasBubbles" width="520" height="260"></canvas>
+        <div class="hint">
+          Bubble area follows absolute droplet radius on a fixed LUT scale. This preview is disabled in multi-DSD mode.
+        </div>
+      </section>
       </div>
-
-      <div class="row toggles">
-        <label><input id="toggleLogX" type="checkbox" checked/> log x-axis</label>
-        <label><input id="toggleLogInterp" type="checkbox" checked/> log x-interp</label>
-        <label><input id="toggleMulti" type="checkbox"/> multi DSD</label>
-        <button id="btnClear" class="btn danger">Clear</button>
-      </div>
-
-      <div class="hint">
-        Drag the current dot to preview a new point. In <b>multi DSD</b> mode, click empty selector space to pin a curve; pinned points can be dragged.
-      </div>
-    </section>
-
-    <!-- Middle: DSD -->
-    <section class="panel">
-      <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
-      <canvas id="canvasDSD" width="520" height="260"></canvas>
-      <div class="legend" id="legendDSD"></div>
-    </section>
-
-    <!-- Right: P12 -->
-    <section class="panel">
-      <div class="panel-title">
-        P12 LUT (interpolated)
-        <span class="chip" id="chipInterp">interp: log(reff)</span>
-      </div>
-
-      <div class="row channels">
-        <button class="btn channel active" data-ch="1" id="btnG">Green</button>
-        <button class="btn channel" data-ch="0" id="btnR">Red</button>
-        <button class="btn channel" data-ch="2" id="btnB">Blue</button>
-      </div>
-
-      <canvas id="canvasP12" width="520" height="260"></canvas>
-      <div class="legend" id="legendP12"></div>
-    </section>
-
-    <!-- Bottom-right: DSD visualisation -->
-    <section class="panel">
-      <div class="panel-title">
-        DSD bubble preview
-        <span class="chip" id="chipBubbleMode">single DSD</span>
-      </div>
-      <canvas id="canvasBubbles" width="520" height="260"></canvas>
-      <div class="hint">
-        Bubble area follows the selected droplet radius. This preview is disabled in multi-DSD mode.
-      </div>
-    </section>
   </main>
 
   <footer class="footer">

@@ -40,6 +40,15 @@ const palette = [
 ];
 const currentColor = "#ff7a45";
 let bubbleAnimationTimer = null;
+let bubbleParticles = [];
+let bubbleSignature = "";
+let bubbleLastTime = 0;
+
+const layoutState = {
+  colRatios: [0.5, 0.5],
+  rowRatio: 0.5,
+  userRowRatio: null,
+};
 
 function clamp(x, lo, hi){ return Math.min(Math.max(x, lo), hi); }
 
@@ -588,6 +597,132 @@ function sampleRadiusFromDSD(dsd, q){
   return dsd.r[dsd.r.length - 1];
 }
 
+function currentBubbleSignature(){
+  if (!state.loaded || !state.reffArr || !state.veffArr) return "unloaded";
+  return [
+    state.multi ? "multi" : "single",
+    state.name,
+    state.reff.toFixed(3),
+    state.veff.toFixed(4),
+    document.getElementById("canvasBubbles")?.width || 0,
+    document.getElementById("canvasBubbles")?.height || 0,
+  ].join("|");
+}
+
+function bubbleScaleBounds(){
+  if (!state.reffArr || !state.veffArr) return {minR: 1, maxR: 40};
+  const minReff = state.reffArr[0];
+  const maxReff = state.reffArr[state.reffArr.length - 1];
+  const maxVeff = state.veffArr[state.veffArr.length - 1];
+  const maxStd = maxReff * Math.sqrt(maxVeff);
+  return {
+    minR: Math.max(1e-6, minReff * 0.18),
+    maxR: Math.max(minReff, maxReff + 4 * maxStd),
+  };
+}
+
+function radiusToBubblePx(radius, w, h){
+  const {minR, maxR} = bubbleScaleBounds();
+  const minBubble = Math.max(1.8, Math.min(w, h) * 0.010);
+  const maxBubble = Math.max(8, Math.min(w, h) * 0.078);
+  const t = clamp((radius - minR) / (maxR - minR + 1e-30), 0, 1);
+  return minBubble + Math.sqrt(t) * (maxBubble - minBubble);
+}
+
+function rebuildBubbleParticles(w, h){
+  const dsd = hansenDSD(state.reff, state.veff, 500);
+  const droplets = 88;
+  const marginTop = 42;
+  bubbleParticles = [];
+
+  for (let i=0;i<droplets;i++){
+    const q = (i + 0.5) / droplets;
+    const radius = sampleRadiusFromDSD(dsd, q);
+    const bubbleR = radiusToBubblePx(radius, w, h);
+    bubbleParticles.push({
+      q,
+      radius,
+      baseR: bubbleR,
+      r: bubbleR,
+      x: clamp(24 + pseudoRandom(i) * (w - 48), bubbleR + 16, w - bubbleR - 16),
+      y: clamp(marginTop + pseudoRandom(i + 1000) * (h - marginTop - 18), bubbleR + marginTop, h - bubbleR - 16),
+      vx: (pseudoRandom(i + 2000) - 0.5) * 0.4,
+      vy: (pseudoRandom(i + 3000) - 0.5) * 0.4,
+      phase: pseudoRandom(i + 4000) * Math.PI * 2,
+      alpha: 0.22 + 0.30 * pseudoRandom(i + 5000),
+    });
+  }
+}
+
+function stepBubbleParticles(dt, tSec, w, h){
+  const marginTop = 42;
+  const damping = Math.pow(0.16, dt);
+  const repulsion = 54;
+  const spring = 1.35;
+
+  for (let i=0;i<bubbleParticles.length;i++){
+    const p = bubbleParticles[i];
+    const pulse = 1 + 0.12 * Math.sin(tSec * (0.68 + 0.5 * pseudoRandom(i + 6000)) + p.phase);
+    p.r += (p.baseR * pulse - p.r) * Math.min(1, dt * 4.5);
+    p.vx += Math.sin(tSec * (0.22 + pseudoRandom(i + 7000) * 0.22) + p.phase) * dt * 1.4;
+    p.vy += Math.cos(tSec * (0.20 + pseudoRandom(i + 8000) * 0.22) + p.phase * 0.7) * dt * 1.2;
+  }
+
+  for (let i=0;i<bubbleParticles.length;i++){
+    const a = bubbleParticles[i];
+    for (let j=i+1;j<bubbleParticles.length;j++){
+      const b = bubbleParticles[j];
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist = Math.hypot(dx, dy);
+      const minDist = a.r + b.r + 2.0;
+      if (dist < 1e-6){
+        const ang = pseudoRandom(i * 101 + j) * Math.PI * 2;
+        dx = Math.cos(ang);
+        dy = Math.sin(ang);
+        dist = 1;
+      }
+      if (dist < minDist){
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDist - dist;
+        const force = overlap * repulsion * dt;
+        a.vx -= nx * force;
+        a.vy -= ny * force;
+        b.vx += nx * force;
+        b.vy += ny * force;
+
+        const correction = overlap * 0.18;
+        a.x -= nx * correction;
+        a.y -= ny * correction;
+        b.x += nx * correction;
+        b.y += ny * correction;
+      }
+    }
+  }
+
+  for (let i=0;i<bubbleParticles.length;i++){
+    const p = bubbleParticles[i];
+    const targetX = 24 + pseudoRandom(i) * (w - 48);
+    const targetY = marginTop + pseudoRandom(i + 1000) * (h - marginTop - 18);
+    p.vx += (targetX - p.x) * spring * dt;
+    p.vy += (targetY - p.y) * spring * dt;
+    p.vx *= damping;
+    p.vy *= damping;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+
+    const left = 16 + p.r;
+    const right = w - 16 - p.r;
+    const top = marginTop + p.r;
+    const bottom = h - 16 - p.r;
+    if (p.x < left){ p.x = left; p.vx = Math.abs(p.vx) * 0.35; }
+    if (p.x > right){ p.x = right; p.vx = -Math.abs(p.vx) * 0.35; }
+    if (p.y < top){ p.y = top; p.vy = Math.abs(p.vy) * 0.35; }
+    if (p.y > bottom){ p.y = bottom; p.vy = -Math.abs(p.vy) * 0.35; }
+  }
+}
+
 function drawBubbleDSD(timeMs=0){
   const canvas = document.getElementById("canvasBubbles");
   const ctx = canvas.getContext("2d");
@@ -611,31 +746,27 @@ function drawBubbleDSD(timeMs=0){
     return;
   }
 
-  const dsd = hansenDSD(state.reff, state.veff, 500);
-  const droplets = 88;
-  const maxRadius = Math.max(1e-6, dsd.r[dsd.r.length - 1]);
-  const minBubble = 2.3;
-  const maxBubble = 18;
+  const signature = currentBubbleSignature();
+  if (signature !== bubbleSignature){
+    bubbleSignature = signature;
+    bubbleLastTime = timeMs;
+    rebuildBubbleParticles(w, h);
+  }
+  const dt = clamp((timeMs - bubbleLastTime) / 1000, 0.016, 0.08);
+  bubbleLastTime = timeMs;
+  stepBubbleParticles(dt, tSec, w, h);
 
   ctx.save();
   ctx.fillStyle = theme.muted;
   ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto";
   ctx.fillText(`single DSD: r_eff=${fmt(state.reff,2)} µm, v_eff=${fmt(state.veff,2)}`, 18, 24);
+  ctx.fillText("fixed LUT radius scale", 18, 39);
 
-  for (let i=0;i<droplets;i++){
-    const q = (i + 0.5) / droplets;
-    const radius = sampleRadiusFromDSD(dsd, q);
-    const baseR = minBubble + Math.sqrt(radius / maxRadius) * (maxBubble - minBubble);
-    const phase = pseudoRandom(i + 3000) * Math.PI * 2;
-    const pulse = 1 + 0.18 * Math.sin(tSec * (0.75 + 0.7 * pseudoRandom(i + 4000)) + phase);
-    const bubbleR = Math.max(1.4, baseR * pulse);
-    const baseX = 30 + pseudoRandom(i) * (w - 60);
-    const baseY = 48 + pseudoRandom(i + 1000) * (h - 78);
-    const driftX = 5.5 * Math.sin(tSec * (0.28 + pseudoRandom(i + 5000) * 0.32) + phase);
-    const driftY = 4.5 * Math.cos(tSec * (0.24 + pseudoRandom(i + 6000) * 0.30) + phase * 0.7);
-    const x = clamp(baseX + driftX, 20 + bubbleR, w - 20 - bubbleR);
-    const y = clamp(baseY + driftY, 40 + bubbleR, h - 18 - bubbleR);
-    const alpha = 0.22 + 0.30 * pseudoRandom(i + 2000);
+  for (const p of bubbleParticles){
+    const bubbleR = p.r;
+    const x = p.x;
+    const y = p.y;
+    const alpha = p.alpha;
     const glow = ctx.createRadialGradient(x - bubbleR*0.35, y - bubbleR*0.35, bubbleR*0.15, x, y, bubbleR);
     glow.addColorStop(0, `rgba(255, 255, 255, ${0.24 + alpha * 0.3})`);
     glow.addColorStop(0.42, `rgba(38, 152, 186, ${alpha})`);
@@ -656,6 +787,191 @@ function animateBubbleDSD(){
   if (state.loaded){
     drawBubbleDSD(performance.now());
   }
+}
+
+// -------------------- Responsive panel sizing --------------------
+
+function canvasIds(){
+  return ["canvasSel", "canvasDSD", "canvasP12", "canvasBubbles"];
+}
+
+function panelChromeHeight(panel, canvas){
+  let used = 22;
+  for (const child of panel.children){
+    if (child === canvas) continue;
+    used += child.getBoundingClientRect().height;
+  }
+  return used;
+}
+
+function autoCanvasHeights(){
+  const grid = document.getElementById("panelGrid");
+  if (!grid) return [260, 260];
+  const gridTop = grid.getBoundingClientRect().top;
+  const footer = document.querySelector(".footer");
+  const footerH = footer ? footer.getBoundingClientRect().height : 0;
+  const available = Math.max(360, window.innerHeight - gridTop - footerH - 36);
+  const topShare = layoutState.userRowRatio ?? layoutState.rowRatio;
+  const rowGap = 24;
+  return [
+    clamp((available - rowGap) * topShare, 190, 360),
+    clamp((available - rowGap) * (1 - topShare), 190, 360),
+  ];
+}
+
+function resizeCanvasBackings(){
+  const rowHeights = autoCanvasHeights();
+  let changed = false;
+
+  for (const id of canvasIds()){
+    const canvas = document.getElementById(id);
+    if (!canvas) continue;
+    const panel = canvas.closest(".panel");
+    const row = canvas.closest(".panel-row");
+    const rowIndex = row ? Number(row.dataset.row || 0) : 0;
+    const rect = canvas.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const cssW = clamp(Math.round(rect.width || panelRect.width - 22), 280, 920);
+    const autoH = Math.round(rowHeights[rowIndex] - panelChromeHeight(panel, canvas));
+    const aspectH = Math.round(cssW * 0.50);
+    const cssH = clamp(Math.min(aspectH, autoH), 180, 340);
+    const nextW = cssW;
+    const nextH = cssH;
+
+    canvas.style.height = `${cssH}px`;
+    if (canvas.width !== nextW || canvas.height !== nextH){
+      canvas.width = nextW;
+      canvas.height = nextH;
+      changed = true;
+    }
+  }
+
+  if (changed){
+    bubbleSignature = "";
+  }
+  return changed;
+}
+
+function scheduleResizeRedraw(){
+  resizeCanvasBackings();
+  redrawAll();
+}
+
+function applyColumnRatios(){
+  document.querySelectorAll(".panel-row").forEach((row)=>{
+    const index = Number(row.dataset.row || 0);
+    row.style.setProperty("--left", `${layoutState.colRatios[index] * 100}%`);
+  });
+}
+
+function setupPanelResize(){
+  applyColumnRatios();
+  const observer = new ResizeObserver(()=>scheduleResizeRedraw());
+  const grid = document.getElementById("panelGrid");
+  if (grid) observer.observe(grid);
+
+  function setColumnFromClientX(row, rowIndex, clientX){
+    const rowRect = row.getBoundingClientRect();
+    const ratio = clamp((clientX - rowRect.left) / rowRect.width, 0.32, 0.68);
+    layoutState.colRatios[rowIndex] = ratio;
+    applyColumnRatios();
+    scheduleResizeRedraw();
+  }
+
+  function setRowsFromClientY(clientY){
+    const gridRect = document.getElementById("panelGrid").getBoundingClientRect();
+    layoutState.userRowRatio = clamp((clientY - gridRect.top) / gridRect.height, 0.38, 0.62);
+    scheduleResizeRedraw();
+  }
+
+  document.querySelectorAll(".col-resizer").forEach((handle)=>{
+    handle.addEventListener("pointerdown", (event)=>{
+      const row = handle.closest(".panel-row");
+      const rowIndex = Number(handle.dataset.row || 0);
+      document.body.classList.add("resizing");
+      handle.setPointerCapture(event.pointerId);
+
+      function move(moveEvent){
+        setColumnFromClientX(row, rowIndex, moveEvent.clientX);
+      }
+
+      function end(){
+        document.body.classList.remove("resizing");
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", end);
+        handle.removeEventListener("pointercancel", end);
+      }
+
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", end);
+      handle.addEventListener("pointercancel", end);
+      event.preventDefault();
+    });
+
+    handle.addEventListener("mousedown", (event)=>{
+      const row = handle.closest(".panel-row");
+      const rowIndex = Number(handle.dataset.row || 0);
+      document.body.classList.add("resizing");
+
+      function move(moveEvent){
+        setColumnFromClientX(row, rowIndex, moveEvent.clientX);
+      }
+
+      function end(){
+        document.body.classList.remove("resizing");
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", end);
+      }
+
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", end);
+      event.preventDefault();
+    });
+  });
+
+  const rowHandle = document.querySelector(".row-resizer");
+  if (rowHandle){
+    rowHandle.addEventListener("pointerdown", (event)=>{
+      document.body.classList.add("resizing");
+      rowHandle.setPointerCapture(event.pointerId);
+
+      function move(moveEvent){
+        setRowsFromClientY(moveEvent.clientY);
+      }
+
+      function end(){
+        document.body.classList.remove("resizing");
+        rowHandle.removeEventListener("pointermove", move);
+        rowHandle.removeEventListener("pointerup", end);
+        rowHandle.removeEventListener("pointercancel", end);
+      }
+
+      rowHandle.addEventListener("pointermove", move);
+      rowHandle.addEventListener("pointerup", end);
+      rowHandle.addEventListener("pointercancel", end);
+      event.preventDefault();
+    });
+
+    rowHandle.addEventListener("mousedown", (event)=>{
+      document.body.classList.add("resizing");
+
+      function move(moveEvent){
+        setRowsFromClientY(moveEvent.clientY);
+      }
+
+      function end(){
+        document.body.classList.remove("resizing");
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", end);
+      }
+
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", end);
+      event.preventDefault();
+    });
+  }
+
+  window.addEventListener("resize", scheduleResizeRedraw);
 }
 
 // -------------------- UI / Interaction --------------------
@@ -874,6 +1190,7 @@ async function loadLUT(kind="small"){
     // reset pinned if switching datasets
     state.pinned = [];
     updateInputs();
+    resizeCanvasBackings();
     redrawAll();
 
     const sizeMB = (arr.byteLength / (1024*1024)).toFixed(2);
@@ -888,6 +1205,7 @@ function init(){
   applyTheme();
   setupControls();
   setupSelectorEvents();
+  setupPanelResize();
   loadLUT("small");
   if (bubbleAnimationTimer === null){
     bubbleAnimationTimer = window.setInterval(animateBubbleDSD, 90);
