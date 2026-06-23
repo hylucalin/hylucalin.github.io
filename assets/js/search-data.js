@@ -17,7 +17,7 @@ ninja.data = [{
             window.location.href = "/blog/";
           },
         },{id: "nav-projects",
-          title: "projects",
+          title: "Projects",
           description: "A growing collection of my projects.",
           section: "Navigation",
           handler: () => {
@@ -44,7 +44,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/external_links/";
               },
-            },{id: "books-the-godfather",
+            },{id: "post-cues-funded-atmospheric-profiling-drone",
+        
+          title: "CUES-funded Atmospheric Profiling Drone",
+        
+        description: "The basic sensing idea behind my CUES-funded atmospheric profiling drone logger.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/atmospheric-profiling-drone/";
+          
+        },
+      },{id: "books-the-godfather",
           title: 'The Godfather',
           description: "",
           section: "Books",handler: () => {
@@ -65,6 +76,11 @@ ninja.data = [{
           description: "Interactive lookup-table viewer for how cloud droplet size distributions shape the P12 cloudbow signal.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/10_cloudbow_lut/";
+            },},{id: "projects-atmospheric-profiling-drone-logger",
+          title: 'Atmospheric Profiling Drone Logger',
+          description: "A CUES-sponsored personal drone payload for measuring near-ground temperature, humidity, and wind profiles.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/11_atmospheric_profiling_drone/";
             },},{id: "projects-project-1",
           title: 'project 1',
           description: "with background image",
