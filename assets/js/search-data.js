@@ -82,9 +82,9 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-simulated-light-polarisation-signal-from-water-droplet-scattering",
-          title: 'Simulated Light Polarisation Signal from Water Droplet Scattering',
-          description: "Explore the P12 component of the phase scattering matrix as (r_eff, v_eff) is varied.",
+          section: "News",},{id: "projects-scattered-light-39-s-polarisation-variation-due-to-changing-droplet-sizes",
+          title: 'Scattered Light&amp;#39;s Polarisation Variation Due to Changing Droplet Sizes',
+          description: "Explore the P12 component of the phase scattering matrix as droplet size distribution is varied.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/10_cloudbow_lut/";
             },},{id: "projects-project-1",
