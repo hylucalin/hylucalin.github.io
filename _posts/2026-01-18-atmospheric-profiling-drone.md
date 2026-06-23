@@ -1,7 +1,7 @@
 ---
 layout: post
 title: CUES-funded Atmospheric Profiling Drone
-date: 2026-06-23 12:00:00
+date: 2026-01-18 12:00:00
 description: The basic sensing idea behind my CUES-funded atmospheric profiling drone logger.
 tags: drones atmospheric-science sensors esp32 cues
 categories: personal-projects
