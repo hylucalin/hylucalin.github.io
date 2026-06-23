@@ -38,6 +38,7 @@ const palette = [
   "#8ab4ff", "#ff9b9b", "#88ffb8", "#ffd36e", "#c1a3ff",
   "#7ef3ff", "#ff86df", "#b4ff7a", "#ffa86a", "#a0d0ff",
 ];
+const currentColor = "#ff7a45";
 
 function clamp(x, lo, hi){ return Math.min(Math.max(x, lo), hi); }
 
@@ -361,7 +362,7 @@ function drawSelector(){
   ctx.beginPath();
   ctx.arc(px, py, 7, 0, 2*Math.PI);
   ctx.stroke();
-  ctx.fillStyle = "#8ab4ff";
+  ctx.fillStyle = currentColor;
   ctx.beginPath();
   ctx.arc(px, py, 5, 0, 2*Math.PI);
   ctx.fill();
@@ -411,7 +412,7 @@ function drawDSD(){
     }
   }
 
-  plotLine(ctx, w, h, pad, r, y, 0, xMax, 0, 1.05, "#8ab4ff", 2.3);
+  plotLine(ctx, w, h, pad, r, y, 0, xMax, 0, 1.05, currentColor, 2.3);
 
   // legends (HTML)
   const legend = document.getElementById("legendDSD");
@@ -423,7 +424,7 @@ function drawDSD(){
     }
   }
   if (items.length){
-    items.push({label:`current reff=${fmt(state.reff,2)} µm, veff=${fmt(state.veff,2)}`, color:"#8ab4ff"});
+    items.push({label:`current reff=${fmt(state.reff,2)} µm, veff=${fmt(state.veff,2)}`, color:currentColor});
   }
   if (items.length){
     for (const it of items){
@@ -462,7 +463,7 @@ function drawP12(){
     }
   }
   const yCur = bilinearP12(state.reff, state.veff, state.channel);
-  series.push({y:yCur, color:"#8ab4ff", label:`current reff=${fmt(state.reff,2)} µm, veff=${fmt(state.veff,2)}`});
+  series.push({y:yCur, color:currentColor, label:`current reff=${fmt(state.reff,2)} µm, veff=${fmt(state.veff,2)}`});
   for (let i=0;i<yCur.length;i++){ yMin = Math.min(yMin, yCur[i]); yMax = Math.max(yMax, yCur[i]); }
 
   // pad y-range a bit
@@ -481,7 +482,7 @@ function drawP12(){
 
   // plot
   for (const s of series){
-    plotLine(ctx, w, h, pad, theta, s.y, xMin, xMax, yMin, yMax, s.color, s.color==="#8ab4ff"?2.3:1.5);
+    plotLine(ctx, w, h, pad, theta, s.y, xMin, xMax, yMin, yMax, s.color, s.color===currentColor?2.3:1.5);
   }
 
   // legends (HTML)
@@ -504,7 +505,7 @@ function drawP12(){
     div.className = "item";
     const sw = document.createElement("span");
     sw.className = "swatch";
-    sw.style.background = "#8ab4ff";
+    sw.style.background = currentColor;
     const sp = document.createElement("span");
     sp.textContent = `current reff=${fmt(state.reff,2)} µm, veff=${fmt(state.veff,2)}`;
     div.appendChild(sw); div.appendChild(sp);
@@ -562,6 +563,9 @@ function setupSelectorEvents(){
   const pad = 46;
   let dragging = false;
   let dragPinnedIndex = -1;
+  let dragCurrent = false;
+  let dragMoved = false;
+  let dragStart = null;
 
   function eventPosition(evt){
     const rect = canvas.getBoundingClientRect();
@@ -587,16 +591,19 @@ function setupSelectorEvents(){
     return best;
   }
 
-  function setFromPosition(x, y, pinOnClick=false){
+  function isCurrentPoint(x, y){
+    const {px, py} = selToPixel(state.reff, state.veff, canvas.width, canvas.height, pad);
+    const d2 = (px-x)*(px-x) + (py-y)*(py-y);
+    return d2 <= 12 * 12;
+  }
+
+  function setFromPosition(x, y){
     const sel = pixelToSel(x, y, canvas.width, canvas.height, pad);
 
     if (dragPinnedIndex >= 0){
       state.pinned[dragPinnedIndex].reff = sel.reff;
       state.pinned[dragPinnedIndex].veff = sel.veff;
     } else {
-      if (pinOnClick && state.multi){
-        pinCurrentSelection();
-      }
       state.reff = sel.reff;
       state.veff = sel.veff;
     }
@@ -608,17 +615,35 @@ function setupSelectorEvents(){
   canvas.addEventListener("mousedown", (e)=>{
     const {x, y} = eventPosition(e);
     dragPinnedIndex = nearestPinnedIndex(x, y);
+    dragCurrent = dragPinnedIndex < 0 && isCurrentPoint(x, y);
+    dragMoved = false;
+    dragStart = {x, y, reff: state.reff, veff: state.veff};
     dragging = true;
-    setFromPosition(x, y, dragPinnedIndex < 0);
+    if (dragPinnedIndex >= 0 || dragCurrent || !state.multi){
+      setFromPosition(x, y);
+    }
   });
   window.addEventListener("mousemove", (e)=>{
     if (!dragging) return;
     const {x, y} = eventPosition(e);
-    setFromPosition(x, y, false);
+    if (dragStart && ((x-dragStart.x)*(x-dragStart.x) + (y-dragStart.y)*(y-dragStart.y)) > 16){
+      dragMoved = true;
+    }
+    if (dragPinnedIndex >= 0 || dragCurrent || !state.multi){
+      setFromPosition(x, y);
+    }
   });
-  window.addEventListener("mouseup", ()=>{
+  window.addEventListener("mouseup", (e)=>{
+    if (dragging && state.multi && dragPinnedIndex < 0 && !dragCurrent && !dragMoved){
+      const {x, y} = eventPosition(e);
+      pinCurrentSelection();
+      setFromPosition(x, y);
+    }
     dragging = false;
     dragPinnedIndex = -1;
+    dragCurrent = false;
+    dragMoved = false;
+    dragStart = null;
   });
 }
 
