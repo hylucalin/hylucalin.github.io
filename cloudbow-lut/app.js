@@ -46,6 +46,9 @@ let bubbleDSDSignature = "";
 let bubbleLastTime = 0;
 let resizeFrame = null;
 
+const MIN_CANVAS_H = 170;
+const MAX_CANVAS_H = 420;
+
 const layoutState = {
   colRatios: [0.5, 0.5],
   rowRatio: 0.5,
@@ -829,7 +832,21 @@ function panelChromeHeight(panel, canvas){
   return used;
 }
 
-function autoCanvasHeights(){
+function rowPanelHeightBounds(row){
+  const panels = [...row.querySelectorAll(".panel")];
+  let minHeight = 0;
+  let maxHeight = 0;
+  for (const panel of panels){
+    const canvas = panel.querySelector("canvas");
+    if (!canvas) continue;
+    const chrome = panelChromeHeight(panel, canvas);
+    minHeight = Math.max(minHeight, chrome + MIN_CANVAS_H);
+    maxHeight = Math.max(maxHeight, chrome + MAX_CANVAS_H);
+  }
+  return {minHeight, maxHeight};
+}
+
+function autoPanelHeights(){
   const grid = document.getElementById("panelGrid");
   if (!grid) return [260, 260];
   const gridTop = grid.getBoundingClientRect().top;
@@ -838,14 +855,18 @@ function autoCanvasHeights(){
   const available = Math.max(360, window.innerHeight - gridTop - footerH - 36);
   const topShare = layoutState.userRowRatio ?? layoutState.rowRatio;
   const rowGap = 24;
+  const rows = [...document.querySelectorAll(".panel-row")];
+  const topBounds = rows[0] ? rowPanelHeightBounds(rows[0]) : {minHeight: 190, maxHeight: 520};
+  const bottomBounds = rows[1] ? rowPanelHeightBounds(rows[1]) : {minHeight: 190, maxHeight: 520};
+
   return [
-    clamp((available - rowGap) * topShare, 190, 360),
-    clamp((available - rowGap) * (1 - topShare), 190, 360),
+    clamp((available - rowGap) * topShare, topBounds.minHeight, topBounds.maxHeight),
+    clamp((available - rowGap) * (1 - topShare), bottomBounds.minHeight, bottomBounds.maxHeight),
   ];
 }
 
 function resizeCanvasBackings(){
-  const rowHeights = autoCanvasHeights();
+  const panelHeights = autoPanelHeights();
   let changed = false;
 
   for (const id of canvasIds()){
@@ -856,8 +877,8 @@ function resizeCanvasBackings(){
     const rowIndex = row ? Number(row.dataset.row || 0) : 0;
     const panelWidth = panel.clientWidth || panel.getBoundingClientRect().width;
     const cssW = clamp(Math.round(panelWidth - 20), 260, 920);
-    const autoH = Math.round(rowHeights[rowIndex] - panelChromeHeight(panel, canvas));
-    const cssH = clamp(autoH, 170, 420);
+    const autoH = Math.round(panelHeights[rowIndex] - panelChromeHeight(panel, canvas));
+    const cssH = clamp(autoH, MIN_CANVAS_H, MAX_CANVAS_H);
     const nextW = cssW;
     const nextH = cssH;
 

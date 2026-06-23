@@ -14,8 +14,8 @@ The atmosphere near the ground is not uniform. Temperature can change rapidly ov
 
 So the design choice was to hang a small logger below the drone. The payload stayed lightweight, recorded data locally, and carried the sensors far enough from the airframe to make the measurements more meaningful.
 
-<div class="row mt-3">
-  <div class="col-sm mt-3 mt-md-0">
+<div class="row mt-3 justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
     {% include figure.liquid loading="eager" path="assets/img/projects/atmospheric-profiling-drone/logger-web.jpg" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
