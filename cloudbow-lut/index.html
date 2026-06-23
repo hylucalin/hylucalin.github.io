@@ -18,7 +18,7 @@
     <div>
       <h1>Cloud-bow LUT Explorer</h1>
       <p class="sub">
-        Interactive viewer for P12 (RGB) LUT over (r<sub>eff</sub>, v<sub>eff</sub>) with Hansen gamma DSD.
+        Interactive viewer for P12 (RGB) LUT over (r_eff, v_eff) with Hansen gamma DSD.
       </p>
     </div>
     <div class="topbar-right">
@@ -32,7 +32,7 @@
     <!-- Left: selector -->
     <section class="panel">
       <div class="panel-title">Selector (r_eff, v_eff)</div>
-      <canvas id="canvasSel" width="520" height="380"></canvas>
+      <canvas id="canvasSel" width="520" height="260"></canvas>
 
       <div class="row">
         <label>r<sub>eff</sub> (µm)</label>
@@ -56,7 +56,7 @@
     <!-- Middle: DSD -->
     <section class="panel">
       <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
-      <canvas id="canvasDSD" width="520" height="380"></canvas>
+      <canvas id="canvasDSD" width="520" height="260"></canvas>
       <div class="legend" id="legendDSD"></div>
     </section>
 
@@ -73,8 +73,20 @@
         <button class="btn channel" data-ch="2" id="btnB">Blue</button>
       </div>
 
-      <canvas id="canvasP12" width="520" height="380"></canvas>
+      <canvas id="canvasP12" width="520" height="260"></canvas>
       <div class="legend" id="legendP12"></div>
+    </section>
+
+    <!-- Bottom-right: DSD visualisation -->
+    <section class="panel">
+      <div class="panel-title">
+        DSD bubble preview
+        <span class="chip" id="chipBubbleMode">single DSD</span>
+      </div>
+      <canvas id="canvasBubbles" width="520" height="260"></canvas>
+      <div class="hint">
+        Bubble area follows the selected droplet radius. This preview is disabled in multi-DSD mode.
+      </div>
     </section>
   </main>
 
