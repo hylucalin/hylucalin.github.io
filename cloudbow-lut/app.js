@@ -39,6 +39,7 @@ const palette = [
   "#7ef3ff", "#ff86df", "#b4ff7a", "#ffa86a", "#a0d0ff",
 ];
 const currentColor = "#ff7a45";
+let bubbleAnimationTimer = null;
 
 function clamp(x, lo, hi){ return Math.min(Math.max(x, lo), hi); }
 
@@ -163,7 +164,9 @@ function hansenDSD(reff, veff, n=400){
 
 function formatMagnitude(x){
   const ax = Math.abs(x);
+  if (ax < 1e-10) return "0";
   if (ax > 0 && (ax < 0.01 || ax >= 1000)) return x.toExponential(1);
+  if (ax < 0.1) return x.toFixed(3);
   if (ax < 1) return x.toFixed(2);
   if (ax < 10) return x.toFixed(1);
   return x.toFixed(0);
@@ -182,6 +185,33 @@ function niceTicks(min, max, count=5){
     if (v >= min - step*0.5) ticks.push(Number(v.toPrecision(12)));
   }
   return ticks;
+}
+
+function ticksWithZero(min, max, count=5){
+  const ticks = niceTicks(min, max, count);
+  if (min < 0 && max > 0 && !ticks.some((tick)=>Math.abs(tick) < 1e-10)){
+    ticks.push(0);
+    ticks.sort((a,b)=>a-b);
+  }
+  return ticks.map((tick)=>Math.abs(tick) < 1e-10 ? 0 : tick);
+}
+
+function drawXRegion(ctx, w, h, padding, x0, x1, xMin, xMax, color, label){
+  const left = padding + (x0 - xMin) / (xMax - xMin + 1e-30) * (w - 2*padding);
+  const right = padding + (x1 - xMin) / (xMax - xMin + 1e-30) * (w - 2*padding);
+  const x = Math.max(padding, Math.min(left, right));
+  const width = Math.min(w-padding, Math.max(left, right)) - x;
+  if (width <= 0) return;
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.fillRect(x, padding, width, h - 2*padding);
+  ctx.fillStyle = plotTheme().muted;
+  ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText(label, x + width/2, padding + 7);
+  ctx.restore();
 }
 
 function drawAxes(ctx, w, h, padding, xLabel, yLabel, xTicks=[], yTicks=[], xToPx=null, yToPy=null){
@@ -399,7 +429,7 @@ function drawDSD(){
     "r (µm)",
     "n(r) (norm)",
     niceTicks(0, xMax, 5),
-    niceTicks(0, 1.05, 5),
+    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
     (x)=>pad + x / (xMax + 1e-30) * (w - 2*pad),
     (yy)=>(h-pad) - yy / 1.05 * (h - 2*pad)
   );
@@ -469,16 +499,31 @@ function drawP12(){
   // pad y-range a bit
   const padY = 0.06*(yMax - yMin + 1e-9);
   yMin -= padY; yMax += padY;
+  if (Math.abs(yMin) < 1e-10) yMin = 0;
+  if (Math.abs(yMax) < 1e-10) yMax = 0;
   clearCanvas(ctx, w, h);
+  drawXRegion(ctx, w, h, pad, 135, 165, xMin, xMax, "rgba(38, 152, 186, 0.10)", "cloudbow");
+  drawXRegion(ctx, w, h, pad, 170, 180, xMin, xMax, "rgba(255, 122, 69, 0.10)", "glory");
   drawAxes(
     ctx, w, h, pad,
     "θ (deg)",
     "P12",
     niceTicks(xMin, xMax, 5),
-    niceTicks(yMin, yMax, 5),
+    ticksWithZero(yMin, yMax, 5),
     (x)=>pad + (x - xMin) / (xMax - xMin + 1e-30) * (w - 2*pad),
     (y)=>(h-pad) - (y - yMin) / (yMax - yMin + 1e-30) * (h - 2*pad)
   );
+  if (yMin < 0 && yMax > 0){
+    const y0 = (h-pad) - (0 - yMin) / (yMax - yMin + 1e-30) * (h - 2*pad);
+    ctx.save();
+    ctx.strokeStyle = plotTheme().axis;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pad, y0);
+    ctx.lineTo(w-pad, y0);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // plot
   for (const s of series){
@@ -543,11 +588,12 @@ function sampleRadiusFromDSD(dsd, q){
   return dsd.r[dsd.r.length - 1];
 }
 
-function drawBubbleDSD(){
+function drawBubbleDSD(timeMs=0){
   const canvas = document.getElementById("canvasBubbles");
   const ctx = canvas.getContext("2d");
   const w = canvas.width, h = canvas.height;
   const theme = plotTheme();
+  const tSec = timeMs / 1000;
   clearCanvas(ctx, w, h);
 
   const chip = document.getElementById("chipBubbleMode");
@@ -566,7 +612,7 @@ function drawBubbleDSD(){
   }
 
   const dsd = hansenDSD(state.reff, state.veff, 500);
-  const droplets = 95;
+  const droplets = 88;
   const maxRadius = Math.max(1e-6, dsd.r[dsd.r.length - 1]);
   const minBubble = 2.3;
   const maxBubble = 18;
@@ -579,20 +625,37 @@ function drawBubbleDSD(){
   for (let i=0;i<droplets;i++){
     const q = (i + 0.5) / droplets;
     const radius = sampleRadiusFromDSD(dsd, q);
-    const bubbleR = minBubble + Math.sqrt(radius / maxRadius) * (maxBubble - minBubble);
-    const x = 28 + pseudoRandom(i) * (w - 56);
-    const y = 46 + pseudoRandom(i + 1000) * (h - 74);
-    const alpha = 0.26 + 0.34 * pseudoRandom(i + 2000);
+    const baseR = minBubble + Math.sqrt(radius / maxRadius) * (maxBubble - minBubble);
+    const phase = pseudoRandom(i + 3000) * Math.PI * 2;
+    const pulse = 1 + 0.18 * Math.sin(tSec * (0.75 + 0.7 * pseudoRandom(i + 4000)) + phase);
+    const bubbleR = Math.max(1.4, baseR * pulse);
+    const baseX = 30 + pseudoRandom(i) * (w - 60);
+    const baseY = 48 + pseudoRandom(i + 1000) * (h - 78);
+    const driftX = 5.5 * Math.sin(tSec * (0.28 + pseudoRandom(i + 5000) * 0.32) + phase);
+    const driftY = 4.5 * Math.cos(tSec * (0.24 + pseudoRandom(i + 6000) * 0.30) + phase * 0.7);
+    const x = clamp(baseX + driftX, 20 + bubbleR, w - 20 - bubbleR);
+    const y = clamp(baseY + driftY, 40 + bubbleR, h - 18 - bubbleR);
+    const alpha = 0.22 + 0.30 * pseudoRandom(i + 2000);
+    const glow = ctx.createRadialGradient(x - bubbleR*0.35, y - bubbleR*0.35, bubbleR*0.15, x, y, bubbleR);
+    glow.addColorStop(0, `rgba(255, 255, 255, ${0.24 + alpha * 0.3})`);
+    glow.addColorStop(0.42, `rgba(38, 152, 186, ${alpha})`);
+    glow.addColorStop(1, "rgba(38, 152, 186, 0.05)");
 
     ctx.beginPath();
-    ctx.fillStyle = `rgba(38, 152, 186, ${alpha})`;
-    ctx.strokeStyle = "rgba(38, 152, 186, 0.72)";
+    ctx.fillStyle = glow;
+    ctx.strokeStyle = `rgba(38, 152, 186, ${0.45 + alpha * 0.6})`;
     ctx.lineWidth = 1;
     ctx.arc(x, y, bubbleR, 0, 2*Math.PI);
     ctx.fill();
     ctx.stroke();
   }
   ctx.restore();
+}
+
+function animateBubbleDSD(){
+  if (state.loaded){
+    drawBubbleDSD(performance.now());
+  }
 }
 
 // -------------------- UI / Interaction --------------------
@@ -610,7 +673,7 @@ function redrawAll(){
   drawSelector();
   drawDSD();
   drawP12();
-  drawBubbleDSD();
+  drawBubbleDSD(performance.now());
 }
 
 function pinCurrentSelection(){
@@ -826,6 +889,9 @@ function init(){
   setupControls();
   setupSelectorEvents();
   loadLUT("small");
+  if (bubbleAnimationTimer === null){
+    bubbleAnimationTimer = window.setInterval(animateBubbleDSD, 90);
+  }
 }
 
 window.addEventListener("DOMContentLoaded", init);
