@@ -4,6 +4,13 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cloud-bow LUT Explorer</title>
+  <script>
+    const themeSetting = localStorage.getItem("theme") || "system";
+    const theme = themeSetting === "system"
+      ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : themeSetting;
+    document.documentElement.setAttribute("data-theme", theme);
+  </script>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -24,7 +31,7 @@
   <main class="grid">
     <!-- Left: selector -->
     <section class="panel">
-      <div class="panel-title">Selector (r<sub>eff</sub>, v<sub>eff</sub>)</div>
+      <div class="panel-title">Selector (r_eff, v_eff)</div>
       <canvas id="canvasSel" width="520" height="380"></canvas>
 
       <div class="row">
@@ -42,7 +49,7 @@
       </div>
 
       <div class="hint">
-        Drag the dot or click to pick a new point. In <b>multi DSD</b> mode, clicks/text-entry pin curves (with matching colours in P12).
+        Drag the dot or click to pick a new point. In <b>multi DSD</b> mode, clicks/text-entry pin curves (with matching colours in P12); pinned points can be dragged.
       </div>
     </section>
 
