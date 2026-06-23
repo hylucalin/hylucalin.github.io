@@ -4,7 +4,7 @@ title: Simulated Light Polarisation Signal from Water Droplet Scattering
 description: Explore the P12 component of the phase scattering matrix as (r_eff, v_eff) is varied.
 img: assets/img/project_thumbnails/cloudbow_lut_thumb.png
 importance: 0
-category: work
+category: uni
 ---
 
 This project hosts an interactive **Cloud-bow P12 LUT visualiser** (RGB), intended for rapid inspection of lookup tables used in droplet-size retrievals.
