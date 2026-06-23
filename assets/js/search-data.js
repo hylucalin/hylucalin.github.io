@@ -44,7 +44,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/external_links/";
               },
-            },{id: "post-cues-funded-atmospheric-profiling-drone",
+            },{id: "post-dyson-day-outreach-drone-design-and-image-tracking",
+        
+          title: "Dyson Day Outreach: Drone Design and Image Tracking",
+        
+        description: "A brief report on my James Dyson funded outreach activity about drone payload design, sensor trade-offs, and normalised cross correlation.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dyson-day-drone-design-ncc/";
+          
+        },
+      },{id: "post-cues-funded-atmospheric-profiling-drone",
         
           title: "CUES-funded Atmospheric Profiling Drone",
         
