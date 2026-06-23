@@ -56,18 +56,7 @@
 
       <div class="col-resizer" data-row="0" title="Drag to resize columns"></div>
 
-      <!-- Middle: DSD -->
-      <section class="panel">
-        <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
-        <canvas id="canvasDSD" width="520" height="260"></canvas>
-        <div class="legend" id="legendDSD"></div>
-      </section>
-    </div>
-
-    <div class="row-resizer" title="Drag to resize rows"></div>
-
-    <div class="panel-row" data-row="1">
-      <!-- Right: P12 -->
+      <!-- Top-right: P12 -->
       <section class="panel">
         <div class="panel-title">
           P12 LUT (interpolated)
@@ -83,6 +72,17 @@
         <canvas id="canvasP12" width="520" height="260"></canvas>
         <div class="legend" id="legendP12"></div>
       </section>
+    </div>
+
+    <div class="row-resizer" title="Drag to resize rows"></div>
+
+    <div class="panel-row" data-row="1">
+      <!-- Bottom-left: DSD -->
+      <section class="panel">
+        <div class="panel-title">Droplet Size Distribution (normalised max = 1)</div>
+        <canvas id="canvasDSD" width="520" height="260"></canvas>
+        <div class="legend" id="legendDSD"></div>
+      </section>
 
       <div class="col-resizer" data-row="1" title="Drag to resize columns"></div>
 
@@ -97,7 +97,7 @@
           Bubble area follows absolute droplet radius on a fixed LUT scale. This preview is disabled in multi-DSD mode.
         </div>
       </section>
-      </div>
+    </div>
   </main>
 
   <footer class="footer">
