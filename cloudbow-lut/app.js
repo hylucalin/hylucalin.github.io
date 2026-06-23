@@ -42,7 +42,9 @@ const currentColor = "#ff7a45";
 let bubbleAnimationTimer = null;
 let bubbleParticles = [];
 let bubbleSignature = "";
+let bubbleDSDSignature = "";
 let bubbleLastTime = 0;
+let resizeFrame = null;
 
 const layoutState = {
   colRatios: [0.5, 0.5],
@@ -597,16 +599,19 @@ function sampleRadiusFromDSD(dsd, q){
   return dsd.r[dsd.r.length - 1];
 }
 
-function currentBubbleSignature(){
+function currentBubbleLayoutSignature(){
   if (!state.loaded || !state.reffArr || !state.veffArr) return "unloaded";
   return [
     state.multi ? "multi" : "single",
     state.name,
-    state.reff.toFixed(3),
-    state.veff.toFixed(4),
     document.getElementById("canvasBubbles")?.width || 0,
     document.getElementById("canvasBubbles")?.height || 0,
   ].join("|");
+}
+
+function currentBubbleDSDSignature(){
+  if (!state.loaded) return "unloaded";
+  return `${state.name}|${state.reff.toFixed(3)}|${state.veff.toFixed(4)}`;
 }
 
 function bubbleScaleBounds(){
@@ -633,24 +638,39 @@ function rebuildBubbleParticles(w, h){
   const dsd = hansenDSD(state.reff, state.veff, 500);
   const droplets = 88;
   const marginTop = 42;
+  const previous = bubbleParticles;
   bubbleParticles = [];
 
   for (let i=0;i<droplets;i++){
     const q = (i + 0.5) / droplets;
     const radius = sampleRadiusFromDSD(dsd, q);
     const bubbleR = radiusToBubblePx(radius, w, h);
+    const old = previous[i];
     bubbleParticles.push({
       q,
       radius,
       baseR: bubbleR,
-      r: bubbleR,
-      x: clamp(24 + pseudoRandom(i) * (w - 48), bubbleR + 16, w - bubbleR - 16),
-      y: clamp(marginTop + pseudoRandom(i + 1000) * (h - marginTop - 18), bubbleR + marginTop, h - bubbleR - 16),
-      vx: (pseudoRandom(i + 2000) - 0.5) * 0.4,
-      vy: (pseudoRandom(i + 3000) - 0.5) * 0.4,
+      r: old ? Math.min(Math.max(old.r, bubbleR * 0.45), bubbleR * 1.8) : bubbleR,
+      x: old ? clamp(old.x, bubbleR + 16, w - bubbleR - 16) : clamp(24 + pseudoRandom(i) * (w - 48), bubbleR + 16, w - bubbleR - 16),
+      y: old ? clamp(old.y, bubbleR + marginTop, h - bubbleR - 16) : clamp(marginTop + pseudoRandom(i + 1000) * (h - marginTop - 18), bubbleR + marginTop, h - bubbleR - 16),
+      vx: old ? old.vx : (pseudoRandom(i + 2000) - 0.5) * 0.4,
+      vy: old ? old.vy : (pseudoRandom(i + 3000) - 0.5) * 0.4,
       phase: pseudoRandom(i + 4000) * Math.PI * 2,
       alpha: 0.22 + 0.30 * pseudoRandom(i + 5000),
     });
+  }
+}
+
+function updateBubbleTargets(w, h){
+  if (!bubbleParticles.length){
+    rebuildBubbleParticles(w, h);
+    return;
+  }
+
+  const dsd = hansenDSD(state.reff, state.veff, 500);
+  for (const p of bubbleParticles){
+    p.radius = sampleRadiusFromDSD(dsd, p.q);
+    p.baseR = radiusToBubblePx(p.radius, w, h);
   }
 }
 
@@ -746,12 +766,17 @@ function drawBubbleDSD(timeMs=0){
     return;
   }
 
-  const signature = currentBubbleSignature();
-  if (signature !== bubbleSignature){
-    bubbleSignature = signature;
-    bubbleLastTime = timeMs;
+  const layoutSignature = currentBubbleLayoutSignature();
+  if (layoutSignature !== bubbleSignature){
+    bubbleSignature = layoutSignature;
     rebuildBubbleParticles(w, h);
   }
+  const dsdSignature = currentBubbleDSDSignature();
+  if (dsdSignature !== bubbleDSDSignature){
+    bubbleDSDSignature = dsdSignature;
+    updateBubbleTargets(w, h);
+  }
+  if (!bubbleLastTime) bubbleLastTime = timeMs;
   const dt = clamp((timeMs - bubbleLastTime) / 1000, 0.016, 0.08);
   bubbleLastTime = timeMs;
   stepBubbleParticles(dt, tSec, w, h);
@@ -829,12 +854,10 @@ function resizeCanvasBackings(){
     const panel = canvas.closest(".panel");
     const row = canvas.closest(".panel-row");
     const rowIndex = row ? Number(row.dataset.row || 0) : 0;
-    const rect = canvas.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
-    const cssW = clamp(Math.round(rect.width || panelRect.width - 22), 280, 920);
+    const panelWidth = panel.clientWidth || panel.getBoundingClientRect().width;
+    const cssW = clamp(Math.round(panelWidth - 20), 260, 920);
     const autoH = Math.round(rowHeights[rowIndex] - panelChromeHeight(panel, canvas));
-    const aspectH = Math.round(cssW * 0.50);
-    const cssH = clamp(Math.min(aspectH, autoH), 180, 340);
+    const cssH = clamp(autoH, 170, 420);
     const nextW = cssW;
     const nextH = cssH;
 
@@ -853,8 +876,12 @@ function resizeCanvasBackings(){
 }
 
 function scheduleResizeRedraw(){
-  resizeCanvasBackings();
-  redrawAll();
+  if (resizeFrame !== null) return;
+  resizeFrame = requestAnimationFrame(()=>{
+    resizeFrame = null;
+    resizeCanvasBackings();
+    redrawAll();
+  });
 }
 
 function applyColumnRatios(){
