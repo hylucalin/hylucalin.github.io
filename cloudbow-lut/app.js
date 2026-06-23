@@ -45,6 +45,31 @@ function fmt(x, n=4){ return Number(x).toFixed(n); }
 
 function setStatus(msg){ document.getElementById("status").textContent = msg; }
 
+function computedTheme(){
+  const setting = localStorage.getItem("theme") || "system";
+  if (setting === "light" || setting === "dark") return setting;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme", computedTheme());
+}
+
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function plotTheme(){
+  return {
+    bg: cssVar("--plot-bg") || "#ffffff",
+    text: cssVar("--plot-text") || "#222222",
+    muted: cssVar("--plot-muted") || "#666666",
+    axis: cssVar("--plot-axis") || "rgba(0,0,0,0.55)",
+    grid: cssVar("--plot-grid") || "rgba(0,0,0,0.12)",
+    node: cssVar("--plot-node") || "rgba(0,0,0,0.22)",
+  };
+}
+
 function getDataIndex(iR, iV, ch, iT){
   const [R, V, C, T] = state.shape;
   return (((iR*V + iV)*C + ch)*T + iT);
@@ -135,25 +160,82 @@ function hansenDSD(reff, veff, n=400){
 
 // -------------------- Drawing helpers (canvas) --------------------
 
-function drawAxes(ctx, w, h, padding, xLabel, yLabel){
+function formatMagnitude(x){
+  const ax = Math.abs(x);
+  if (ax > 0 && (ax < 0.01 || ax >= 1000)) return x.toExponential(1);
+  if (ax < 1) return x.toFixed(2);
+  if (ax < 10) return x.toFixed(1);
+  return x.toFixed(0);
+}
+
+function niceTicks(min, max, count=5){
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) return [min];
+  const span = max - min;
+  const rawStep = span / Math.max(1, count - 1);
+  const pow10 = Math.pow(10, Math.floor(Math.log10(Math.abs(rawStep))));
+  const err = rawStep / pow10;
+  const step = (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1) * pow10;
+  const start = Math.ceil(min / step) * step;
+  const ticks = [];
+  for (let v=start; v<=max + step*0.5; v+=step){
+    if (v >= min - step*0.5) ticks.push(Number(v.toPrecision(12)));
+  }
+  return ticks;
+}
+
+function drawAxes(ctx, w, h, padding, xLabel, yLabel, xTicks=[], yTicks=[], xToPx=null, yToPy=null){
+  const theme = plotTheme();
   ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.25)";
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.strokeStyle = theme.grid;
+  ctx.fillStyle = theme.muted;
   ctx.lineWidth = 1;
+  ctx.font = "11px system-ui, -apple-system, Segoe UI, Roboto";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  if (xToPx){
+    for (const tick of xTicks){
+      const px = xToPx(tick);
+      ctx.beginPath();
+      ctx.moveTo(px, padding);
+      ctx.lineTo(px, h-padding);
+      ctx.stroke();
+      ctx.fillText(formatMagnitude(tick), px, h-padding+7);
+    }
+  }
+
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  if (yToPy){
+    for (const tick of yTicks){
+      const py = yToPy(tick);
+      ctx.beginPath();
+      ctx.moveTo(padding, py);
+      ctx.lineTo(w-padding, py);
+      ctx.stroke();
+      ctx.fillText(formatMagnitude(tick), padding-7, py);
+    }
+  }
+
+  ctx.strokeStyle = theme.axis;
+  ctx.fillStyle = theme.text;
 
   // axes
   ctx.beginPath();
   ctx.moveTo(padding, h-padding);
   ctx.lineTo(w-padding, h-padding);
-  ctx.lineTo(w-padding, padding);
+  ctx.moveTo(padding, h-padding);
+  ctx.lineTo(padding, padding);
   ctx.stroke();
 
   // labels
   ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillText(xLabel, w/2 - ctx.measureText(xLabel).width/2, h-6);
 
   ctx.save();
-  ctx.translate(10, h/2);
+  ctx.translate(12, h/2);
   ctx.rotate(-Math.PI/2);
   ctx.fillText(yLabel, 0, 0);
   ctx.restore();
@@ -180,7 +262,7 @@ function clearCanvas(ctx, w, h){
   ctx.clearRect(0,0,w,h);
   // fill background
   ctx.save();
-  ctx.fillStyle = "#0a0f18";
+  ctx.fillStyle = plotTheme().bg;
   ctx.fillRect(0,0,w,h);
   ctx.restore();
 }
@@ -225,27 +307,34 @@ function drawSelector(){
 
   clearCanvas(ctx, w, h);
 
-  drawAxes(ctx, w, h, pad, state.logX ? "log reff (µm)" : "reff (µm)", "veff");
+  const rMin = state.reffArr[0], rMax = state.reffArr[state.reffArr.length-1];
+  const vMin = state.veffArr[0], vMax = state.veffArr[state.veffArr.length-1];
+  const xTicks = state.logX
+    ? niceTicks(Math.log(rMin), Math.log(rMax), 5).map(Math.exp)
+    : niceTicks(rMin, rMax, 5);
+  const yTicks = niceTicks(vMin, vMax, 5);
+  drawAxes(
+    ctx, w, h, pad,
+    state.logX ? "log reff (µm)" : "reff (µm)",
+    "veff",
+    xTicks,
+    yTicks,
+    (x)=>selToPixel(x, vMin, w, h, pad).px,
+    (y)=>selToPixel(rMin, y, w, h, pad).py
+  );
 
   // draw grid of permissible nodes lightly
   ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.06)";
-  ctx.lineWidth = 1;
+  ctx.fillStyle = plotTheme().node;
   const rArr = state.reffArr;
   const vArr = state.veffArr;
   for (let i=0;i<rArr.length;i++){
-    const {px} = selToPixel(rArr[i], vArr[0], w, h, pad);
-    ctx.beginPath();
-    ctx.moveTo(px, h-pad);
-    ctx.lineTo(px, pad);
-    ctx.stroke();
-  }
-  for (let j=0;j<vArr.length;j++){
-    const {py} = selToPixel(rArr[0], vArr[j], w, h, pad);
-    ctx.beginPath();
-    ctx.moveTo(pad, py);
-    ctx.lineTo(w-pad, py);
-    ctx.stroke();
+    for (let j=0;j<vArr.length;j++){
+      const {px, py} = selToPixel(rArr[i], vArr[j], w, h, pad);
+      ctx.beginPath();
+      ctx.arc(px, py, 1.4, 0, 2*Math.PI);
+      ctx.fill();
+    }
   }
   ctx.restore();
 
@@ -280,7 +369,7 @@ function drawSelector(){
 
   // status text
   ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.fillStyle = plotTheme().text;
   ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto";
   const msg = `reff=${fmt(state.reff,4)} µm   veff=${fmt(state.veff,4)}`;
   ctx.fillText(msg, pad, pad-14);
@@ -294,20 +383,35 @@ function drawDSD(){
   const ctx = canvas.getContext("2d");
   const w = canvas.width, h = canvas.height;
   const pad = 46;
+  const {r, y} = hansenDSD(state.reff, state.veff);
+  let xMax = r[r.length-1];
+  if (state.multi){
+    for (const p of state.pinned){
+      const dsd = hansenDSD(p.reff, p.veff);
+      xMax = Math.max(xMax, dsd.r[dsd.r.length-1]);
+    }
+  }
 
   clearCanvas(ctx, w, h);
-  drawAxes(ctx, w, h, pad, "r (µm)", "n(r) (norm)");
+  drawAxes(
+    ctx, w, h, pad,
+    "r (µm)",
+    "n(r) (norm)",
+    niceTicks(0, xMax, 5),
+    niceTicks(0, 1.05, 5),
+    (x)=>pad + x / (xMax + 1e-30) * (w - 2*pad),
+    (yy)=>(h-pad) - yy / 1.05 * (h - 2*pad)
+  );
 
   // pinned first (lighter)
   if (state.multi){
     for (const p of state.pinned){
-      const {r, y} = hansenDSD(p.reff, p.veff);
-      plotLine(ctx, w, h, pad, r, y, 0, r[r.length-1], 0, 1.05, p.color, 1.5);
+      const dsd = hansenDSD(p.reff, p.veff);
+      plotLine(ctx, w, h, pad, dsd.r, dsd.y, 0, xMax, 0, 1.05, p.color, 1.5);
     }
   }
 
-  const {r, y} = hansenDSD(state.reff, state.veff);
-  plotLine(ctx, w, h, pad, r, y, 0, r[r.length-1], 0, 1.05, "#8ab4ff", 2.3);
+  plotLine(ctx, w, h, pad, r, y, 0, xMax, 0, 1.05, "#8ab4ff", 2.3);
 
   // legends (HTML)
   const legend = document.getElementById("legendDSD");
@@ -344,20 +448,8 @@ function drawP12(){
   const w = canvas.width, h = canvas.height;
   const pad = 46;
 
-  clearCanvas(ctx, w, h);
-  drawAxes(ctx, w, h, pad, "θ (deg)", "P12");
-
   const theta = state.thetaArr;
   const xMin = theta[0], xMax = theta[theta.length-1];
-
-  // pinned
-  if (state.multi){
-    for (const p of state.pinned){
-      const y = bilinearP12(p.reff, p.veff, state.channel);
-      // y range autoscale: compute min/max from y
-      // We'll plot with a fixed y range based on current + pinned for consistency.
-    }
-  }
 
   // compute y-range
   let yMin = 1e30, yMax = -1e30;
@@ -376,6 +468,16 @@ function drawP12(){
   // pad y-range a bit
   const padY = 0.06*(yMax - yMin + 1e-9);
   yMin -= padY; yMax += padY;
+  clearCanvas(ctx, w, h);
+  drawAxes(
+    ctx, w, h, pad,
+    "θ (deg)",
+    "P12",
+    niceTicks(xMin, xMax, 5),
+    niceTicks(yMin, yMax, 5),
+    (x)=>pad + (x - xMin) / (xMax - xMin + 1e-30) * (w - 2*pad),
+    (y)=>(h-pad) - (y - yMin) / (yMax - yMin + 1e-30) * (h - 2*pad)
+  );
 
   // plot
   for (const s of series){
@@ -459,28 +561,65 @@ function setupSelectorEvents(){
   const canvas = document.getElementById("canvasSel");
   const pad = 46;
   let dragging = false;
+  let dragPinnedIndex = -1;
 
-  function setFromEvent(evt, isClick=false){
+  function eventPosition(evt){
     const rect = canvas.getBoundingClientRect();
-    const x = (evt.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (evt.clientY - rect.top) * (canvas.height / rect.height);
+    return {
+      x: (evt.clientX - rect.left) * (canvas.width / rect.width),
+      y: (evt.clientY - rect.top) * (canvas.height / rect.height),
+    };
+  }
 
+  function nearestPinnedIndex(x, y){
+    if (!state.multi) return -1;
+    let best = -1;
+    let bestDist = 12 * 12;
+    for (let i=0;i<state.pinned.length;i++){
+      const p = state.pinned[i];
+      const {px, py} = selToPixel(p.reff, p.veff, canvas.width, canvas.height, pad);
+      const d2 = (px-x)*(px-x) + (py-y)*(py-y);
+      if (d2 < bestDist){
+        best = i;
+        bestDist = d2;
+      }
+    }
+    return best;
+  }
+
+  function setFromPosition(x, y, pinOnClick=false){
     const sel = pixelToSel(x, y, canvas.width, canvas.height, pad);
 
-    if (isClick && state.multi){
-      pinCurrentSelection();
+    if (dragPinnedIndex >= 0){
+      state.pinned[dragPinnedIndex].reff = sel.reff;
+      state.pinned[dragPinnedIndex].veff = sel.veff;
+    } else {
+      if (pinOnClick && state.multi){
+        pinCurrentSelection();
+      }
+      state.reff = sel.reff;
+      state.veff = sel.veff;
     }
-
-    state.reff = sel.reff;
-    state.veff = sel.veff;
 
     updateInputs();
     redrawAll();
   }
 
-  canvas.addEventListener("mousedown", (e)=>{ dragging=true; setFromEvent(e, true); });
-  window.addEventListener("mousemove", (e)=>{ if(dragging) setFromEvent(e, false); });
-  window.addEventListener("mouseup", ()=>{ dragging=false; });
+  canvas.addEventListener("mousedown", (e)=>{
+    const {x, y} = eventPosition(e);
+    dragPinnedIndex = nearestPinnedIndex(x, y);
+    dragging = true;
+    setFromPosition(x, y, dragPinnedIndex < 0);
+  });
+  window.addEventListener("mousemove", (e)=>{
+    if (!dragging) return;
+    const {x, y} = eventPosition(e);
+    setFromPosition(x, y, false);
+  });
+  window.addEventListener("mouseup", ()=>{
+    dragging = false;
+    dragPinnedIndex = -1;
+  });
 }
 
 function setupControls(){
@@ -578,9 +717,20 @@ async function loadLUT(kind="small"){
 }
 
 function init(){
+  applyTheme();
   setupControls();
   setupSelectorEvents();
   loadLUT("small");
 }
 
 window.addEventListener("DOMContentLoaded", init);
+window.addEventListener("storage", (event)=>{
+  if (event.key === "theme"){
+    applyTheme();
+    redrawAll();
+  }
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{
+  applyTheme();
+  redrawAll();
+});

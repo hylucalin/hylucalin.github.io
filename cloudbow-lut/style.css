@@ -1,13 +1,39 @@
 :root{
-  --bg:#0b0f15;
-  --panel:#121926;
+  color-scheme: light;
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --text:#000000;
+  --muted:#828282;
+  --border:rgba(0,0,0,0.10);
+  --btn:#f7f7f7;
+  --btn2:#eeeeee;
+  --danger:#fff0f0;
+  --chip:#f6edf6;
+  --plot-bg:#ffffff;
+  --plot-text:#000000;
+  --plot-muted:#828282;
+  --plot-axis:rgba(0,0,0,0.55);
+  --plot-grid:rgba(0,0,0,0.14);
+  --plot-node:rgba(0,0,0,0.20);
+}
+
+html[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#1c1c1d;
+  --panel:#212529;
   --text:#e8eefc;
-  --muted:#aab5d0;
-  --border:rgba(255,255,255,0.08);
-  --btn:#1d2a44;
-  --btn2:#203055;
+  --muted:#828282;
+  --border:#424246;
+  --btn:#2c3237;
+  --btn2:#37424b;
   --danger:#5a1e1e;
-  --chip:#2a3a62;
+  --chip:#2c3237;
+  --plot-bg:#212529;
+  --plot-text:#e8eefc;
+  --plot-muted:#aeb6c2;
+  --plot-axis:rgba(232,238,252,0.60);
+  --plot-grid:rgba(232,238,252,0.16);
+  --plot-node:rgba(232,238,252,0.24);
 }
 
 *{box-sizing:border-box}
@@ -60,7 +86,7 @@ canvas{
   width:100%;
   height:auto;
   border-radius:10px;
-  background:#0a0f18;
+  background:var(--plot-bg);
   border:1px solid var(--border);
 }
 
@@ -78,7 +104,7 @@ input[type=number]{
   padding:7px 8px;
   border-radius:10px;
   border:1px solid var(--border);
-  background:#0a0f18;
+  background:var(--plot-bg);
   color:var(--text);
 }
 
@@ -101,7 +127,7 @@ input[type=number]{
 .btn.danger:hover{filter:brightness(1.15)}
 
 .channels .btn{flex:1;justify-content:center}
-.btn.channel.active{outline:2px solid rgba(130,170,255,0.55); background:#2a3a62}
+.btn.channel.active{outline:2px solid rgba(38,152,186,0.55); background:var(--chip)}
 
 .toggles{gap:14px}
 
