@@ -516,6 +516,85 @@ function drawP12(){
   document.getElementById("chipInterp").textContent = `interp: ${state.logInterp ? "log(reff)" : "linear reff"}`;
 }
 
+// -------------------- DSD bubble preview --------------------
+
+function pseudoRandom(i){
+  const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function sampleRadiusFromDSD(dsd, q){
+  let total = 0;
+  for (let i=1;i<dsd.r.length;i++){
+    total += 0.5 * (dsd.y[i-1] + dsd.y[i]) * (dsd.r[i] - dsd.r[i-1]);
+  }
+  if (total <= 0) return dsd.r[Math.floor(dsd.r.length / 2)];
+
+  const target = q * total;
+  let accum = 0;
+  for (let i=1;i<dsd.r.length;i++){
+    const area = 0.5 * (dsd.y[i-1] + dsd.y[i]) * (dsd.r[i] - dsd.r[i-1]);
+    if (accum + area >= target){
+      const t = (target - accum) / (area + 1e-30);
+      return dsd.r[i-1] + clamp(t, 0, 1) * (dsd.r[i] - dsd.r[i-1]);
+    }
+    accum += area;
+  }
+  return dsd.r[dsd.r.length - 1];
+}
+
+function drawBubbleDSD(){
+  const canvas = document.getElementById("canvasBubbles");
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  const theme = plotTheme();
+  clearCanvas(ctx, w, h);
+
+  const chip = document.getElementById("chipBubbleMode");
+  chip.textContent = state.multi ? "multi disabled" : "single DSD";
+
+  if (state.multi){
+    ctx.save();
+    ctx.fillStyle = theme.muted;
+    ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Bubble preview is available in single-DSD mode.", w/2, h/2 - 10);
+    ctx.fillText("Turn off multi DSD to inspect the selected distribution.", w/2, h/2 + 14);
+    ctx.restore();
+    return;
+  }
+
+  const dsd = hansenDSD(state.reff, state.veff, 500);
+  const droplets = 95;
+  const maxRadius = Math.max(1e-6, dsd.r[dsd.r.length - 1]);
+  const minBubble = 2.3;
+  const maxBubble = 18;
+
+  ctx.save();
+  ctx.fillStyle = theme.muted;
+  ctx.font = "12px system-ui, -apple-system, Segoe UI, Roboto";
+  ctx.fillText(`single DSD: r_eff=${fmt(state.reff,2)} µm, v_eff=${fmt(state.veff,2)}`, 18, 24);
+
+  for (let i=0;i<droplets;i++){
+    const q = (i + 0.5) / droplets;
+    const radius = sampleRadiusFromDSD(dsd, q);
+    const bubbleR = minBubble + Math.sqrt(radius / maxRadius) * (maxBubble - minBubble);
+    const x = 28 + pseudoRandom(i) * (w - 56);
+    const y = 46 + pseudoRandom(i + 1000) * (h - 74);
+    const alpha = 0.26 + 0.34 * pseudoRandom(i + 2000);
+
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(38, 152, 186, ${alpha})`;
+    ctx.strokeStyle = "rgba(38, 152, 186, 0.72)";
+    ctx.lineWidth = 1;
+    ctx.arc(x, y, bubbleR, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // -------------------- UI / Interaction --------------------
 
 function updateInputs(){
@@ -531,6 +610,7 @@ function redrawAll(){
   drawSelector();
   drawDSD();
   drawP12();
+  drawBubbleDSD();
 }
 
 function pinCurrentSelection(){
