@@ -11,7 +11,7 @@ My fourth-year project asked a simple question with a surprisingly tricky answer
 
 > Can a small drone measure the size of tiny droplets inside low cloud or fog?
 
-That matters because clouds help control Earth's temperature. A bright cloud reflects sunlight back to space, while a darker cloud lets more sunlight warm the surface. One thing that changes cloud brightness is the size of the droplets inside it. If the same amount of cloud water is split into many smaller droplets, the cloud can become brighter. Climate scientists call this the **Twomey effect**.
+That matters because clouds help control Earth's temperature. A bright cloud reflects sunlight back to space, while a darker cloud lets more sunlight warm the surface. One thing that changes cloud brightness is the size of the droplets inside it. If the same amount of cloud water is split into many smaller droplets, the cloud can become brighter. Climate scientists call this the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can make a cloud more reflective.">Twomey effect</span> {% cite twomey1977influence %}.
 
 The full research project used a drone, a small onboard computer, fast storage, and a special colour polarisation camera to look for a hidden rainbow-like signal in cloud. The submitted report used data from valley fog in the Yorkshire Dales on 8 March 2026. This page tells the easier version: how engineers turn a flying camera into a scientific instrument.
 
@@ -20,6 +20,25 @@ The story has three layers:
 1. **Why DSD matters:** droplet size affects cloud brightness and climate.
 2. **How DSD can be seen indirectly:** droplets create a polarised cloudbow feature.
 3. **How the solution was built:** hardware, data storage, tracking, calibration, and lookup-table fitting turn flight video into DSD estimates.
+
+### Pocket Glossary
+
+Hover over highlighted terms later on the page for a quick reminder.
+
+<div class="glossary-grid">
+  <div><strong>Cloud droplet</strong><p>A tiny liquid-water sphere floating inside cloud or fog.</p></div>
+  <div><strong>DSD</strong><p>Droplet size distribution: how many small, medium, and large droplets are in the cloud.</p></div>
+  <div><strong>Effective radius</strong><p>A useful average droplet size for predicting how the cloud scatters light.</p></div>
+  <div><strong>Effective variance</strong><p>How mixed the droplet sizes are. A small value means most droplets are similar.</p></div>
+  <div><strong>Polarisation</strong><p>The direction in which a light wave wiggles.</p></div>
+  <div><strong>Linear polarisation intensity</strong><p>How strongly the camera sees light with one preferred wiggle direction.</p></div>
+  <div><strong>Anti-solar point, or ASP</strong><p>The point in the image directly opposite the Sun.</p></div>
+  <div><strong>Cloudbow</strong><p>A faint rainbow-like pattern in polarised light from cloud droplets.</p></div>
+  <div><strong>LUT</strong><p>Lookup table: a library of simulated cloudbow patterns used for matching measured data.</p></div>
+  <div><strong>USB</strong><p>A standard for connecting devices. Plug shape and data speed are separate things.</p></div>
+  <div><strong>MB/s</strong><p>Megabytes per second. A video recorder needs enough write speed, not just enough storage space.</p></div>
+  <div><strong>BOT and UASP</strong><p>Two USB storage protocols. UASP can queue work more efficiently than older BOT.</p></div>
+</div>
 
 <div class="cloud-question" id="cloud-question">
   <div>
@@ -31,34 +50,17 @@ The story has three layers:
   <p id="cloud-question-result" aria-live="polite">Choose an answer to reveal the idea.</p>
 </div>
 
-### Pocket Glossary
-
-| Word | School-level meaning |
-| --- | --- |
-| Cloud droplet | A tiny liquid-water sphere floating inside cloud or fog. |
-| DSD | Short for droplet size distribution: how many small, medium, and large droplets are in the cloud. |
-| Effective radius | A useful "average droplet size" for predicting how the cloud scatters light. |
-| Effective variance | A number describing how mixed the droplet sizes are. A small value means most droplets are similar; a large value means the sizes are more spread out. |
-| Polarisation | The direction in which a light wave wiggles. Ordinary sunlight contains many wiggle directions mixed together. Polarised light has more of one preferred wiggle direction. |
-| Linear polarisation intensity | How strongly the camera sees light with one preferred wiggle direction. In this project, the important cloud signal appears as a ring or arc of stronger linear polarisation. |
-| Anti-solar point, or ASP | The point in the image directly opposite the Sun. It acts like the centre mark for measuring scattering angles. |
-| Cloudbow | A faint rainbow-like pattern in polarised light from cloud droplets. It is usually much easier to see in a polarisation measurement than in an ordinary photo. |
-| LUT | Short for lookup table: a library of simulated cloudbow patterns used for matching measured data. |
-| USB | A common standard for connecting devices such as storage drives, cameras, keyboards, and chargers. The plug shape and the data speed are separate things. |
-| MB/s | Megabytes per second, a measure of how quickly data can be read or written. A video recorder needs enough write speed, not just enough storage space. |
-| BOT and UASP | Two USB storage protocols. BOT is older and simpler. UASP can queue work more efficiently, so it is often better for fast storage. |
-
 ## 1. The Big Question
 
-Cloud droplets are tiny, often only a few micrometres across. A micrometre is one millionth of a metre, so a typical cloud droplet can be much smaller than the width of a human hair.
+<span class="term" data-def="Tiny liquid-water spheres suspended in cloud or fog.">Cloud droplets</span> are tiny, often only a few micrometres across. A micrometre is one millionth of a metre, so a typical cloud droplet can be much smaller than the width of a human hair.
 
 Instead of measuring every droplet one by one, cloud scientists often describe a cloud using:
 
-- **Droplet size distribution:** how many small, medium, and large droplets there are.
-- **Effective radius:** a useful average droplet size for light scattering.
-- **Effective variance:** how spread out the droplet sizes are.
+- **<span class="term" data-def="How many small, medium, and large droplets are in the cloud.">Droplet size distribution</span>:** how many small, medium, and large droplets there are.
+- **<span class="term" data-def="A useful average droplet size for light scattering.">Effective radius</span>:** a useful average droplet size for light scattering.
+- **<span class="term" data-def="How spread out the droplet sizes are.">Effective variance</span>:** how spread out the droplet sizes are.
 
-Satellites can estimate cloud droplet size over large areas, but their pixels are usually far larger than a small patch of cloud. My project explored whether a drone could measure cloud droplets at much finer local detail, especially for small low clouds or fog that change quickly.
+Satellites can estimate cloud droplet size over large areas {% cite platnick2017modis %}, but their pixels are usually far larger than a small patch of cloud. My project explored whether a drone could measure cloud droplets at much finer local detail, especially for small low clouds or fog that change quickly.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
@@ -71,7 +73,7 @@ Satellites can estimate cloud droplet size over large areas, but their pixels ar
 
 ## 2. The Optical Feature That Reveals DSD
 
-Light behaves like a wave. One way to picture a light wave is to imagine a tiny sideways wiggle travelling through space. In ordinary sunlight, many wiggle directions are mixed together. When sunlight scatters from a water droplet, the scattered light can become more organised: more of it wiggles in one preferred direction. That is called **polarisation**.
+Light behaves like a wave. One way to picture a light wave is to imagine a tiny sideways wiggle travelling through space. In ordinary sunlight, many wiggle directions are mixed together. When sunlight scatters from a water droplet, the scattered light can become more organised: more of it wiggles in one preferred direction. That is called <span class="term" data-def="The direction in which a light wave wiggles.">polarisation</span> {% cite bohren1983absorption hansen1974light %}.
 
 An ordinary camera mainly records brightness and colour. A polarisation camera records extra information about the wiggle direction of the light. That extra information is useful because cloud droplets do not scatter all directions equally. They leave a faint pattern in the polarised part of the light.
 
@@ -90,9 +92,9 @@ An ordinary camera mainly records brightness and colour. A polarisation camera r
   </div>
 </div>
 
-The project used **linear polarisation intensity**, which you can think of as "how much of the measured light has a preferred wiggle direction". The cloudbow signal is not just a colourful arc in a normal photo; in this project, it is a bright arc or ring in that linear polarisation signal.
+The project used <span class="term" data-def="How strongly the camera sees light with one preferred wiggle direction.">linear polarisation intensity</span>, which you can think of as "how much of the measured light has a preferred wiggle direction". The <span class="term" data-def="A faint rainbow-like pattern in polarised light from cloud droplets.">cloudbow</span> signal is not just a colourful arc in a normal photo; in this project, it is a bright arc or ring in that linear polarisation signal.
 
-The Sun was behind the drone-camera direction during the useful measurements. In that geometry, the image has a special reference point called the **anti-solar point**, or ASP: the point directly opposite the Sun. Around the ASP, cloud droplets can create a ring or arc of maximum linear polarisation intensity. That ring is the cloudbow fingerprint.
+The Sun was behind the drone-camera direction during the useful measurements. In that geometry, the image has a special reference point called the <span class="term" data-def="The point in the image directly opposite the Sun.">anti-solar point</span>, or ASP: the point directly opposite the Sun. Around the ASP, cloud droplets can create a ring or arc of maximum linear polarisation intensity. That ring is the cloudbow fingerprint.
 
 The ring changes when the droplet size distribution changes:
 
@@ -100,11 +102,10 @@ The ring changes when the droplet size distribution changes:
 - a larger effective variance makes the feature broader and smoother;
 - a narrow droplet-size distribution gives a sharper fingerprint.
 
-Try moving the sliders. This is a simplified teaching model, not the exact physics code from the final report.
+Try moving the sliders. This is a simplified teaching model, not the exact physics code from the final report. The droplet preview uses the same broad gamma-distribution idea as the LUT explorer, while the bright ring remains a separate optical sketch.
 
 <div class="cloudbow-lab" id="cloudbow-lab">
   <div class="cloudbow-lab__visual" aria-label="Interactive cloudbow ring model">
-    <div class="cloudbow-lab__cloud" id="droplet-demo" aria-hidden="true"></div>
     <div class="cloudbow-lab__asp">ASP</div>
     <div class="cloudbow-lab__ring" id="cloudbow-ring" aria-hidden="true"></div>
   </div>
@@ -113,15 +114,16 @@ Try moving the sliders. This is a simplified teaching model, not the exact physi
     <input id="reff-control" type="range" min="3" max="12" step="0.5" value="5">
     <label for="veff-control">Effective variance: <strong id="veff-label">0.05</strong></label>
     <input id="veff-control" type="range" min="0.03" max="0.14" step="0.01" value="0.05">
+    <canvas id="dsd-bubble-canvas" class="dsd-bubble-canvas" width="420" height="220" aria-label="Animated droplet size distribution preview"></canvas>
     <p id="cloudbow-lab-note" aria-live="polite"></p>
   </div>
 </div>
 
 ## 3. Turning The Optical Feature Into Numbers
 
-The project then turned the cloudbow fingerprint into DSD numbers. First, the software tracked the ASP. Then it estimated the **scattering angle** of each cloud pixel. The scattering angle is the angle between the incoming sunlight and the light that travels from the cloud droplet into the camera.
+The project then turned the cloudbow fingerprint into DSD numbers. First, the software tracked the ASP. Then it estimated the <span class="term" data-def="The angle between incoming sunlight and the light that travels from the droplet to the camera.">scattering angle</span> of each cloud pixel. The scattering angle is the angle between the incoming sunlight and the light that travels from the cloud droplet into the camera.
 
-Different droplet sizes create slightly different polarisation patterns at different scattering angles. That turns the cloud into a fingerprint-matching problem.
+Different droplet sizes create slightly different polarisation patterns at different scattering angles. That turns the cloud into a fingerprint-matching problem. This follows the same broad idea as existing cloudbow polarimetric retrievals: compare the measured angular polarisation pattern with simulated patterns until the closest DSD is found {% cite poertge2023cloudbow %}.
 
 The scientific pipeline worked like this:
 
@@ -132,27 +134,9 @@ The scientific pipeline worked like this:
 5. Compare that profile with many simulated profiles in a lookup table.
 6. Choose the closest match to estimate effective radius and effective variance.
 
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Intention: make the geometry visible. The yellow cross marks the tracked anti-solar point. The red rings mark scattering-angle contours, and the coloured cloud overlay shows the processed polarisation signal used for retrieval. Source: final report Figure 10, originally exported as <code>image239.png</code>.
-</div>
-
-<div class="row justify-content-sm-center">
-  <div class="col-sm-9 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/lut-fit-example.png" title="Lookup-table fit example" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Intention: show the "fingerprint matching" step for readers who want one technical plot. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
-</div>
-
 ### Go Deeper: The LUT Explorer
 
-The lookup table is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this."
+The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations {% cite bohren1983absorption miepython2026 %}.
 
 Interested students can move the sliders in the interactive explorer and watch how the predicted cloudbow curve changes:
 
@@ -205,11 +189,7 @@ The camera recorded high-bit-depth image data at up to about 10 frames per secon
   Intention: connect the accessible story to the actual hardware. Left: the completed drone-camera assembly on a bench. Right: the exploded CAD view showing the camera, lens, onboard computer, power board, storage drive, battery, and protective cage. Sources: final report Figure 5 (<code>image153.jpg</code>) and Figure 4 (<code>image152.png</code>).
 </div>
 
-### Try The Payload Design Challenge
-
-Imagine you are given a fixed budget and can choose only some of these parts: camera, GPS, IMU, gimbal, laser range finder, onboard computer. Which ones would you pick if the drone had to track a patch of cloud?
-
-There is no perfect answer. A camera is light and useful, but it does not directly tell you distance. GPS helps locate the drone, but not the cloud patch inside the image. An onboard computer can run image tracking, but it adds weight and power demand. Engineering is often about choosing the least-bad set of clues and understanding what each one can and cannot tell you.
+The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas {% cite zhang2000flexible %}.
 
 ## 5. Technical Steps From Flight Video To DSD
 
@@ -270,7 +250,7 @@ The final choice was the SSD. The UASP stick was much better than the slow USB s
 
 A cloud changes shape, drifts with the wind, and has soft edges. To compare cloud images over time, the computer needs to recognise whether it is looking at the same patch.
 
-The project used an image-matching idea called **normalised cross correlation**, or NCC. In simple terms:
+The project used an image-matching idea called **normalised cross correlation**, or NCC. This is one kind of template matching, a standard computer-vision idea {% cite brunelli2009template %}. In simple terms:
 
 1. Remember a small patch of an image.
 2. Slide that patch over the next image.
@@ -278,6 +258,24 @@ The project used an image-matching idea called **normalised cross correlation**,
 4. Keep the position where the bright and dark pattern matches best.
 
 In my real project, NCC was used to track the ASP and useful optical features. Once the computer knew where that point was, it could work out the scattering angle for nearby cloud pixels. Three visual-line-of-sight flights were made on the fieldwork morning; the third flight provided the three usable video windows for droplet-size retrieval.
+
+The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In the actual project, an equivalent idea appears as a larger circular pattern with a dark cross at the centre. The kernel is still just a small pattern that the computer can compare against an image.
+
+<div class="kernel-note">
+  <div class="kernel-picture" role="img" aria-label="Circular kernel pattern with a dark cross at the centre">
+    <span class="kernel-picture__cross kernel-picture__cross--vertical"></span>
+    <span class="kernel-picture__cross kernel-picture__cross--horizontal"></span>
+  </div>
+  <div>
+    <strong>Classic kernel picture</strong>
+    <p>This is the project-level cousin of the simple 3 by 3 kernel from the example. Instead of matching a tiny square pattern, the software can use a circular pattern whose central dark cross marks the expected reference structure.</p>
+  </div>
+</div>
+
+<details class="cloud-case-details">
+  <summary>For keen students: why does this shape appear?</summary>
+  <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of Stokes-vector polarimetry: the Stokes vector stores intensity and polarisation information, and rotating the reference frame mixes its <code>Q</code> and <code>U</code> components {% cite bohren1983absorption %}.</p>
+</details>
 
 <div class="row mt-3">
   <div class="col-sm mt-3 mt-md-0">
@@ -297,6 +295,24 @@ For a hands-on version of the tracking idea, see my outreach activity:
 ### Step 3: Compare With The Lookup Table
 
 The last technical step was to keep only trustworthy cloud pixels, reconstruct the polarisation profile, and compare it with the lookup table. That is where the optical feature became final DSD parameters rather than just a bright ring in an image.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: make the retrieval geometry visible at the stage where it is actually used. The yellow cross marks the tracked anti-solar point. The red rings mark scattering-angle contours, and the coloured cloud overlay shows the processed polarisation signal used for retrieval. Source: final report Figure 10, originally exported as <code>image239.png</code>.
+</div>
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-9 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/lut-fit-example.png" title="Lookup-table fit example" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: show the "fingerprint matching" step after the theory and hardware have been introduced. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
+</div>
 
 ## 6. What The Project Found
 
@@ -366,6 +382,101 @@ These are the assets used on this page and why I chose them:
     font-weight: 600;
   }
 
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0 1.6rem;
+  }
+
+  .glossary-grid > div {
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 0.85rem;
+    background: var(--global-card-bg-color);
+  }
+
+  .glossary-grid p {
+    margin: 0.35rem 0 0;
+  }
+
+  .term {
+    position: relative;
+    border-bottom: 1px dotted var(--global-theme-color);
+    cursor: help;
+  }
+
+  .term::after {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.45rem);
+    z-index: 20;
+    width: min(260px, 70vw);
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    background: var(--global-card-bg-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    color: var(--global-text-color);
+    content: attr(data-def);
+    font-size: 0.85rem;
+    line-height: 1.35;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 0.25rem);
+    transition: opacity 120ms ease, transform 120ms ease;
+  }
+
+  .term:hover::after,
+  .term:focus::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .post table,
+  article table,
+  .storage-challenge table {
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+  }
+
+  .post table th,
+  .post table td,
+  article table th,
+  article table td,
+  .storage-challenge th,
+  .storage-challenge td {
+    border-bottom: 1px solid var(--global-divider-color);
+    border-right: 1px solid var(--global-divider-color);
+    padding: 0.7rem;
+    vertical-align: top;
+  }
+
+  .post table th:last-child,
+  .post table td:last-child,
+  article table th:last-child,
+  article table td:last-child,
+  .storage-challenge th:last-child,
+  .storage-challenge td:last-child {
+    border-right: 0;
+  }
+
+  .post table tr:last-child td,
+  article table tr:last-child td,
+  .storage-challenge tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .post table th,
+  article table th,
+  .storage-challenge th {
+    background: rgba(127, 127, 127, 0.08);
+    font-weight: 700;
+  }
+
   .storage-challenge {
     border: 1px solid var(--global-divider-color);
     border-radius: 8px;
@@ -377,19 +488,7 @@ These are the assets used on this page and why I chose them:
   .storage-challenge table {
     width: 100%;
     margin: 0.75rem 0 1rem;
-    border-collapse: collapse;
     font-size: 0.94rem;
-  }
-
-  .storage-challenge th,
-  .storage-challenge td {
-    border: 1px solid var(--global-divider-color);
-    padding: 0.55rem;
-    vertical-align: top;
-  }
-
-  .storage-challenge th {
-    font-weight: 700;
   }
 
   .storage-challenge button {
@@ -513,18 +612,6 @@ These are the assets used on this page and why I chose them:
       linear-gradient(145deg, rgba(83, 135, 180, 0.2), rgba(136, 168, 185, 0.08));
   }
 
-  .cloudbow-lab__cloud {
-    position: absolute;
-    inset: 0;
-  }
-
-  .cloudbow-lab__cloud .droplet {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(224, 240, 255, 0.72);
-    box-shadow: 0 0 10px rgba(160, 205, 235, 0.35);
-  }
-
   .cloudbow-lab__asp {
     position: absolute;
     left: 50%;
@@ -570,13 +657,71 @@ These are the assets used on this page and why I chose them:
     margin: 0.3rem 0 0.55rem;
   }
 
+  .dsd-bubble-canvas {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin: 0.7rem 0 0.35rem;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.24), transparent 28%),
+      rgba(44, 123, 150, 0.08);
+  }
+
   #cloudbow-lab-note {
     margin: 0.5rem 0 0;
   }
 
+  .kernel-note {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 1rem;
+    align-items: center;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0 1.2rem;
+    background: var(--global-card-bg-color);
+  }
+
+  .kernel-picture {
+    position: relative;
+    width: 132px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin: 0 auto;
+    background:
+      radial-gradient(circle at center, rgba(15, 20, 28, 0.94) 0 8%, transparent 8.5%),
+      repeating-conic-gradient(from 0deg, rgba(48, 148, 178, 0.9) 0 18deg, rgba(232, 246, 249, 0.92) 18deg 36deg);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .kernel-picture__cross {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    border-radius: 999px;
+    background: rgba(8, 11, 18, 0.88);
+    transform: translate(-50%, -50%);
+  }
+
+  .kernel-picture__cross--vertical {
+    width: 18px;
+    height: 82px;
+  }
+
+  .kernel-picture__cross--horizontal {
+    width: 82px;
+    height: 18px;
+  }
+
   @media (max-width: 576px) {
     .polarisation-demo__scene,
-    .cloudbow-lab {
+    .cloudbow-lab,
+    .kernel-note {
       grid-template-columns: 1fr;
     }
 
@@ -649,9 +794,215 @@ These are the assets used on this page and why I chose them:
     const reffLabel = document.getElementById("reff-label");
     const veffLabel = document.getElementById("veff-label");
     const ring = document.getElementById("cloudbow-ring");
-    const dropletDemo = document.getElementById("droplet-demo");
+    const bubbleCanvas = document.getElementById("dsd-bubble-canvas");
+    const bubbleContext = bubbleCanvas ? bubbleCanvas.getContext("2d") : null;
     const note = document.getElementById("cloudbow-lab-note");
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+    const pseudoRandom = (index) => {
+      const value = Math.sin(index * 12.9898 + 78.233) * 43758.5453;
+      return value - Math.floor(value);
+    };
+    let bubbleParticles = [];
+    let bubbleLastTime = 0;
+    let bubbleSignature = "";
+
+    const hansenDSD = (reff, veff, count = 360) => {
+      const k = 1 / veff - 2;
+      const theta = reff * veff;
+      const std = reff * Math.sqrt(veff);
+      const maxRadius = Math.max(reff + 10 * std, 4 * reff);
+      const radii = [];
+      const density = [];
+
+      for (let index = 0; index < count; index += 1) {
+        const radius = maxRadius * index / (count - 1);
+        radii.push(radius);
+        density.push(radius > 0 ? Math.pow(radius, k - 1) * Math.exp(-radius / theta) : 0);
+      }
+
+      return { radii, density };
+    };
+
+    const sampleRadiusFromDSD = (dsd, q) => {
+      let total = 0;
+      for (let index = 1; index < dsd.radii.length; index += 1) {
+        total += 0.5 * (dsd.density[index - 1] + dsd.density[index]) * (dsd.radii[index] - dsd.radii[index - 1]);
+      }
+      if (total <= 0) return dsd.radii[Math.floor(dsd.radii.length / 2)];
+
+      const target = q * total;
+      let accum = 0;
+      for (let index = 1; index < dsd.radii.length; index += 1) {
+        const area = 0.5 * (dsd.density[index - 1] + dsd.density[index]) * (dsd.radii[index] - dsd.radii[index - 1]);
+        if (accum + area >= target) {
+          const t = (target - accum) / (area + 1e-30);
+          return dsd.radii[index - 1] + clamp(t, 0, 1) * (dsd.radii[index] - dsd.radii[index - 1]);
+        }
+        accum += area;
+      }
+      return dsd.radii[dsd.radii.length - 1];
+    };
+
+    const radiusToBubblePx = (radius, width, height) => {
+      const minRadius = 0.5;
+      const maxRadius = 18;
+      const minBubble = Math.max(2.5, Math.min(width, height) * 0.014);
+      const maxBubble = Math.max(13, Math.min(width, height) * 0.075);
+      const t = clamp((radius - minRadius) / (maxRadius - minRadius), 0, 1);
+      return minBubble + Math.sqrt(t) * (maxBubble - minBubble);
+    };
+
+    const rebuildBubbles = (reff, veff) => {
+      if (!bubbleCanvas) return;
+      const width = bubbleCanvas.width;
+      const height = bubbleCanvas.height;
+      const dsd = hansenDSD(reff, veff, 500);
+      const count = 72;
+      const marginTop = 36;
+      const previous = bubbleParticles;
+      bubbleParticles = [];
+
+      for (let index = 0; index < count; index += 1) {
+        const q = (index + 0.5) / count;
+        const radius = sampleRadiusFromDSD(dsd, q);
+        const baseR = radiusToBubblePx(radius, width, height);
+        const old = previous[index];
+        bubbleParticles.push({
+          q,
+          radius,
+          baseR,
+          r: old ? clamp(old.r, baseR * 0.45, baseR * 1.8) : baseR,
+          x: old ? clamp(old.x, baseR + 16, width - baseR - 16) : clamp(22 + pseudoRandom(index) * (width - 44), baseR + 16, width - baseR - 16),
+          y: old ? clamp(old.y, baseR + marginTop, height - baseR - 14) : clamp(marginTop + pseudoRandom(index + 1000) * (height - marginTop - 16), baseR + marginTop, height - baseR - 14),
+          vx: old ? old.vx : (pseudoRandom(index + 2000) - 0.5) * 0.4,
+          vy: old ? old.vy : (pseudoRandom(index + 3000) - 0.5) * 0.4,
+          phase: pseudoRandom(index + 4000) * Math.PI * 2,
+          alpha: 0.34 + 0.32 * pseudoRandom(index + 5000)
+        });
+      }
+    };
+
+    const updateBubbleTargets = (reff, veff) => {
+      if (!bubbleCanvas) return;
+      if (!bubbleParticles.length) {
+        rebuildBubbles(reff, veff);
+        return;
+      }
+      const dsd = hansenDSD(reff, veff, 500);
+      for (const particle of bubbleParticles) {
+        particle.radius = sampleRadiusFromDSD(dsd, particle.q);
+        particle.baseR = radiusToBubblePx(particle.radius, bubbleCanvas.width, bubbleCanvas.height);
+      }
+    };
+
+    const stepBubbles = (dt, timeSeconds) => {
+      if (!bubbleCanvas) return;
+      const width = bubbleCanvas.width;
+      const height = bubbleCanvas.height;
+      const marginTop = 36;
+      const damping = Math.pow(0.18, dt);
+      const repulsion = 54;
+      const spring = 1.35;
+
+      bubbleParticles.forEach((particle, index) => {
+        const pulse = 1 + 0.1 * Math.sin(timeSeconds * (0.68 + 0.5 * pseudoRandom(index + 6000)) + particle.phase);
+        particle.r += (particle.baseR * pulse - particle.r) * Math.min(1, dt * 4.5);
+        particle.vx += Math.sin(timeSeconds * (0.22 + pseudoRandom(index + 7000) * 0.22) + particle.phase) * dt * 1.4;
+        particle.vy += Math.cos(timeSeconds * (0.2 + pseudoRandom(index + 8000) * 0.22) + particle.phase * 0.7) * dt * 1.2;
+      });
+
+      for (let i = 0; i < bubbleParticles.length; i += 1) {
+        const a = bubbleParticles[i];
+        for (let j = i + 1; j < bubbleParticles.length; j += 1) {
+          const b = bubbleParticles[j];
+          let dx = b.x - a.x;
+          let dy = b.y - a.y;
+          let dist = Math.hypot(dx, dy);
+          const minDist = a.r + b.r + 2;
+          if (dist < 1e-6) {
+            const angle = pseudoRandom(i * 101 + j) * Math.PI * 2;
+            dx = Math.cos(angle);
+            dy = Math.sin(angle);
+            dist = 1;
+          }
+          if (dist < minDist) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const overlap = minDist - dist;
+            const force = overlap * repulsion * dt;
+            a.vx -= nx * force;
+            a.vy -= ny * force;
+            b.vx += nx * force;
+            b.vy += ny * force;
+            const correction = overlap * 0.18;
+            a.x -= nx * correction;
+            a.y -= ny * correction;
+            b.x += nx * correction;
+            b.y += ny * correction;
+          }
+        }
+      }
+
+      bubbleParticles.forEach((particle, index) => {
+        const targetX = 22 + pseudoRandom(index) * (width - 44);
+        const targetY = marginTop + pseudoRandom(index + 1000) * (height - marginTop - 16);
+        particle.vx += (targetX - particle.x) * spring * dt;
+        particle.vy += (targetY - particle.y) * spring * dt;
+        particle.vx *= damping;
+        particle.vy *= damping;
+        particle.x += particle.vx * dt;
+        particle.y += particle.vy * dt;
+
+        const left = 14 + particle.r;
+        const right = width - 14 - particle.r;
+        const top = marginTop + particle.r;
+        const bottom = height - 14 - particle.r;
+        if (particle.x < left) { particle.x = left; particle.vx = Math.abs(particle.vx) * 0.35; }
+        if (particle.x > right) { particle.x = right; particle.vx = -Math.abs(particle.vx) * 0.35; }
+        if (particle.y < top) { particle.y = top; particle.vy = Math.abs(particle.vy) * 0.35; }
+        if (particle.y > bottom) { particle.y = bottom; particle.vy = -Math.abs(particle.vy) * 0.35; }
+      });
+    };
+
+    const drawBubbles = (timeMs) => {
+      if (!bubbleCanvas || !bubbleContext) return;
+      const reff = Number.parseFloat(reffControl.value);
+      const veff = Number.parseFloat(veffControl.value);
+      const signature = `${reff.toFixed(2)}|${veff.toFixed(3)}`;
+      if (signature !== bubbleSignature) {
+        bubbleSignature = signature;
+        updateBubbleTargets(reff, veff);
+      }
+      if (!bubbleLastTime) bubbleLastTime = timeMs;
+      const dt = clamp((timeMs - bubbleLastTime) / 1000, 0.016, 0.08);
+      bubbleLastTime = timeMs;
+      stepBubbles(dt, timeMs / 1000);
+
+      const ctx = bubbleContext;
+      const width = bubbleCanvas.width;
+      const height = bubbleCanvas.height;
+      const textColor = window.getComputedStyle(document.body).color || "#27343b";
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = textColor;
+      ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText(`DSD preview: r_eff=${reff.toFixed(1)} um, v_eff=${veff.toFixed(2)}`, 14, 23);
+
+      for (const particle of bubbleParticles) {
+        const gradient = ctx.createRadialGradient(particle.x - particle.r * 0.35, particle.y - particle.r * 0.35, particle.r * 0.15, particle.x, particle.y, particle.r);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${0.25 + particle.alpha * 0.26})`);
+        gradient.addColorStop(0.42, `rgba(38, 152, 186, ${particle.alpha})`);
+        gradient.addColorStop(1, "rgba(38, 152, 186, 0.1)");
+        ctx.beginPath();
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = `rgba(16, 92, 125, ${0.55 + particle.alpha * 0.35})`;
+        ctx.lineWidth = 1.2;
+        ctx.arc(particle.x, particle.y, particle.r, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      window.requestAnimationFrame(drawBubbles);
+    };
 
     const updateCloudbowLab = () => {
       const reff = Number.parseFloat(reffControl.value);
@@ -669,28 +1020,13 @@ These are the assets used on this page and why I chose them:
       ring.style.filter = `blur(${blur}px)`;
       ring.style.opacity = opacity.toFixed(2);
 
-      const dropletCount = Math.round(clamp(42 - (reff - 3) * 2.4, 16, 42));
-      const baseSize = 5 + reff * 1.5;
-      dropletDemo.innerHTML = "";
-
-      for (let index = 0; index < dropletCount; index += 1) {
-        const droplet = document.createElement("span");
-        const spreadFactor = 1 + (((index * 17) % 9) - 4) * veff * 0.9;
-        const size = clamp(baseSize * spreadFactor, 5, 26);
-        droplet.className = "droplet";
-        droplet.style.left = `${5 + ((index * 37) % 88)}%`;
-        droplet.style.top = `${6 + ((index * 53) % 84)}%`;
-        droplet.style.width = `${size}px`;
-        droplet.style.height = `${size}px`;
-        droplet.style.opacity = `${clamp(0.45 + ((index * 11) % 30) / 100, 0.45, 0.75)}`;
-        dropletDemo.appendChild(droplet);
-      }
-
       note.textContent = "Larger effective radius pushes the bright ring farther from the ASP. Higher effective variance makes the ring fuzzier because many droplet sizes overlap.";
     };
 
     reffControl.addEventListener("input", updateCloudbowLab);
     veffControl.addEventListener("input", updateCloudbowLab);
     updateCloudbowLab();
+    rebuildBubbles(Number.parseFloat(reffControl.value), Number.parseFloat(veffControl.value));
+    window.requestAnimationFrame(drawBubbles);
   })();
 </script>
