@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Measuring Cloud Droplets From a Drone"
-description: A school-level case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.
+description: An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.
 img: assets/img/projects/drone-cloud-droplet-measurement/drone-camera-assembly.jpg
 importance: 0
 category: uni
@@ -13,7 +13,7 @@ My fourth-year project asked a simple question with a surprisingly tricky answer
 
 That matters because clouds help control Earth's temperature. A bright cloud reflects sunlight back to space, while a darker cloud lets more sunlight warm the surface. One thing that changes cloud brightness is the size of the droplets inside it. If the same amount of cloud water is split into many smaller droplets, the cloud can become brighter. Climate scientists call this the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can make a cloud more reflective.">Twomey effect</span> {% cite twomey1977influence %}.
 
-The full research project used a drone, a small onboard computer, fast storage, and a special colour polarisation camera to look for a hidden rainbow-like signal in cloud. The submitted report used data from valley fog in the Yorkshire Dales on 8 March 2026. This page tells the easier version: how engineers turn a flying camera into a scientific instrument.
+The full research project used a drone, a small onboard computer, fast storage, and a special colour polarisation camera to look for a hidden rainbow-like signal in cloud. The submitted report used data from valley fog in the Yorkshire Dales on 8 March 2026. This page tells the simpler version: how engineers turn a flying camera into a scientific instrument.
 
 The story has three layers:
 
@@ -134,31 +134,6 @@ The scientific pipeline worked like this:
 5. Compare that profile with many simulated profiles in a lookup table.
 6. Choose the closest match to estimate effective radius and effective variance.
 
-### Go Deeper: The LUT Explorer
-
-The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations {% cite bohren1983absorption miepython2026 %}.
-
-Interested students can move the sliders in the interactive explorer and watch how the predicted cloudbow curve changes:
-
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloudbow-lut-thumb.png" title="Cloudbow LUT explorer preview" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Intention: preview the optional advanced interactive tool. This thumbnail belongs to the existing Cloudbow Polarisation LUT Explorer project and is used here as a signpost for students who want to explore the lookup-table idea with sliders.
-</div>
-
-<p>
-  <a class="btn btn-sm btn-outline-primary" href="{{ '/cloudbow-lut/' | relative_url }}">Explore the interactive LUT</a>
-  <a class="btn btn-sm btn-outline-secondary" href="{{ '/projects/10_cloudbow_lut/' | relative_url }}">Read the technical project page</a>
-</p>
-
-<details class="cloud-case-details">
-  <summary>What does the LUT actually compare?</summary>
-  <p>The project used simulated Mie-scattering curves for many possible droplet size distributions. The measured polarisation signal from the cloud was compared against those curves. A lower fitting error meant the measured curve and the simulated curve looked more alike.</p>
-</details>
-
 ## 4. Building The Flying Measurement System
 
 After the optical idea was clear, the engineering job was to build a platform that could collect the right kind of data in real cloud or fog. The drone was not just taking pretty videos. It had to carry a measurement system:
@@ -189,11 +164,17 @@ The camera recorded high-bit-depth image data at up to about 10 frames per secon
   Intention: connect the accessible story to the actual hardware. Left: the completed drone-camera assembly on a bench. Right: the exploded CAD view showing the camera, lens, onboard computer, power board, storage drive, battery, and protective cage. Sources: final report Figure 5 (<code>image153.jpg</code>) and Figure 4 (<code>image152.png</code>).
 </div>
 
+<p>
+  <a class="btn btn-sm btn-outline-primary ar-link" rel="ar" href="{{ '/assets/models/projects/drone-cloud-droplet-measurement/chimera-payload-assembly.usdz' | relative_url }}">View the payload assembly in AR</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{{ '/assets/models/projects/drone-cloud-droplet-measurement/chimera-payload-assembly.usdz' | relative_url }}">Open the USDZ model</a>
+</p>
+<div class="caption">
+  Intention: provide an interactive Apple Quick Look / AR view of the drone mockup and payload assembly. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
+</div>
+
 The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas {% cite zhang2000flexible %}.
 
-## 5. Technical Steps From Flight Video To DSD
-
-### Step 1: Store The Data Fast Enough
+### Choosing Storage That Is Actually Fast Enough
 
 One surprisingly important part of the project was not the drone or the cloud physics. It was the storage drive.
 
@@ -246,7 +227,41 @@ The `480M` and `5000M` clues are bus speeds reported by the computer in megabits
 
 The final choice was the SSD. The UASP stick was much better than the slow USB stick, but the SSD gave more safety margin for long recordings. A later payload test found that 12-bit recording at 10 frames per second worked for a 1200 second run, while 13 frames per second caused many incomplete images.
 
-### Step 2: Follow The Same Patch Of Cloud
+## 5. Technical Steps From Flight Video To DSD
+
+The full retrieval pipeline had three main parts: video pre-processing, camera calibration, and lookup-table fitting. The flowchart below shows how raw polarisation video became the final DSD estimates.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid loading="eager" path="assets/img/projects/drone-cloud-droplet-measurement/main-retrieval-flowchart.jpg" title="Main retrieval flowchart" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: show the complete retrieval pipeline before breaking it into smaller steps. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
+</div>
+
+### Step 1: Split The Polarisation Video Into Useful Signals
+
+The polarisation camera measures four micro-polariser angles: 0 degrees, 45 degrees, 90 degrees, and 135 degrees. Different combinations of those channels are useful for different jobs:
+
+- The **45-135 channel** emphasises the cross-shaped ASP feature, so I used it for NCC tracking of the anti-solar point.
+- A single image channel was enough for cloud masking and horizon detection, where the task was mainly to separate cloud, sky, and terrain.
+- The full **12-bit raw data** from all polarisation angles was needed for the final physics, because retrieving linear polarisation requires the relative brightness at several polariser angles.
+
+### Step 2: Calibrate The Camera And Recover Viewing Direction
+
+A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look?
+
+Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.
+
+<div class="calibration-demo" id="calibration-demo">
+  <canvas id="calibration-canvas" width="720" height="260" aria-label="Interactive camera distortion correction demonstration"></canvas>
+  <label for="distortion-control">Distortion strength: <strong id="distortion-label">0.45</strong></label>
+  <input id="distortion-control" type="range" min="0" max="0.9" step="0.05" value="0.45">
+  <p id="calibration-note">Calibration turns bent image coordinates into viewing rays, so the software can compare each cloud pixel with the correct scattering angle.</p>
+</div>
+
+### Step 3: Track The Optical Features
 
 A cloud changes shape, drifts with the wind, and has soft edges. To compare cloud images over time, the computer needs to recognise whether it is looking at the same patch.
 
@@ -262,18 +277,20 @@ In my real project, NCC was used to track the ASP and useful optical features. O
 The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In the actual project, an equivalent idea appears as a larger circular pattern with a dark cross at the centre. The kernel is still just a small pattern that the computer can compare against an image.
 
 <div class="kernel-note">
-  <div class="kernel-picture" role="img" aria-label="Circular kernel pattern with a dark cross at the centre">
-    <span class="kernel-picture__cross kernel-picture__cross--vertical"></span>
-    <span class="kernel-picture__cross kernel-picture__cross--horizontal"></span>
+  <div>
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/filtered-asp-kernel.png" title="Filtered ASP kernel" class="img-fluid rounded z-depth-1" %}
   </div>
   <div>
     <strong>Classic kernel picture</strong>
-    <p>This is the project-level cousin of the simple 3 by 3 kernel from the example. Instead of matching a tiny square pattern, the software can use a circular pattern whose central dark cross marks the expected reference structure.</p>
+    <p>This is the project-level cousin of the simple 3 by 3 kernel from the example. Instead of matching a tiny square pattern, the software uses an 80 by 80 filtered ASP kernel: a circular polarisation pattern with a dark cross at the centre.</p>
   </div>
+</div>
+<div class="caption">
+  Intention: show the actual ASP tracking kernel used by the project, replacing the simplified drawn sketch. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
 </div>
 
 <details class="cloud-case-details">
-  <summary>For keen students: why does this shape appear?</summary>
+  <summary>Technical note: why does this shape appear?</summary>
   <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of Stokes-vector polarimetry: the Stokes vector stores intensity and polarisation information, and rotating the reference frame mixes its <code>Q</code> and <code>U</code> components {% cite bohren1983absorption %}.</p>
 </details>
 
@@ -292,7 +309,23 @@ The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In 
 For a hands-on version of the tracking idea, see my outreach activity:
 <a class="btn btn-sm btn-outline-primary" href="{{ '/blog/2026/dyson-day-drone-design-ncc/' | relative_url }}">Try the NCC demo</a>
 
-### Step 3: Compare With The Lookup Table
+### Step 4: Build A Multi-frame Cloudbow Profile
+
+For the multi-frame retrieval, the goal was to follow the same small cloud region across several frames. Each frame contributes polarisation samples at slightly different viewing angles, so the cloudbow profile gradually fills in.
+
+<div class="row mt-3">
+  <div class="col-sm mt-3 mt-md-0">
+    {% include video.liquid path="assets/video/projects/drone-cloud-droplet-measurement/manual-tracking-overlay-322p2-preview.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include video.liquid path="assets/video/projects/drone-cloud-droplet-measurement/profile-build-window-1-region-1.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true %}
+  </div>
+</div>
+<div class="caption">
+  Intention: show how manual cloud-region tracking and profile construction correspond in time. Left: a 7.3 second clip from <code>manual_tracking_overlay.mp4</code> starting at 322.2 seconds. Right: the matching profile-build video <code>profile_build_window_1_region_1.mp4</code>, where the multi-frame scattering-angle profile accumulates.
+</div>
+
+### Step 5: Compare With The Lookup Table
 
 The last technical step was to keep only trustworthy cloud pixels, reconstruct the polarisation profile, and compare it with the lookup table. That is where the optical feature became final DSD parameters rather than just a bright ring in an image.
 
@@ -314,13 +347,38 @@ The last technical step was to keep only trustworthy cloud pixels, reconstruct t
   Intention: show the "fingerprint matching" step after the theory and hardware have been introduced. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
 </div>
 
+### Go Deeper: The LUT Explorer
+
+The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations {% cite bohren1983absorption miepython2026 %}.
+
+You can move the sliders in the interactive explorer and watch how the predicted cloudbow curve changes:
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloudbow-lut-thumb.png" title="Cloudbow LUT explorer preview" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: preview the optional advanced interactive tool after the page has introduced the full retrieval chain. This thumbnail belongs to the existing Cloudbow Polarisation LUT Explorer project and is used here as a signpost for readers who want to explore the lookup-table idea with sliders.
+</div>
+
+<p>
+  <a class="btn btn-sm btn-outline-primary" href="{{ '/cloudbow-lut/' | relative_url }}">Explore the interactive LUT</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{{ '/projects/10_cloudbow_lut/' | relative_url }}">Read the technical project page</a>
+</p>
+
+<details class="cloud-case-details">
+  <summary>What does the LUT actually compare?</summary>
+  <p>The project used simulated Mie-scattering curves for many possible droplet size distributions. The measured polarisation signal from the cloud was compared against those curves. A lower fitting error meant the measured curve and the simulated curve looked more alike.</p>
+</details>
+
 ## 6. What The Project Found
 
 The headline result was that different retrieval methods agreed on a droplet effective radius close to **5 micrometres**, with effective variance around **0.05**. The multi-frame method reached an estimated spatial resolution of about **3 m by 3 m** and a time resolution of about **15 seconds**. The simpler single-frame method assumed the cloud was more uniform across the image, giving a coarser estimated resolution of about **200 m by 160 m**.
 
 That does not mean the problem is solved. Real clouds are messy. Drone motion, camera calibration, viewing geometry, cloud movement, and sunlight all affect the signal. But the project showed that a low-cost drone-borne polarisation camera can collect useful cloudbow-region measurements and retrieve physically plausible droplet sizes.
 
-For school students, the most important lesson is not a single number. It is the way the engineering pieces fit together:
+The most important lesson is not a single number. It is the way the engineering pieces fit together:
 
 - physics explains why droplets leave a light-scattering fingerprint;
 - hardware collects the raw data;
@@ -334,14 +392,19 @@ These are the assets used on this page and why I chose them:
 
 | Page asset | Original source | Intended use |
 | --- | --- | --- |
-| <code>drone-camera-assembly.jpg</code> | Final report Figure 5, <code>image153.jpg</code> | Main project thumbnail and hardware photo; lets students see the real drone payload. |
+| <code>drone-camera-assembly.jpg</code> | Final report Figure 5, <code>image153.jpg</code> | Main project thumbnail and hardware photo; shows the real drone payload. |
 | <code>payload-exploded-view.png</code> | Final report Figure 4, <code>image152.png</code> | Explains the instrument stack: camera, lens, onboard computer, storage drive, battery, and protective cage. |
+| <code>chimera-payload-assembly.usdz</code> | Downloads folder, <code>Assembly for Chimera Payload (with drone mockup).usdz</code> | Provides the Apple Quick Look / AR model for inspecting the drone and payload assembly. |
 | <code>fieldwork-site-topography.png</code> | Final report Figure 6, <code>image155.png</code> | Shows the real outdoor location and why terrain/low cloud mattered. |
+| <code>main-retrieval-flowchart.jpg</code> | Final report figures folder, <code>Main Flow-Chart.jpg</code> | Shows the complete retrieval sequence: pre-processing, calibration, tracking, Stokes construction, and LUT fitting. |
+| <code>filtered-asp-kernel.png</code> | <code>cloudbow_detection/core/kernel_45_135/filtered_kernel_example.png</code> | Shows the real 80 by 80 filtered ASP kernel used to explain the larger version of the simple 3 by 3 pattern-matching example. |
 | <code>cloud-frame-scattering-rings.png</code> | Final report Figure 10, <code>image239.png</code> | Shows the anti-solar point, scattering-angle rings, and processed cloud image in one visual. |
 | <code>lut-fit-example.png</code> | Final report Figure 20, <code>image356.png</code> | Gives a single "measured curve versus model curve" example for the cloud fingerprint idea. |
-| <code>cloudbow-lut-thumb.png</code> | Existing site asset <code>assets/img/project_thumbnails/cloudbow_lut_thumb.png</code> | Previews the optional interactive LUT explorer linked from the school resource. |
+| <code>cloudbow-lut-thumb.png</code> | Existing site asset <code>assets/img/project_thumbnails/cloudbow_lut_thumb.png</code> | Previews the optional interactive LUT explorer linked from this resource. |
 | <code>kernel-tracking-preview.mp4</code> | Trimmed from <code>kernel_tracking_annotated.mp4</code> | Shows tracking on real flight imagery without embedding the full 36 MB analysis video. |
 | <code>detection-overlay-preview.mp4</code> | Trimmed from <code>detection_overlay.mp4</code>, starting at 327.2 seconds | Shows the processed detection overlay without embedding the full 32 MB analysis video; the time window is intended to match the kernel-detection choice. |
+| <code>manual-tracking-overlay-322p2-preview.mp4</code> | Trimmed from <code>manual_tracking_overlay.mp4</code>, starting at 322.2 seconds | Shows the manually tracked cloud region in the same time window as the profile-build visual. |
+| <code>profile-build-window-1-region-1.mp4</code> | Re-encoded from <code>profile_build_window_1_region_1.mp4</code> | Shows how the multi-frame retrieval gradually builds a cloudbow profile from tracked frames. |
 
 <style>
   .cloud-question {
@@ -676,7 +739,7 @@ These are the assets used on this page and why I chose them:
 
   .kernel-note {
     display: grid;
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: minmax(180px, 280px) 1fr;
     gap: 1rem;
     align-items: center;
     border: 1px solid var(--global-divider-color);
@@ -686,36 +749,32 @@ These are the assets used on this page and why I chose them:
     background: var(--global-card-bg-color);
   }
 
-  .kernel-picture {
-    position: relative;
-    width: 132px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    margin: 0 auto;
-    background:
-      radial-gradient(circle at center, rgba(15, 20, 28, 0.94) 0 8%, transparent 8.5%),
-      repeating-conic-gradient(from 0deg, rgba(48, 148, 178, 0.9) 0 18deg, rgba(232, 246, 249, 0.92) 18deg 36deg);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+  .calibration-demo {
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0 1.5rem;
+    background: var(--global-card-bg-color);
   }
 
-  .kernel-picture__cross {
-    position: absolute;
-    left: 50%;
-    top: 50%;
+  .calibration-demo canvas {
     display: block;
-    border-radius: 999px;
-    background: rgba(8, 11, 18, 0.88);
-    transform: translate(-50%, -50%);
+    width: 100%;
+    height: auto;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    background: rgba(127, 127, 127, 0.06);
   }
 
-  .kernel-picture__cross--vertical {
-    width: 18px;
-    height: 82px;
+  .calibration-demo label {
+    display: block;
+    font-weight: 600;
   }
 
-  .kernel-picture__cross--horizontal {
-    width: 82px;
-    height: 18px;
+  .calibration-demo input[type="range"] {
+    width: 100%;
+    margin: 0.35rem 0 0.55rem;
   }
 
   @media (max-width: 576px) {
@@ -783,6 +842,95 @@ These are the assets used on this page and why I chose them:
         result.textContent = messages[button.dataset.storage];
       });
     });
+  })();
+
+  (() => {
+    const canvas = document.getElementById("calibration-canvas");
+    const control = document.getElementById("distortion-control");
+    const label = document.getElementById("distortion-label");
+    if (!canvas || !control || !label) return;
+
+    const ctx = canvas.getContext("2d");
+    const drawGrid = (originX, originY, width, height, distortion, corrected) => {
+      const cols = 9;
+      const rows = 7;
+      const cx = originX + width / 2;
+      const cy = originY + height / 2;
+      const project = (x, y) => {
+        const nx = (x - cx) / (width / 2);
+        const ny = (y - cy) / (height / 2);
+        const r2 = nx * nx + ny * ny;
+        const factor = corrected ? 1 : 1 + distortion * r2;
+        return {
+          x: cx + nx * factor * width / 2,
+          y: cy + ny * factor * height / 2
+        };
+      };
+
+      ctx.save();
+      ctx.strokeStyle = corrected ? "rgba(48, 135, 80, 0.88)" : "rgba(185, 75, 90, 0.86)";
+      ctx.lineWidth = 2;
+
+      for (let col = 0; col <= cols; col += 1) {
+        ctx.beginPath();
+        for (let step = 0; step <= 80; step += 1) {
+          const x = originX + width * col / cols;
+          const y = originY + height * step / 80;
+          const point = project(x, y);
+          if (step === 0) ctx.moveTo(point.x, point.y);
+          else ctx.lineTo(point.x, point.y);
+        }
+        ctx.stroke();
+      }
+
+      for (let row = 0; row <= rows; row += 1) {
+        ctx.beginPath();
+        for (let step = 0; step <= 80; step += 1) {
+          const x = originX + width * step / 80;
+          const y = originY + height * row / rows;
+          const point = project(x, y);
+          if (step === 0) ctx.moveTo(point.x, point.y);
+          else ctx.lineTo(point.x, point.y);
+        }
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = window.getComputedStyle(document.body).color || "#263238";
+      ctx.font = "16px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText(corrected ? "after calibration: rays recovered" : "raw image: lens distortion", originX, originY - 14);
+      ctx.restore();
+    };
+
+    const drawCalibration = () => {
+      const distortion = Number.parseFloat(control.value);
+      label.textContent = distortion.toFixed(2);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(127, 127, 127, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawGrid(46, 58, 260, 150, distortion, false);
+      drawGrid(414, 58, 260, 150, distortion, true);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(60, 120, 180, 0.8)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(333, 132);
+      ctx.lineTo(387, 132);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(387, 132);
+      ctx.lineTo(376, 125);
+      ctx.moveTo(387, 132);
+      ctx.lineTo(376, 139);
+      ctx.stroke();
+      ctx.fillStyle = window.getComputedStyle(document.body).color || "#263238";
+      ctx.font = "13px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText("calibration model", 314, 116);
+      ctx.restore();
+    };
+
+    control.addEventListener("input", drawCalibration);
+    drawCalibration();
   })();
 
   (() => {
