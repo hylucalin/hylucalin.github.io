@@ -105,7 +105,7 @@ ninja.data = [{
               window.location.href = "/projects/11_atmospheric_profiling_drone/";
             },},{id: "projects-measuring-cloud-droplets-from-a-drone",
           title: 'Measuring Cloud Droplets From a Drone',
-          description: "A school-level case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.",
+          description: "An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/12_drone_cloud_droplet_measurement/";
             },},{id: "projects-project-1",
