@@ -11,34 +11,7 @@ My fourth-year project asked a simple question with a surprisingly tricky answer
 
 > Can a small drone measure the size of tiny droplets inside low cloud or fog?
 
-That matters because clouds help control Earth's temperature. A bright cloud reflects sunlight back to space, while a darker cloud lets more sunlight warm the surface. One thing that changes cloud brightness is the size of the droplets inside it. If the same amount of cloud water is split into many smaller droplets, the cloud can become brighter. Climate scientists call this the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can make a cloud more reflective.">Twomey effect</span> {% cite twomey1977influence %}.
-
-The full research project used a drone, a small onboard computer, fast storage, and a special colour polarisation camera to look for a hidden rainbow-like signal in cloud. The submitted report used data from valley fog in the Yorkshire Dales on 8 March 2026. This page tells the simpler version: how engineers turn a flying camera into a scientific instrument.
-
-The story has three layers:
-
-1. **Why DSD matters:** droplet size affects cloud brightness and climate.
-2. **How DSD can be seen indirectly:** droplets create a polarised cloudbow feature.
-3. **How the solution was built:** hardware, data storage, tracking, calibration, and lookup-table fitting turn flight video into DSD estimates.
-
-### Pocket Glossary
-
-Hover over highlighted terms later on the page for a quick reminder.
-
-<div class="glossary-grid">
-  <div><strong>Cloud droplet</strong><p>A tiny liquid-water sphere floating inside cloud or fog.</p></div>
-  <div><strong>DSD</strong><p>Droplet size distribution: how many small, medium, and large droplets are in the cloud.</p></div>
-  <div><strong>Effective radius</strong><p>A useful average droplet size for predicting how the cloud scatters light.</p></div>
-  <div><strong>Effective variance</strong><p>How mixed the droplet sizes are. A small value means most droplets are similar.</p></div>
-  <div><strong>Polarisation</strong><p>The direction in which a light wave wiggles.</p></div>
-  <div><strong>Linear polarisation intensity</strong><p>How strongly the camera sees light with one preferred wiggle direction.</p></div>
-  <div><strong>Anti-solar point, or ASP</strong><p>The point in the image directly opposite the Sun.</p></div>
-  <div><strong>Cloudbow</strong><p>A faint rainbow-like pattern in polarised light from cloud droplets.</p></div>
-  <div><strong>LUT</strong><p>Lookup table: a library of simulated cloudbow patterns used for matching measured data.</p></div>
-  <div><strong>USB</strong><p>A standard for connecting devices. Plug shape and data speed are separate things.</p></div>
-  <div><strong>MB/s</strong><p>Megabytes per second. A video recorder needs enough write speed, not just enough storage space.</p></div>
-  <div><strong>BOT and UASP</strong><p>Two USB storage protocols. UASP can queue work more efficiently than older BOT.</p></div>
-</div>
+Two facts drive the project. First, clouds help control Earth's temperature because bright clouds reflect sunlight back to space. Second, a cloud's brightness depends strongly on its <span class="term" data-def="Droplet size distribution: a description of how many small, medium, and large droplets are present in a cloud.">droplet size distribution</span>, or DSD: if the same amount of liquid water is split into many smaller droplets, the cloud can become brighter. This is the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can increase cloud reflectivity.">Twomey effect</span> {% cite twomey1977influence %}.
 
 <div class="cloud-question" id="cloud-question">
   <div>
@@ -50,17 +23,9 @@ Hover over highlighted terms later on the page for a quick reminder.
   <p id="cloud-question-result" aria-live="polite">Choose an answer to reveal the idea.</p>
 </div>
 
-## 1. The Big Question
+This matters for <span class="term" data-def="A proposed climate intervention in which sea-salt aerosol would be added to some low marine clouds to increase droplet number and cloud reflectivity.">marine cloud brightening</span>, or MCB. Before anything like MCB could be used in the real world, researchers would need to measure how cloud DSD changes over time after an aerosol perturbation, and whether the cloud response really produces the intended brightening rather than being offset by evaporation, mixing, drizzle, or changing weather.
 
-<span class="term" data-def="Tiny liquid-water spheres suspended in cloud or fog.">Cloud droplets</span> are tiny, often only a few micrometres across. A micrometre is one millionth of a metre, so a typical cloud droplet can be much smaller than the width of a human hair.
-
-Instead of measuring every droplet one by one, cloud scientists often describe a cloud using:
-
-- **<span class="term" data-def="How many small, medium, and large droplets are in the cloud.">Droplet size distribution</span>:** how many small, medium, and large droplets there are.
-- **<span class="term" data-def="A useful average droplet size for light scattering.">Effective radius</span>:** a useful average droplet size for light scattering.
-- **<span class="term" data-def="How spread out the droplet sizes are.">Effective variance</span>:** how spread out the droplet sizes are.
-
-Satellites can estimate cloud droplet size over large areas {% cite platnick2017modis %}, but their pixels are usually far larger than a small patch of cloud. My project explored whether a drone could measure cloud droplets at much finer local detail, especially for small low clouds or fog that change quickly.
+The submitted report used data from valley fog in the Yorkshire Dales National Park on 8 March 2026. The field site was not marine cloud, but it provided a practical low-cloud environment for testing whether a drone-borne polarisation camera could retrieve DSD at very fine spatial and temporal scales.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
@@ -68,35 +33,62 @@ Satellites can estimate cloud droplet size over large areas {% cite platnick2017
   </div>
 </div>
 <div class="caption">
-  Intention: show that this was a real outdoor field experiment, not just a simulation. This map marks the March 8 fieldwork site in hilly terrain where low cloud or valley fog could form. Source: final report Figure 6, originally exported as <code>image155.png</code>.
+  Intention: introduce the real field experiment at the point where the Yorkshire Dales site is first mentioned. This map marks the 8 March 2026 low-cloud and valley-fog fieldwork location in hilly terrain. Source: final report Figure 6, originally exported as <code>image155.png</code>.
 </div>
 
-## 2. The Optical Feature That Reveals DSD
+The case study follows the same structure as an engineering report: why the measurement matters, what optical signal makes it possible, how the retrieval pipeline works, how the flying instrument was built, what the real data looked like, and what the result means.
 
-Light behaves like a wave. One way to picture a light wave is to imagine a tiny sideways wiggle travelling through space. In ordinary sunlight, many wiggle directions are mixed together. When sunlight scatters from a water droplet, the scattered light can become more organised: more of it wiggles in one preferred direction. That is called <span class="term" data-def="The direction in which a light wave wiggles.">polarisation</span> {% cite bohren1983absorption hansen1974light %}.
+## 1. Scientific Motivation
 
-An ordinary camera mainly records brightness and colour. A polarisation camera records extra information about the wiggle direction of the light. That extra information is useful because cloud droplets do not scatter all directions equally. They leave a faint pattern in the polarised part of the light.
+<span class="term" data-def="Tiny liquid-water spheres suspended inside cloud or fog.">Cloud droplets</span> are often only a few micrometres across. A micrometre is one millionth of a metre, so many cloud droplets are far smaller than the width of a human hair.
+
+Instead of trying to count every droplet, cloud scientists describe the DSD using compact parameters:
+
+- **<span class="term" data-def="A weighted average droplet radius that is especially useful for predicting how cloud droplets scatter and absorb light.">Effective radius</span>:** a useful average droplet size for light scattering.
+- **<span class="term" data-def="A dimensionless measure of how spread out the droplet sizes are. A small value means the droplets are more similar in size.">Effective variance</span>:** how broad or narrow the droplet-size distribution is.
+
+Satellites can estimate cloud droplet size over large areas {% cite platnick2017modis %}, but their pixels are usually much larger than a small evolving patch of cloud. Research aircraft can do better, but they are expensive and still not ideal for repeated close-range monitoring. The project therefore tested a lower-cost route: a drone carrying a compact polarisation camera.
+
+## 2. Methodology
+
+### 2.1 Polarisation And The Cloudbow Signal
+
+Light is an electromagnetic wave. A wave is a repeating disturbance that travels: a water wave moves across a pond, while the water surface rises and falls. In a light wave, the changing quantities are the electric and magnetic fields. They oscillate perpendicular to the direction in which the light travels.
+
+For this project, the important part is the electric field. <span class="term" data-def="The orientation of the electric-field oscillation in a light wave.">Polarisation</span> describes the direction in which that electric field oscillates. Ordinary sunlight contains many polarisation directions mixed together. After sunlight scatters from water droplets, some directions can become stronger than others, giving <span class="term" data-def="How strongly the measured light prefers one linear electric-field oscillation direction over another.">linear polarisation intensity</span> {% cite bohren1983absorption hansen1974light %}.
+
+<div class="row align-items-center">
+  <div class="col-md-6 mt-3 mt-md-0">
+    <img class="img-fluid rounded z-depth-1" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Cross_linear_polarization.gif" alt="Animation of a linearly polarised wave passing through a rotating polariser">
+  </div>
+  <div class="col-md-6 mt-3 mt-md-0">
+    <p>The GIF shows a linearly polarised wave meeting a polariser. The wave amplitude changes as the polariser axis rotates relative to the electric-field oscillation direction.</p>
+    <p class="caption">External teaching reference: <a href="https://commons.wikimedia.org/wiki/File:Cross_linear_polarization.gif">Cross linear polarization.gif</a> by Smouss / Simon Raffy, CC BY 4.0, via Wikimedia Commons.</p>
+  </div>
+</div>
 
 <div class="polarisation-demo" aria-label="Simple diagram comparing mixed and linearly polarised light">
   <div class="polarisation-demo__scene">
     <strong>Ordinary sunlight</strong>
+    <small>Many electric-field oscillation directions are mixed.</small>
     <div class="polarisation-demo__bundle mixed" aria-hidden="true">
       <span></span><span></span><span></span><span></span><span></span>
     </div>
   </div>
   <div class="polarisation-demo__scene">
     <strong>More linearly polarised light</strong>
+    <small>The electric field has a stronger preferred oscillation direction.</small>
     <div class="polarisation-demo__bundle linear" aria-hidden="true">
       <span></span><span></span><span></span><span></span><span></span>
     </div>
   </div>
 </div>
 
-The project used <span class="term" data-def="How strongly the camera sees light with one preferred wiggle direction.">linear polarisation intensity</span>, which you can think of as "how much of the measured light has a preferred wiggle direction". The <span class="term" data-def="A faint rainbow-like pattern in polarised light from cloud droplets.">cloudbow</span> signal is not just a colourful arc in a normal photo; in this project, it is a bright arc or ring in that linear polarisation signal.
+The optical feature used here is the <span class="term" data-def="A rainbow-like angular feature produced when sunlight is scattered by many small cloud droplets. In this project it is detected mainly in linear polarisation, not as a bright ordinary-colour rainbow.">cloudbow</span>. It is related to a rainbow, but cloud droplets are much smaller and the useful signal is often clearest in polarised light. In the cloudbow region, roughly 135 degrees to 165 degrees in scattering angle, the linear polarisation signal changes shape when the DSD changes {% cite poertge2023cloudbow %}.
 
-The Sun was behind the drone-camera direction during the useful measurements. In that geometry, the image has a special reference point called the <span class="term" data-def="The point in the image directly opposite the Sun.">anti-solar point</span>, or ASP: the point directly opposite the Sun. Around the ASP, cloud droplets can create a ring or arc of maximum linear polarisation intensity. That ring is the cloudbow fingerprint.
+The geometry is centred on the <span class="term" data-def="The image point directly opposite the Sun. It is approximately where the camera or drone shadow would appear on a cloud or on the ground if the surface were visible.">anti-solar point</span>, or ASP. A useful way to picture it is: if the cloud were a screen and the drone shadow could be seen on it, the shadow would lie near the ASP. Around the ASP, points with the same scattering angle form rings. The linear polarisation intensity therefore forms ring-like patterns: each ring contains pixels with approximately the same scattering angle.
 
-The ring changes when the droplet size distribution changes:
+The easiest way to connect the optical signal to DSD is to look at the ring of maximum linear polarisation intensity. A larger effective radius tends to shift this cloudbow feature farther from the ASP. A larger effective variance tends to broaden and smooth the feature. That is why the ring can act like a fingerprint of the droplet size distribution.
 
 - a larger effective radius moves the bright cloudbow feature farther from the ASP;
 - a larger effective variance makes the feature broader and smoother;
@@ -119,28 +111,91 @@ Try moving the sliders. This is a simplified teaching model, not the exact physi
   </div>
 </div>
 
-## 3. Turning The Optical Feature Into Numbers
+### 2.2 Retrieval Pipeline
 
-The project then turned the cloudbow fingerprint into DSD numbers. First, the software tracked the ASP. Then it estimated the <span class="term" data-def="The angle between incoming sunlight and the light that travels from the droplet to the camera.">scattering angle</span> of each cloud pixel. The scattering angle is the angle between the incoming sunlight and the light that travels from the cloud droplet into the camera.
+The retrieval needs an angular profile: linear polarisation intensity plotted against <span class="term" data-def="The angle between the incoming sunlight direction and the direction from the cloud droplet to the camera. In this project theta is calculated from the ASP ray and the cloud-pixel ray.">scattering angle</span>. To build that profile, the software must know three things for each useful cloud pixel:
 
-Different droplet sizes create slightly different polarisation patterns at different scattering angles. That turns the cloud into a fingerprint-matching problem. This follows the same broad idea as existing cloudbow polarimetric retrievals: compare the measured angular polarisation pattern with simulated patterns until the closest DSD is found {% cite poertge2023cloudbow %}.
+1. whether the pixel is cloud rather than sky, ground, or horizon;
+2. where the ASP is, because scattering angles are measured relative to it;
+3. which viewing direction that pixel corresponds to after camera calibration.
 
-The scientific pipeline worked like this:
+The report used the convention that the ASP provides the reference for a 180 degree scattering angle. If the camera ray to a cloud pixel is separated from the ASP ray by an angle gamma, then the scattering angle is approximately 180 degrees minus gamma.
 
-1. Measure cloud light with a polarisation camera.
-2. Convert the raw image into a linear polarisation signal.
-3. Find the ASP and work out the scattering angle of cloud pixels.
-4. Reconstruct the measured cloudbow profile.
-5. Compare that profile with many simulated profiles in a lookup table.
-6. Choose the closest match to estimate effective radius and effective variance.
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid loading="eager" path="assets/img/projects/drone-cloud-droplet-measurement/main-retrieval-flowchart.jpg" title="Main retrieval flowchart" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: present the whole method before the detailed subsections. The flowchart groups the work into video pre-processing, camera calibration, and lookup-table fitting. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
+</div>
 
-## 4. Building The Flying Measurement System
+### 2.3 Video Pre-processing
+
+The polarisation camera records four micro-polariser angles: 0 degrees, 45 degrees, 90 degrees, and 135 degrees. The raw data were 12-bit, which preserves faint intensity differences better than normal 8-bit video.
+
+Different combinations of the same video were used for different jobs:
+
+- The **45-135 channel** emphasises the cross-shaped ASP feature. I used this channel with <span class="term" data-def="Normalised cross correlation: a template-matching method that slides a remembered pattern over an image and scores how well each position matches.">normalised cross correlation</span>, or NCC, to track the ASP {% cite brunelli2009template %}.
+- A single image channel was enough for cloud masking and horizon detection. The aim was to keep bright low-saturation cloud pixels while excluding blue sky, terrain, and the horizon.
+- All four polarisation angles from the 12-bit data were used to retrieve the final linear polarisation information.
+
+Cloud masking is important because the LUT should only be fitted to cloud pixels. If sky, hillside, horizon, or non-cloud artefacts are included, the angular profile stops representing the cloud droplet population.
+
+The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In the actual project, an equivalent idea appears as a larger circular pattern with a dark cross at the centre. The kernel is still just a small pattern that the computer compares against an image.
+
+<div class="kernel-note">
+  <div>
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/filtered-asp-kernel.png" title="Filtered ASP kernel" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div>
+    <strong>Classic kernel picture</strong>
+    <p>This is the project-level cousin of the simple 3 by 3 kernel from the example. Instead of matching a tiny square pattern, the software uses an 80 by 80 filtered ASP kernel: a circular polarisation pattern with a dark cross at the centre.</p>
+  </div>
+</div>
+<div class="caption">
+  Intention: show the actual ASP tracking kernel used by the project. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
+</div>
+
+<details class="cloud-case-details">
+  <summary>Technical note: why does this shape appear?</summary>
+  <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of <span class="term" data-def="A four-number description of light intensity and polarisation: I, Q, U, and V.">Stokes-vector</span> polarimetry: rotating the reference frame mixes the <code>Q</code> and <code>U</code> components {% cite bohren1983absorption %}.</p>
+</details>
+
+For a hands-on version of the tracking idea, see my outreach activity:
+<a class="btn btn-sm btn-outline-primary" href="{{ '/blog/2026/dyson-day-drone-design-ncc/' | relative_url }}">Try the NCC demo</a>
+
+### 2.4 Camera Calibration
+
+A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look? Camera calibration follows standard geometric calibration ideas {% cite zhang2000flexible %}.
+
+Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.
+
+<div class="calibration-demo" id="calibration-demo">
+  <canvas id="calibration-canvas" width="720" height="260" aria-label="Interactive camera distortion correction demonstration"></canvas>
+  <label for="distortion-control">Distortion strength: <strong id="distortion-label">0.45</strong></label>
+  <input id="distortion-control" type="range" min="0" max="0.9" step="0.05" value="0.45">
+  <p id="calibration-note">Calibration turns bent image coordinates into viewing rays. The viewing-angle difference between the ASP ray and each cloud-pixel ray then gives the scattering angle.</p>
+</div>
+
+### 2.5 Lookup Table Fitting
+
+Once each cloud pixel has a scattering angle and a linear polarisation signal, the retrieval becomes curve fitting. I generated a lookup table of theoretical linear polarisation profiles in the scattering plane. Each curve corresponds to one possible gamma-distribution DSD.
+
+The LUT grid covered effective radius from **1 micrometre to 40.77 micrometres** on a logarithmic grid, and effective variance from **0.01 to 0.325**. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve {% cite bohren1983absorption miepython2026 %}. The measured profile was then fitted to the LUT, and the best-fitting curve gave the retrieved DSD parameters.
+
+<details class="cloud-case-details">
+  <summary>What does the LUT actually compare?</summary>
+  <p>The measured scattering-plane signal is compared with many simulated <code>P12(theta)</code> curves. The fitting allows scale and background terms, then looks for the effective radius and effective variance whose curve has the lowest error against the measured cloudbow profile.</p>
+</details>
+
+## 3. Building The Flying Measurement System
 
 After the optical idea was clear, the engineering job was to build a platform that could collect the right kind of data in real cloud or fog. The drone was not just taking pretty videos. It had to carry a measurement system:
 
 | Part | What it did | Why it mattered |
 | --- | --- | --- |
-| Drone airframe | Lifted the payload and moved the camera into cloud/fog viewing positions. | The instrument had to be light enough to fly and stable enough to collect useful images. |
+| Drone itself | A pre-built flying platform lifted the payload into useful cloud/fog viewing positions. | This was the simplest practical route: the project effort could focus on measurement, payload integration, and retrieval. |
 | Polarisation camera | Measured brightness, colour, and the direction information in scattered light. | Ordinary images miss much of the faint cloudbow signal. |
 | Lens | Set how much of the cloud scene fitted into each image. | A wide view helps capture the cloudbow geometry, but the image must still have enough detail. |
 | Onboard computer | Controlled the camera, saved data, and provided a practical field interface. | The drone could not depend on a full laptop during flight. |
@@ -148,9 +203,7 @@ After the optical idea was clear, the engineering job was to build a platform th
 | Batteries and power electronics | Supplied the voltages needed by the drone, computer, and camera. | Flying instruments have to manage power safely and separately from data. |
 | Protective mount | Held the camera, computer, drive, and cables in a repeatable position. | The payload needed to survive vibration, cable strain, and rough landings. |
 
-The engineering challenge was not simply "attach a camera". The camera had to be held rigidly, the cables had to stay away from the propellers, the mass had to remain close to the drone centreline, and the data had to survive a rough landing.
-
-The camera recorded high-bit-depth image data at up to about 10 frames per second in the field. "High-bit-depth" means each pixel stores more brightness levels than a normal 8-bit picture, which is useful for faint signals but creates bigger files. Before the cloud data could be trusted, the camera system was calibrated with a printed pattern, and a practical vignetting correction was applied so that darker image corners would not be mistaken for cloud physics.
+The engineering challenge was not simply "attach a camera". The camera had to be held rigidly, the cables had to stay away from the propellers, the mass had to remain close to the drone centreline, and the data had to survive vibration and rough handling.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-6 mt-3 mt-md-0">
@@ -174,7 +227,7 @@ The camera recorded high-bit-depth image data at up to about 10 frames per secon
 
 The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas {% cite zhang2000flexible %}.
 
-### Choosing Storage That Is Actually Fast Enough
+### 3.1 Choosing Storage That Is Actually Fast Enough
 
 One surprisingly important part of the project was not the drone or the cloud physics. It was the storage drive.
 
@@ -227,72 +280,20 @@ The `480M` and `5000M` clues are bus speeds reported by the computer in megabits
 
 The final choice was the SSD. The UASP stick was much better than the slow USB stick, but the SSD gave more safety margin for long recordings. A later payload test found that 12-bit recording at 10 frames per second worked for a 1200 second run, while 13 frames per second caused many incomplete images.
 
-## 5. Technical Steps From Flight Video To DSD
+## 4. Real Data Products
 
-The full retrieval pipeline had three main parts: video pre-processing, camera calibration, and lookup-table fitting. The flowchart below shows how raw polarisation video became the final DSD estimates.
+The pipeline produces intermediate data that can be inspected visually. This is important because a retrieval can only be trusted if the geometry, masks, and polarisation signal make physical sense.
+
+The example below shows the retrieved geometry and polarisation map on one frame. The yellow cross marks the tracked ASP. The red circles are scattering-angle contours centred on the ASP. The dense coloured overlay on the cloud shows the rotated linear polarisation signal used to build the retrieval profile.
 
 <div class="row justify-content-sm-center">
-  <div class="col-sm-10 mt-3 mt-md-0">
-    {% include figure.liquid loading="eager" path="assets/img/projects/drone-cloud-droplet-measurement/main-retrieval-flowchart.jpg" title="Main retrieval flowchart" class="img-fluid rounded z-depth-1" %}
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">
-  Intention: show the complete retrieval pipeline before breaking it into smaller steps. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
+  Intention: show how cloud masking, ASP tracking, scattering-angle rings, and the polarisation signal meet in a real frame. Source: final report Figure 10, originally exported as <code>image239.png</code>.
 </div>
-
-### Step 1: Split The Polarisation Video Into Useful Signals
-
-The polarisation camera measures four micro-polariser angles: 0 degrees, 45 degrees, 90 degrees, and 135 degrees. Different combinations of those channels are useful for different jobs:
-
-- The **45-135 channel** emphasises the cross-shaped ASP feature, so I used it for NCC tracking of the anti-solar point.
-- A single image channel was enough for cloud masking and horizon detection, where the task was mainly to separate cloud, sky, and terrain.
-- The full **12-bit raw data** from all polarisation angles was needed for the final physics, because retrieving linear polarisation requires the relative brightness at several polariser angles.
-
-### Step 2: Calibrate The Camera And Recover Viewing Direction
-
-A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look?
-
-Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.
-
-<div class="calibration-demo" id="calibration-demo">
-  <canvas id="calibration-canvas" width="720" height="260" aria-label="Interactive camera distortion correction demonstration"></canvas>
-  <label for="distortion-control">Distortion strength: <strong id="distortion-label">0.45</strong></label>
-  <input id="distortion-control" type="range" min="0" max="0.9" step="0.05" value="0.45">
-  <p id="calibration-note">Calibration turns bent image coordinates into viewing rays, so the software can compare each cloud pixel with the correct scattering angle.</p>
-</div>
-
-### Step 3: Track The Optical Features
-
-A cloud changes shape, drifts with the wind, and has soft edges. To compare cloud images over time, the computer needs to recognise whether it is looking at the same patch.
-
-The project used an image-matching idea called **normalised cross correlation**, or NCC. This is one kind of template matching, a standard computer-vision idea {% cite brunelli2009template %}. In simple terms:
-
-1. Remember a small patch of an image.
-2. Slide that patch over the next image.
-3. Score each possible position.
-4. Keep the position where the bright and dark pattern matches best.
-
-In my real project, NCC was used to track the ASP and useful optical features. Once the computer knew where that point was, it could work out the scattering angle for nearby cloud pixels. Three visual-line-of-sight flights were made on the fieldwork morning; the third flight provided the three usable video windows for droplet-size retrieval.
-
-The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In the actual project, an equivalent idea appears as a larger circular pattern with a dark cross at the centre. The kernel is still just a small pattern that the computer can compare against an image.
-
-<div class="kernel-note">
-  <div>
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/filtered-asp-kernel.png" title="Filtered ASP kernel" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div>
-    <strong>Classic kernel picture</strong>
-    <p>This is the project-level cousin of the simple 3 by 3 kernel from the example. Instead of matching a tiny square pattern, the software uses an 80 by 80 filtered ASP kernel: a circular polarisation pattern with a dark cross at the centre.</p>
-  </div>
-</div>
-<div class="caption">
-  Intention: show the actual ASP tracking kernel used by the project, replacing the simplified drawn sketch. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
-</div>
-
-<details class="cloud-case-details">
-  <summary>Technical note: why does this shape appear?</summary>
-  <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of Stokes-vector polarimetry: the Stokes vector stores intensity and polarisation information, and rotating the reference frame mixes its <code>Q</code> and <code>U</code> components {% cite bohren1983absorption %}.</p>
-</details>
 
 <div class="row mt-3">
   <div class="col-sm mt-3 mt-md-0">
@@ -303,13 +304,8 @@ The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In 
   </div>
 </div>
 <div class="caption">
-  Intention: show the algorithm working on real flight data. Left: a short preview of the kernel/NCC-style tracking output, where yellow markers follow optical features in the cloud image. Right: a short detection-overlay preview beginning at 327.2 seconds in the full processed flight video, chosen to match the kernel-detection example. Sources: trimmed from <code>kernel_tracking_annotated.mp4</code> and <code>detection_overlay.mp4</code> in the Flight 3 cloudbow detection output folder.
+  Intention: show video pre-processing on real flight data. Left: kernel/NCC-style ASP tracking output. Right: a detection-overlay preview beginning at 327.2 seconds in the full processed flight video, chosen to match the kernel-detection example. Sources: trimmed from <code>kernel_tracking_annotated.mp4</code> and <code>detection_overlay.mp4</code>.
 </div>
-
-For a hands-on version of the tracking idea, see my outreach activity:
-<a class="btn btn-sm btn-outline-primary" href="{{ '/blog/2026/dyson-day-drone-design-ncc/' | relative_url }}">Try the NCC demo</a>
-
-### Step 4: Build A Multi-frame Cloudbow Profile
 
 For the multi-frame retrieval, the goal was to follow the same small cloud region across several frames. Each frame contributes polarisation samples at slightly different viewing angles, so the cloudbow profile gradually fills in.
 
@@ -325,18 +321,9 @@ For the multi-frame retrieval, the goal was to follow the same small cloud regio
   Intention: show how manual cloud-region tracking and profile construction correspond in time. Left: a 7.3 second clip from <code>manual_tracking_overlay.mp4</code> starting at 322.2 seconds. Right: the matching profile-build video <code>profile_build_window_1_region_1.mp4</code>, where the multi-frame scattering-angle profile accumulates.
 </div>
 
-### Step 5: Compare With The Lookup Table
+### 4.1 Final LUT Comparison
 
-The last technical step was to keep only trustworthy cloud pixels, reconstruct the polarisation profile, and compare it with the lookup table. That is where the optical feature became final DSD parameters rather than just a bright ring in an image.
-
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Intention: make the retrieval geometry visible at the stage where it is actually used. The yellow cross marks the tracked anti-solar point. The red rings mark scattering-angle contours, and the coloured cloud overlay shows the processed polarisation signal used for retrieval. Source: final report Figure 10, originally exported as <code>image239.png</code>.
-</div>
+The final product of the pipeline is a measured angular polarisation profile compared against the lookup table. The blue points are measured cloud data. The orange curve is the best-fitting theoretical curve. The settings that generated that curve give the retrieved effective radius and effective variance.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-9 mt-3 mt-md-0">
@@ -347,7 +334,7 @@ The last technical step was to keep only trustworthy cloud pixels, reconstruct t
   Intention: show the "fingerprint matching" step after the theory and hardware have been introduced. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
 </div>
 
-### Go Deeper: The LUT Explorer
+### 4.2 Go Deeper: The LUT Explorer
 
 The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations {% cite bohren1983absorption miepython2026 %}.
 
@@ -367,26 +354,53 @@ You can move the sliders in the interactive explorer and watch how the predicted
   <a class="btn btn-sm btn-outline-secondary" href="{{ '/projects/10_cloudbow_lut/' | relative_url }}">Read the technical project page</a>
 </p>
 
-<details class="cloud-case-details">
-  <summary>What does the LUT actually compare?</summary>
-  <p>The project used simulated Mie-scattering curves for many possible droplet size distributions. The measured polarisation signal from the cloud was compared against those curves. A lower fitting error meant the measured curve and the simulated curve looked more alike.</p>
-</details>
+## 5. Results, Discussion And Conclusion
 
-## 6. What The Project Found
+The multi-frame retrieval estimated an effective radius close to **5 micrometres** and an effective variance around **0.05**. Its estimated spatial resolution was about **3 m by 3 m**, with a time resolution of about **15 seconds**.
 
-The headline result was that different retrieval methods agreed on a droplet effective radius close to **5 micrometres**, with effective variance around **0.05**. The multi-frame method reached an estimated spatial resolution of about **3 m by 3 m** and a time resolution of about **15 seconds**. The simpler single-frame method assumed the cloud was more uniform across the image, giving a coarser estimated resolution of about **200 m by 160 m**.
+The significance is the resolution. In the submitted report, this was estimated to be one to two orders of magnitude finer than existing space-borne and airborne cloud DSD retrieval methods. That kind of local measurement could help future MCB fieldwork track how small cloud patches evolve over time, and it could also help with fog studies, satellite validation, and high-resolution model evaluation.
 
-That does not mean the problem is solved. Real clouds are messy. Drone motion, camera calibration, viewing geometry, cloud movement, and sunlight all affect the signal. But the project showed that a low-cost drone-borne polarisation camera can collect useful cloudbow-region measurements and retrieve physically plausible droplet sizes.
+The project does not prove that drone retrieval is already a finished operational method. Real clouds are messy, and future work should improve radiometric calibration, focus control, automated cloud-patch tracking, and cloud-motion correction. But it does show that a low-cost drone-borne polarisation camera can collect cloudbow-region measurements and retrieve physically plausible metre-scale cloud droplet size information.
 
-The most important lesson is not a single number. It is the way the engineering pieces fit together:
+## Glossary
 
-- physics explains why droplets leave a light-scattering fingerprint;
-- hardware collects the raw data;
-- image tracking keeps the geometry consistent;
-- code compares measurements with simulations;
-- field testing reveals which assumptions survive contact with real weather.
+Hover over highlighted terms in the case study for a quick reminder. This list gathers the main terms in one place.
 
-## Asset Use Checklist
+<div class="glossary-grid">
+  <div><strong>Cloud droplet</strong><p>A tiny liquid-water sphere floating inside cloud or fog.</p></div>
+  <div><strong>DSD</strong><p>Droplet size distribution: how many small, medium, and large droplets are in the cloud.</p></div>
+  <div><strong>Effective radius</strong><p>A weighted average droplet radius that is useful for predicting cloud optical behaviour.</p></div>
+  <div><strong>Effective variance</strong><p>How mixed the droplet sizes are. A small value means most droplets are similar.</p></div>
+  <div><strong>Polarisation</strong><p>The orientation of the electric-field oscillation in a light wave.</p></div>
+  <div><strong>Linear polarisation intensity</strong><p>How strongly the measured light prefers one linear electric-field direction.</p></div>
+  <div><strong>Cloudbow</strong><p>A rainbow-like angular feature from cloud droplets, especially useful here in polarised light.</p></div>
+  <div><strong>Anti-solar point, or ASP</strong><p>The point opposite the Sun; roughly where the drone shadow would appear on a visible cloud or ground surface.</p></div>
+  <div><strong>Scattering angle</strong><p>The angle between incoming sunlight and the direction from droplet to camera.</p></div>
+  <div><strong>Stokes vector</strong><p>A four-number description of light intensity and polarisation.</p></div>
+  <div><strong>LUT</strong><p>Lookup table: a library of simulated cloudbow patterns used for matching measured data.</p></div>
+  <div><strong>MCB</strong><p>Marine cloud brightening: a proposed way to increase reflectivity of some low marine clouds using sea-salt aerosol.</p></div>
+  <div><strong>USB</strong><p>A standard for connecting devices. Plug shape and data speed are separate things.</p></div>
+  <div><strong>MB/s</strong><p>Megabytes per second. A video recorder needs enough write speed, not just enough storage space.</p></div>
+  <div><strong>BOT and UASP</strong><p>Two USB storage protocols. UASP can queue work more efficiently than older BOT.</p></div>
+</div>
+
+## References
+
+1. S. Twomey, "The Influence of Pollution on the Shortwave Albedo of Clouds," *Journal of the Atmospheric Sciences*, 34(7), 1149-1152, 1977. <https://doi.org/10.1175/1520-0469(1977)034%3C1149:TIOPOT%3E2.0.CO;2>
+2. S. Platnick et al., "The MODIS Cloud Optical and Microphysical Products: Collection 6 Updates and Examples From Terra and Aqua," *IEEE Transactions on Geoscience and Remote Sensing*, 55(1), 502-525, 2017. <https://doi.org/10.1109/TGRS.2016.2610522>
+3. C. F. Bohren and D. R. Huffman, *Absorption and Scattering of Light by Small Particles*. Wiley, 1983.
+4. J. E. Hansen and L. D. Travis, "Light Scattering in Planetary Atmospheres," *Space Science Reviews*, 16, 527-610, 1974. <https://doi.org/10.1007/BF00168069>
+5. V. Pörtge et al., "High-Spatial-Resolution Retrieval of Cloud Droplet Size Distribution from Polarized Observations of the Cloudbow," *Atmospheric Measurement Techniques*, 16, 645-667, 2023. <https://doi.org/10.5194/amt-16-645-2023>
+6. R. Brunelli, *Template Matching Techniques in Computer Vision: Theory and Practice*. Wiley, 2009.
+7. Z. Zhang, "A Flexible New Technique for Camera Calibration," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 22(11), 1330-1334, 2000. <https://doi.org/10.1109/34.888718>
+8. S. Prahl, *miepython: Pure Python Calculation of Mie Scattering*, Zenodo, 2026. <https://doi.org/10.5281/zenodo.18893972>
+
+## Source Notes
+
+The diagnostic asset checklist is hidden by default because it is mainly for checking source choices during editing.
+
+<details class="asset-checklist">
+  <summary>Show Diagnostic Asset Use Checklist</summary>
 
 These are the assets used on this page and why I chose them:
 
@@ -405,6 +419,8 @@ These are the assets used on this page and why I chose them:
 | <code>detection-overlay-preview.mp4</code> | Trimmed from <code>detection_overlay.mp4</code>, starting at 327.2 seconds | Shows the processed detection overlay without embedding the full 32 MB analysis video; the time window is intended to match the kernel-detection choice. |
 | <code>manual-tracking-overlay-322p2-preview.mp4</code> | Trimmed from <code>manual_tracking_overlay.mp4</code>, starting at 322.2 seconds | Shows the manually tracked cloud region in the same time window as the profile-build visual. |
 | <code>profile-build-window-1-region-1.mp4</code> | Re-encoded from <code>profile_build_window_1_region_1.mp4</code> | Shows how the multi-frame retrieval gradually builds a cloudbow profile from tracked frames. |
+
+</details>
 
 <style>
   .cloud-question {
@@ -490,10 +506,28 @@ These are the assets used on this page and why I chose them:
     transition: opacity 120ms ease, transform 120ms ease;
   }
 
+  .term[data-tip-align="left"]::after {
+    left: 0;
+    transform: translate(0, 0.25rem);
+  }
+
+  .term[data-tip-align="right"]::after {
+    right: 0;
+    left: auto;
+    transform: translate(0, 0.25rem);
+  }
+
   .term:hover::after,
   .term:focus::after {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+
+  .term[data-tip-align="left"]:hover::after,
+  .term[data-tip-align="left"]:focus::after,
+  .term[data-tip-align="right"]:hover::after,
+  .term[data-tip-align="right"]:focus::after {
+    transform: translate(0, 0);
   }
 
   .post table,
@@ -569,6 +603,24 @@ These are the assets used on this page and why I chose them:
     color: var(--global-bg-color);
   }
 
+  .asset-checklist {
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin: 1.25rem 0 1.5rem;
+    background: var(--global-card-bg-color);
+  }
+
+  .asset-checklist summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .asset-checklist table {
+    width: 100%;
+    margin-top: 0.9rem;
+  }
+
   .polarisation-demo {
     display: grid;
     gap: 0.75rem;
@@ -584,6 +636,17 @@ These are the assets used on this page and why I chose them:
     border-radius: 8px;
     padding: 0.85rem;
     background: var(--global-card-bg-color);
+  }
+
+  .polarisation-demo__scene small {
+    grid-column: 1;
+    color: var(--global-text-color-light);
+    line-height: 1.35;
+  }
+
+  .polarisation-demo__bundle {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 
   .polarisation-demo__bundle {
@@ -801,6 +864,31 @@ These are the assets used on this page and why I chose them:
 </style>
 
 <script>
+  (() => {
+    const terms = document.querySelectorAll(".term[data-def]");
+    if (!terms.length) return;
+
+    const updateTermAlignment = (term) => {
+      const rect = term.getBoundingClientRect();
+      const tooltipWidth = Math.min(260, window.innerWidth * 0.7);
+      const centredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+      const centredRight = centredLeft + tooltipWidth;
+
+      term.removeAttribute("data-tip-align");
+      if (centredLeft < 12) {
+        term.setAttribute("data-tip-align", "left");
+      } else if (centredRight > window.innerWidth - 12) {
+        term.setAttribute("data-tip-align", "right");
+      }
+    };
+
+    terms.forEach((term) => {
+      term.setAttribute("tabindex", "0");
+      term.addEventListener("mouseenter", () => updateTermAlignment(term));
+      term.addEventListener("focus", () => updateTermAlignment(term));
+    });
+  })();
+
   (() => {
     const box = document.getElementById("cloud-question");
     if (!box) return;
