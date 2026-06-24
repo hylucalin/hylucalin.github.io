@@ -59,18 +59,11 @@ For this project, the important part is the electric field. <span class="term" d
 
 <div class="row align-items-center">
   <div class="col-md-6 mt-3 mt-md-0">
-    <div class="wave-demo" aria-label="Animated local diagram of a linearly polarised electromagnetic wave">
-      <div class="wave-demo__axis"></div>
-      <div class="wave-demo__wave wave-demo__wave--electric"></div>
-      <div class="wave-demo__wave wave-demo__wave--magnetic"></div>
-      <span class="wave-demo__label wave-demo__label--electric">electric-field oscillation</span>
-      <span class="wave-demo__label wave-demo__label--magnetic">magnetic-field oscillation</span>
-      <span class="wave-demo__label wave-demo__label--direction">direction of travel</span>
-    </div>
+    <img class="img-fluid rounded z-depth-1" src="{{ '/assets/img/projects/drone-cloud-droplet-measurement/polarization-linear-polarizers.gif' | relative_url }}" alt="Animation showing light passing through linear polarisers">
   </div>
   <div class="col-md-6 mt-3 mt-md-0">
-    <p>This local animation shows the idea that a light wave travels forward while its electric and magnetic fields oscillate sideways. Linear polarisation describes the orientation of the electric-field oscillation.</p>
-    <p class="caption">Intention: replace the broken external GIF link with a self-contained animation that explains the same wave idea without depending on a remote media file.</p>
+    <p>This animation shows light passing through linear polarisers. It gives a visual example of why the orientation of the electric-field oscillation matters when measuring polarised light.</p>
+    <p class="caption">Intention: complement the text explanation of polarisation using a locally stored GIF. Source: Institute of Noetic Sciences, <a href="https://noetic.org/wp-content/uploads/2021/04/Polarization-example-with-linear-polarizers.gif">Polarization example with linear polarizers</a>.</p>
   </div>
 </div>
 
@@ -238,15 +231,15 @@ The retrieval did not need a separate range finder. The plan was to use a calibr
 
 ### 3.1 Choosing Storage That Is Actually Fast Enough
 
-One surprisingly important part of the project was not the drone or the cloud physics. It was the storage drive.
+One surprisingly important part of the project was the storage drive. The camera could produce raw 12-bit data at up to about **125 MB/s**, so the payload needed storage that could sustain large, fast file writes during the whole recording.
 
-The camera produced a stream of raw image data. That meant the storage device had to keep writing continuously while the drone was flying. A product label such as "USB 3.0" was not enough information, because there are three different questions hiding inside that label:
+A product label such as "USB 3.0" was not enough information. Three different things matter:
 
 - **Connector shape:** USB-A and USB-C describe the plug shape. They do not guarantee the speed.
 - **Bus speed:** USB 2.0, USB 3.0, and USB 3.2 describe how fast the connection can be in theory.
-- **Storage protocol:** BOT and UASP describe how the computer talks to the drive. In my tests, UASP was much better for fast recording.
+- **Storage protocol:** BOT and UASP describe how the computer talks to the drive.
 
-The camera produces data at a maximum rate of 125 MB/s continuously as it's recording, producing gigabytes of data fast. The storage media needs to be able to continuously write data fast enough.
+BOT, or Bulk-Only Transport, is the older USB storage protocol. It handles commands more simply and tends to perform poorly when the computer has to keep sending a stream of large writes. UASP, or USB Attached SCSI Protocol, is newer and can queue commands more efficiently, so it usually gives better real write performance. After that protocol bottleneck is reduced, the limiting factor shifts to the storage device itself: its controller, cache or write buffer, and whether it can keep writing after any short burst buffer has filled.
 
 <div class="storage-challenge" id="storage-challenge">
   <div>
@@ -257,25 +250,29 @@ The camera produces data at a maximum rate of 125 MB/s continuously as it's reco
     <thead>
       <tr>
         <th>Candidate</th>
-        <th>Protocol clue</th>
-        <th>Measured result from the project log</th>
+        <th>What the label suggested</th>
+        <th>Measured result</th>
+        <th>Decision</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Department USB 3.0 stick</td>
-        <td>BOT, reported on a 480M bus</td>
-        <td>68 MB/s read, 4.4 MB/s write; 7.1 MB/s after formatting</td>
+        <td>USB stick, BOT, reported on a 480M bus</td>
+        <td>4.4 MB/s write; 7.1 MB/s after formatting</td>
+        <td>Rejected: far below the camera requirement.</td>
       </tr>
       <tr>
         <td>UASP USB 3.2 Gen 1 stick</td>
-        <td>UASP, reported on a 5000M bus</td>
+        <td>Faster bus, UASP, reported on a 5000M bus</td>
         <td>370 MB/s read, 90 MB/s write</td>
+        <td>Rejected: much better, but not enough sustained write margin.</td>
       </tr>
       <tr>
         <td>External SSD</td>
         <td>Fast solid-state storage</td>
         <td>984.5 MB/s read, 381.2 MB/s write in a 64 GB test</td>
+        <td>Chosen: enough margin for large continuous recordings.</td>
       </tr>
     </tbody>
   </table>
@@ -285,7 +282,7 @@ The camera produces data at a maximum rate of 125 MB/s continuously as it's reco
   <p id="storage-challenge-result" aria-live="polite">Choose a storage option to see the engineering trade-off.</p>
 </div>
 
-The `480M` and `5000M` clues are bus speeds reported by the computer in megabits per second. The measured storage speeds are in megabytes per second, written as MB/s. One byte is eight bits, and real devices never reach the full theoretical bus speed, so practical testing matters. `#Whenever a checker sees this, change this into introducing how BOT and UASP are different, hence leading to the conclusion that only SSD can sustain large fast file writes#'`
+The `480M` and `5000M` clues are bus speeds in megabits per second, while the measured write speeds are in megabytes per second. They are not the same unit, and real devices never reach the ideal bus speed. The lesson was simple: UASP helped, but only the SSD could sustain large fast file writes with a comfortable safety margin.
 
 
 ## 4. Results
@@ -419,6 +416,7 @@ These are the assets used on this page and why I chose them:
 | <code>chimera-payload-assembly.usdz</code> | Downloads folder, <code>Assembly for Chimera Payload (with drone mockup).usdz</code> | Provides the Apple Quick Look / AR model for inspecting the drone and payload assembly. |
 | <code>fieldwork-site-topography.png</code> | Final report Figure 6, <code>image155.png</code> | Shows the real outdoor location and why terrain/low cloud mattered. |
 | <code>main-retrieval-flowchart.jpg</code> | Final report figures folder, <code>Main Flow-Chart.jpg</code> | Shows the complete retrieval sequence: pre-processing, calibration, tracking, Stokes construction, and LUT fitting. |
+| <code>polarization-linear-polarizers.gif</code> | Institute of Noetic Sciences, <code>Polarization-example-with-linear-polarizers.gif</code> | Complements the polarisation explanation with a visual example of linear polarisers. |
 | <code>filtered-asp-kernel.png</code> | <code>cloudbow_detection/core/kernel_45_135/filtered_kernel_example.png</code> | Shows the real 80 by 80 filtered ASP kernel used to explain the larger version of the simple 3 by 3 pattern-matching example. |
 | <code>cloud-frame-scattering-rings.png</code> | Final report Figure 10, <code>image239.png</code> | Shows the anti-solar point, scattering-angle rings, and processed cloud image in one visual. |
 | <code>lut-fit-example.png</code> | Final report Figure 20, <code>image356.png</code> | Gives a single "measured curve versus model curve" example for the cloud fingerprint idea. |
@@ -670,95 +668,6 @@ These are the assets used on this page and why I chose them:
     border-radius: 8px;
     padding: 0.85rem;
     background: var(--global-card-bg-color);
-  }
-
-  .wave-demo {
-    position: relative;
-    min-height: 230px;
-    overflow: hidden;
-    border: 1px solid var(--global-divider-color);
-    border-radius: 8px;
-    background:
-      linear-gradient(90deg, rgba(127, 127, 127, 0.08) 1px, transparent 1px) 0 0 / 34px 34px,
-      linear-gradient(0deg, rgba(127, 127, 127, 0.08) 1px, transparent 1px) 0 0 / 34px 34px,
-      var(--global-card-bg-color);
-  }
-
-  .wave-demo__axis {
-    position: absolute;
-    left: 8%;
-    right: 10%;
-    top: 50%;
-    height: 2px;
-    background: rgba(127, 127, 127, 0.42);
-  }
-
-  .wave-demo__axis::after {
-    position: absolute;
-    right: -4px;
-    top: -5px;
-    width: 12px;
-    height: 12px;
-    border-top: 2px solid rgba(127, 127, 127, 0.7);
-    border-right: 2px solid rgba(127, 127, 127, 0.7);
-    content: "";
-    transform: rotate(45deg);
-  }
-
-  .wave-demo__wave {
-    position: absolute;
-    left: -12%;
-    top: calc(50% - 36px);
-    width: 135%;
-    height: 72px;
-    background-repeat: repeat-x;
-    background-size: 112px 72px;
-    animation: wave-travel 2.8s linear infinite;
-  }
-
-  .wave-demo__wave--electric {
-    background-image: url("data:image/svg+xml,%3Csvg width='112' height='72' viewBox='0 0 112 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 36 C14 4 42 4 56 36 S98 68 112 36' fill='none' stroke='%237c4dff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
-  }
-
-  .wave-demo__wave--magnetic {
-    top: calc(50% - 4px);
-    height: 8px;
-    opacity: 0.75;
-    background-image: linear-gradient(90deg, transparent 0 22px, #18a999 22px 28px, transparent 28px 56px, #18a999 56px 62px, transparent 62px 112px);
-  }
-
-  .wave-demo__label {
-    position: absolute;
-    padding: 0.18rem 0.38rem;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.58);
-    color: #fff;
-    font-size: 0.75rem;
-  }
-
-  .wave-demo__label--electric {
-    left: 8%;
-    top: 12%;
-  }
-
-  .wave-demo__label--magnetic {
-    left: 8%;
-    bottom: 14%;
-  }
-
-  .wave-demo__label--direction {
-    right: 8%;
-    top: 54%;
-  }
-
-  @keyframes wave-travel {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(112px);
-    }
   }
 
   .polarisation-demo__scene small {
@@ -1061,9 +970,9 @@ These are the assets used on this page and why I chose them:
     const buttons = box.querySelectorAll("button[data-storage]");
 
     const messages = {
-      slow: "This would fail. The label says USB 3.0, but the measured write speed was far below the recording requirement.",
-      medium: "This is much better because UASP and the faster bus help, but 90 MB/s write speed leaves little margin for long scientific recordings.",
-      ssd: "Best choice. The SSD had enough measured write speed and enough margin for bursts during real camera recording."
+      slow: "This would fail. The BOT USB stick looked acceptable from the product label, but its measured write speed was far below the camera requirement.",
+      medium: "This is much better: UASP and the faster bus helped a lot. But 90 MB/s write speed still left too little margin for sustained raw recording.",
+      ssd: "Best choice. The SSD had both the protocol/device performance and enough sustained write margin for large fast files."
     };
 
     buttons.forEach((button) => {
