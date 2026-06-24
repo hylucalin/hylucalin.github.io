@@ -44,7 +44,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/external_links/";
               },
-            },{id: "post-dyson-day-outreach-drone-design-and-image-tracking",
+            },{id: "post-dyson-day-outreach-introduction-to-my-4th-year-project",
+        
+          title: "Dyson Day Outreach: Introduction to My 4th Year Project",
+        
+        description: "A very brief introduction to my fourth-year project for Dyson Day outreach.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dyson-day-introduction-to-iib-project/";
+          
+        },
+      },{id: "post-dyson-day-outreach-drone-design-and-image-tracking",
         
           title: "Dyson Day Outreach: Drone Design and Image Tracking",
         
