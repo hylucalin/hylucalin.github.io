@@ -257,15 +257,36 @@ The drone makes the problem tangible, but the main technical concept is that a c
     background: #f3f0d3;
   }
 
-  .ncc-cell.is-active {
-    outline: 3px solid #1f8f78;
+  .ncc-cell.is-match,
+  .ncc-cell.is-opposite {
+    outline: 3px solid currentColor;
     outline-offset: -3px;
-    box-shadow: 0 0 0 2px rgba(31, 143, 120, 0.18);
     transform: translateY(-1px);
   }
 
-  .ncc-cell.is-best {
-    box-shadow: inset 0 0 0 3px #c84a3a;
+  .ncc-cell.is-match {
+    box-shadow: 0 0 0 2px rgba(31, 143, 120, 0.20);
+    color: #1f8f78;
+  }
+
+  .ncc-cell.is-opposite {
+    box-shadow: 0 0 0 2px rgba(200, 74, 58, 0.20);
+    color: #c84a3a;
+  }
+
+  .ncc-cell[data-value="-1"].is-match,
+  .ncc-cell[data-value="-1"].is-opposite {
+    color: #fff;
+  }
+
+  .ncc-cell[data-value="-1"].is-match {
+    outline-color: #39a96b;
+    box-shadow: 0 0 0 2px rgba(57, 169, 107, 0.25);
+  }
+
+  .ncc-cell[data-value="-1"].is-opposite {
+    outline-color: #d9534f;
+    box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.25);
   }
 
   .ncc-demo__controls {
@@ -302,6 +323,18 @@ The drone makes the problem tangible, but the main technical concept is that a c
     font-family: var(--global-mono-font-family, "SFMono-Regular", Consolas, "Liberation Mono", monospace);
     font-size: 0.9rem;
     overflow-wrap: anywhere;
+  }
+
+  .ncc-term {
+    font-weight: 700;
+  }
+
+  .ncc-term--match {
+    color: #1f8f78;
+  }
+
+  .ncc-term--opposite {
+    color: #c84a3a;
   }
 
   @media (max-width: 720px) {
@@ -366,7 +399,7 @@ The drone makes the problem tangible, but the main technical concept is that a c
       const products = [];
 
       imageCells.forEach((cell) => {
-        cell.classList.remove("is-active", "is-best");
+        cell.classList.remove("is-match", "is-opposite");
       });
 
       for (let row = 0; row < 3; row += 1) {
@@ -375,16 +408,10 @@ The drone makes the problem tangible, but the main technical concept is that a c
           const templateValue = template[row][col];
           const product = imageValue * templateValue;
           total += product;
-          products.push(product > 0 ? "+1" : "-1");
+          products.push(product);
 
           const index = (y + row) * 5 + (x + col);
-          imageCells[index].classList.add("is-active");
-        }
-      }
-
-      for (let row = 1; row <= 3; row += 1) {
-        for (let col = 1; col <= 3; col += 1) {
-          imageCells[row * 5 + col].classList.add("is-best");
+          imageCells[index].classList.add(product > 0 ? "is-match" : "is-opposite");
         }
       }
 
@@ -393,7 +420,14 @@ The drone makes the problem tangible, but the main technical concept is that a c
       yLabel.textContent = String(y + 1);
       scoreEl.textContent = `${score >= 0 ? "+" : ""}${score.toFixed(2)}`;
       locationEl.textContent = `position ${labels[y][x]}`;
-      workingEl.textContent = `Products: ${products.join(" ")}; total = ${total}; score = ${total}/9`;
+      const productTerms = products
+        .map((product) => {
+          const className = product > 0 ? "ncc-term--match" : "ncc-term--opposite";
+          const label = product > 0 ? "+1" : "-1";
+          return `<span class="ncc-term ${className}">${label}</span>`;
+        })
+        .join(" ");
+      workingEl.innerHTML = `Products: ${productTerms}; total = ${total}; score = ${total}/9`;
     };
 
     xInput.addEventListener("input", update);
