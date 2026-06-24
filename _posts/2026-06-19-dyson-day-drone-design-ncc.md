@@ -12,7 +12,15 @@ thumbnail: assets/img/blog/dyson-day-2026/dyson-day-challenges.png
 
 This outreach activity was developed for Dyson Day on 19 June 2026 as part of my James Dyson-funded fourth-year project on drone-borne cloud observation. The project uses a small drone carrying a camera and onboard sensors to investigate how cloud droplet size distributions might be retrieved from polarimetric images.
 
+### 1.1 Activity Details
+
+This outreach activity was delivered during Dyson Day as a 30-minute small-group session. The session involved 24 students working in 6 groups. The activity used a simplified drone-tracking scenario to introduce the idea of designing a measurement system from limited data sources, before moving to a paper-based normalised cross-correlation activity for image tracking.
+
+### 1.2 Learning Aims
+
 The aim of the session was to make the project accessible to school students while preserving the central engineering ideas: measurement design, sensor trade-offs, image tracking, uncertainty, and the link between images and geometry.
+
+The activity was designed to help students see a drone as a scientific measurement system rather than simply a flying camera. By the end of the session, students were expected to understand that different payload components provide different data clues, that accuracy and cost must be traded against each other, and that image recognition can be thought of as matching patterns between frames.
 
 The session was organised around two linked activities:
 
@@ -157,7 +165,13 @@ This limitation is typical of basic template matching. It is fast and intuitive,
 
 That is why the payload design discussion matters. Image tracking is stronger when it is combined with other clues such as attitude, range, known drone motion, or repeated observations from different positions.
 
-## 4. Educational Outcomes
+## 4. Reflection
+
+The design discussion was engaging, with students able to suggest different ways of combining payload components to locate the tree relative to the drone. The normalised cross-correlation section was more conceptually challenging, particularly because it required students to connect a physical paper game with an abstract image-processing algorithm.
+
+The online resource is therefore intended to support the live activity by giving a slower explanation of the same ideas and allowing students to revisit the logic after the session.
+
+## 5. Conclusion and Project Connection
 
 The drone design activity provides the systems-engineering context, while the NCC activity gives a concrete way to experience image recognition. By working through the case study, students compare payload designs, discuss sensor accuracy and calibration, test several ways to retrieve relative-position information, and connect a simple tree-tracking example to a real drone-based cloud observation project.
 
