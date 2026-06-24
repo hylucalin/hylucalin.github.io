@@ -8,11 +8,24 @@ categories: outreach
 thumbnail: assets/img/blog/dyson-day-2026/dyson-day-challenges.png
 ---
 
-This activity was developed for Dyson Day on 19 June 2026 as part of my James Dyson-funded fourth-year project on drone-borne cloud observation. The project uses a small drone carrying a camera and onboard sensors to investigate how cloud droplet size distributions might be retrieved from polarimetric images.
+## 1. Introduction and Aims
+
+This outreach activity was developed for Dyson Day on 19 June 2026 as part of my James Dyson-funded fourth-year project on drone-borne cloud observation. The project uses a small drone carrying a camera and onboard sensors to investigate how cloud droplet size distributions might be retrieved from polarimetric images.
+
+The aim of the session was to make the project accessible to school students while preserving the central engineering ideas: measurement design, sensor trade-offs, image tracking, uncertainty, and the link between images and geometry.
+
+The session was organised around two linked activities:
+
+| Activity | Student task | Engineering idea |
+| --- | --- | --- |
+| 1. Drone payload design | Choose useful payload components under a budget constraint. | Scientific measurements require carefully chosen data clues. |
+| 2. Image tracking with NCC | Slide a simplified pattern over a new image and score each position. | Software can recognise a target by comparing local intensity structure. |
 
 Now imagine the same kind of engineering problem in a simpler scene.
 
-## Scenario: One Tree on a Flat Grassland
+## 2. Activity 1: Drone Payload Design
+
+### 2.1 Simplified Scenario
 
 A drone is flying over a flat grassland. There is one clearly visible tree. The engineering task is to work out where the tree is relative to the drone.
 
@@ -27,7 +40,7 @@ To know the tree's relative position, the drone needs at least a direction. To k
 
 This is the conceptual bridge to my real project. In drone-borne cloud observation, the tree becomes a cloud patch. The drone must recognise the same target in repeated images and combine that with viewing geometry, attitude, and position information. The simplified tree problem keeps the physics approachable, while preserving the real engineering challenge: useful measurements require both images and geometry.
 
-## Drone Payload Design
+### 2.2 Payload Components
 
 You cannot carry every payload. Which data clues would you choose?
 
@@ -54,7 +67,7 @@ During the Dyson Day activity, students worked in small groups with a limited bu
 | We combine the data by ______. | Describe sensor fusion. |
 | The biggest weakness of our design is ______. | Notice uncertainty and trade-offs. |
 
-## Compare the Designs
+### 2.3 Possible Design Routes
 
 There is no single perfect answer. A good engineering design chooses which clues are reliable enough for the mission.
 
@@ -65,7 +78,9 @@ There is no single perfect answer. A good engineering design chooses which clues
 | C. Two-frame triangulation | If the drone sees the tree from two different positions, each image gives a direction line towards the tree. Where those two direction lines meet is the estimated position. | Elegant and powerful, but needs enough drone motion and accurate direction estimates. |
 | D. Active pointing and range finding | A gimbal keeps the camera or laser pointed at the tree. Gimbal/attitude data provide direction, and the laser range finder gives distance. | Intuitive and accurate when it works, but heavier, more expensive, and alignment-sensitive. |
 
-## From Drone Design to Pattern Matching
+## 3. Activity 2: Image Tracking with Normalised Cross Correlation
+
+### 3.1 From Drone Design to Pattern Matching
 
 Several of these designs rely on the camera. But a camera image is just a grid of numbers. How can software recognise the same tree again in the next frame?
 
@@ -92,7 +107,7 @@ In the paper version of the activity, students used a physical 3x3 sliding mask 
   The activity had two linked challenges: first, choose a useful drone payload under a budget constraint; second, use a simplified NCC pattern to recognise the same tree again in a new image.
 </div>
 
-## Interactive NCC Demo
+### 3.2 Interactive NCC Demonstration
 
 Try the same idea below. Move the 3x3 tracker across the 5x5 image using the sliders. The score is the average of the nine products between the template and the image patch. A score near `+1` means a strong match; a score near `-1` means the pattern is mostly opposite.
 
@@ -128,19 +143,21 @@ Try the same idea below. Move the 3x3 tracker across the 5x5 image using the sli
 
 In this example, the best match is at the centre of the 5x5 image. That is where the local bright/dark structure is the same as the remembered 3x3 pattern.
 
-## Why Intensity First?
+### 3.3 Why Intensity First?
 
 Intensity is a simple brightness value. Colour can help, but colour is often less stable because sunlight, shadow, camera settings, and white balance can change it. For a first tracking method, brightness structure is often easier to reason about.
 
 If a patch has a dark-left, bright-right pattern, that structure can remain recognisable even if the whole image becomes brighter, dimmer, or slightly tinted. That is why the paper game uses `+1` and `-1`: it teaches the idea of matching structure rather than trusting raw colour labels.
 
-## What Can Go Wrong?
+### 3.4 Limitations of NCC
 
 NCC is useful, but it is not magic. It works best when the object looks similar between frames. It can struggle if the target rotates, changes size, becomes blurred, is partly hidden, or if another object has a similar pattern.
 
 This limitation is typical of basic template matching. It is fast and intuitive, but it is not robust to large changes in rotation, scale, or viewpoint.
 
 That is why the payload design discussion matters. Image tracking is stronger when it is combined with other clues such as attitude, range, known drone motion, or repeated observations from different positions.
+
+## 4. Educational Outcomes
 
 The drone design activity provides the systems-engineering context, while the NCC activity gives a concrete way to experience image recognition. By working through the case study, students compare payload designs, discuss sensor accuracy and calibration, test several ways to retrieve relative-position information, and connect a simple tree-tracking example to a real drone-based cloud observation project.
 
