@@ -55,9 +55,9 @@ ninja.data = [{
             window.location.href = "/blog/2026/dyson-day-introduction-to-iib-project/";
           
         },
-      },{id: "post-dyson-day-outreach-drone-design-and-image-tracking",
+      },{id: "post-dyson-day-outreach-activity-summary-drone-design-and-image-tracking",
         
-          title: "Dyson Day Outreach: Drone Design and Image Tracking",
+          title: "Dyson Day Outreach Activity Summary: Drone Design and Image Tracking",
         
         description: "A brief report on my James Dyson funded outreach activity about drone payload design, sensor trade-offs, and normalised cross correlation.",
         section: "Posts",
