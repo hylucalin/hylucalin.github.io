@@ -8,48 +8,95 @@ categories: outreach
 thumbnail: assets/img/blog/dyson-day-2026/ncc-paper-game-contact-sheet.png
 ---
 
-On 19 June 2026, I delivered an outreach presentation for Dyson Day as the recipient of James Dyson funding for my fourth-year project. The aim was to turn my project into a hands-on engineering activity: rather than only describing a drone-based cloud observation system, I invited students to think through how a drone can make useful measurements when every sensor is imperfect.
+This activity was developed for Dyson Day on 19 June 2026 as part of my James Dyson-funded fourth-year project on drone-borne cloud observation. The project uses a small drone carrying a camera and onboard sensors to investigate how cloud droplet size distributions might be retrieved from polarimetric images.
 
-My project uses a small drone carrying a camera and onboard sensors to investigate how cloud droplet size distributions might be retrieved from polarimetric images. For the outreach session, I simplified that into a more tangible design question:
+Now imagine the same kind of engineering problem in a simpler scene.
 
-> How can a drone work out where an object is relative to itself using incomplete sensor data?
+## Scenario: One Tree on a Flat Grassland
 
-The example scene was a drone flying over a flat grassland with one clearly visible tree. The students' task was to design a payload that could estimate the relative position between the drone and the tree. This kept the discussion grounded in something visible, while still preserving the real engineering ideas behind the project: image tracking, sensor fusion, uncertainty, calibration, and trade-offs.
+A drone is flying over a flat grassland. There is one clearly visible tree. The engineering task is to work out where the tree is relative to the drone.
+
+That sounds simple, but "relative position" contains two different pieces of information:
+
+| Question | Meaning |
+| --- | --- |
+| Direction | Is the tree in front, behind, left, right, or somewhere else in the camera view? |
+| Distance | How far away is the tree from the drone? |
+
+To know the tree's relative position, the drone needs at least a direction. To know the full position, it also needs distance, or enough information to infer distance from geometry.
+
+This is the conceptual bridge to my real project. In drone-borne cloud observation, the tree becomes a cloud patch. The drone must recognise the same target in repeated images and combine that with viewing geometry, attitude, and position information. The simplified tree problem keeps the physics approachable, while preserving the real engineering challenge: useful measurements require both images and geometry.
 
 ## Drone Payload Design
 
-Students were given six possible payload components:
+You cannot carry every payload. Which data clues would you choose?
 
-- camera;
-- gimbal;
-- laser range finder;
-- GPS module;
-- flight controller / IMU;
-- onboard computer.
+Here are six possible payload components. Each one is useful, but each one also has a limitation.
 
-Each component gave a different clue. A camera could show where the tree appeared in the image, but not directly how far away it was. GPS could locate the drone, but not the tree unless the image data were also interpreted. An IMU could describe attitude and motion, but drift and calibration errors matter. A laser range finder could measure distance accurately if it was pointed at the right target. An onboard computer could run image-processing logic, but added cost, weight, and power demand.
+| Payload | Data clue | What it helps with | Limitation |
+| --- | --- | --- | --- |
+| Camera | Image of the tree | Direction in the image | Does not directly give distance |
+| Gimbal | Camera pointing angle | Keeps the tree centred | Heavy/costly; needs pointing control |
+| Laser range finder | Distance along beam | Measures range to the tree | Only works if aimed correctly |
+| GPS module | Drone position | Tracks drone motion | Not precise enough alone for image-level tracking |
+| Flight controller / IMU | Roll, pitch, yaw | Knows drone attitude | Timing/alignment errors matter |
+| Onboard computer | Processed image result | Runs tracking/detection | Uses power; depends on algorithm quality |
 
-The students worked in small groups with a limited budget, so they could not simply choose everything. That forced a useful engineering conversation: which information is essential, which measurements can be inferred, and which uncertainties would dominate the design?
+The learning objective is not just "choose drone hardware". The real question is about data retrieval and sensor fusion: which clues are reliable enough, which measurements can be inferred, and which uncertainties would dominate the design?
 
-Three natural data-retrieval strategies emerged:
+During the Dyson Day activity, students worked in small groups with a limited budget. They had to decide which components they would carry and explain how their system would work. Some useful prompts were:
 
-1. **Position-first retrieval:** use GPS and IMU data to estimate where the drone is and how it is pointing, then combine that with a camera image to infer the tree direction.
-2. **Image-first retrieval:** use the camera and onboard computer to detect and track the tree from frame to frame, then use drone attitude or motion to convert image movement into a relative-position estimate.
-3. **Active pointing retrieval:** use a gimbal and laser range finder to point at the tree and directly measure the distance, while using GPS/IMU data to place that measurement in the drone's frame.
+- We choose ______ because it gives us ______.
+- We use ______ to find the tree in the image.
+- We use ______ to know where the drone is or how it is pointing.
+- We combine the data by ______.
+- The biggest weakness of our design is ______.
 
-The important lesson was that no design was perfect. A cheap camera-only system might be light and simple but ambiguous in distance. A range-finder system might be more accurate but heavier, more expensive, and harder to align. A GPS/IMU-heavy system might be elegant on paper but sensitive to calibration and coordinate-frame errors. This is exactly the kind of trade-off that appears in real scientific drone payloads.
+## Compare the Designs
+
+There is no single perfect answer. A good engineering design chooses which clues are reliable enough for the mission.
+
+**Route A: Take-off reference / motion tracking**
+
+If the drone starts near the tree, then the take-off point can be treated as the tree's location. GPS and/or flight data can estimate how the drone moved away from that point. The relative position of the tree is then approximately the reverse of the drone's displacement from take-off.
+
+This is simple, but imperfect. GPS drift and position error matter.
+
+**Route B: Camera geometry / image tracking**
+
+The camera detects where the tree appears in the image. That image position gives a direction in the camera view. The drone attitude tells how the camera was pointing in the real world. If the ground is assumed flat, that direction can be projected down to the ground to estimate where the tree is.
+
+This is closest to the logic of my project: identify a target in the image, combine it with drone attitude and geometry, and reconstruct a useful viewing direction.
+
+**Route C: Two-frame triangulation**
+
+If the drone sees the tree from two different positions, then each image gives a direction line towards the tree. Where those two direction lines meet is the tree's estimated position.
+
+This is an elegant idea because it introduces triangulation without heavy mathematics. It also shows why repeated observations can be more powerful than one image alone.
+
+**Route D: Active pointing and range finding**
+
+A gimbal can keep the camera or laser pointed at the tree. The gimbal and attitude data provide direction, while the laser range finder gives distance. Together, direction and distance give the tree's relative position.
+
+This design is intuitive and accurate when it works, but it is also heavier, more expensive, and more dependent on alignment and pointing control.
 
 ## From Drone Design to Pattern Matching
 
-After the payload discussion, I focused on the camera-based solution. If a drone sees the tree in one image, how can it recognise the same tree in the next image?
+Several of these designs rely on the camera. But a camera image is just a grid of numbers. How can software recognise the same tree again in the next frame?
 
-This was the bridge to normalised cross correlation (NCC). I introduced NCC as a pattern-matching score: the computer remembers a small patch, slides it over a new image, and asks where the bright and dark pattern matches best. Instead of starting with full image-processing notation, I simplified the template to values of `+1` and `-1`:
+This is the same kind of problem used when tracking a ball in sport, following a car in a video, or keeping a drone camera locked onto a target. One simple method is normalised cross correlation, or NCC.
+
+Cross-correlation means comparing a remembered patch with many possible patches in the new image. The signal is strong when bright parts line up with bright parts and dark parts line up with dark parts. The signal is weak when the two patches are unrelated: some parts agree by chance, some disagree by chance, and the total score tends to cancel out.
+
+Normalised means making the comparison fair even if the whole picture becomes brighter, darker, or higher contrast. Without normalisation, the score can change simply because the camera exposure changed, even if the object is the same. With normalisation, the algorithm focuses more on the relative pattern inside the patch.
+
+For the outreach activity, I simplified the template to values of `+1` and `-1`:
 
 - `+1` means "this part of the remembered patch is bright";
 - `-1` means "this part is dark";
 - the score is high when bright parts line up with bright parts and dark parts line up with dark parts.
 
-In the paper version of the activity, students used a physical 3x3 sliding mask over a 5x5 grid. At each position, they multiplied the nine image values by the nine template values, added the products, and divided by 9. The best-matching location had the highest score.
+In the paper version of the activity, students used a physical 3x3 sliding mask over a 5x5 grid. At each position, they multiplied the nine image values by the nine template values, added the products, and divided by 9. The best-matching location had the highest score. This is a simplified intensity pattern rather than full NCC mathematics, but it captures the main idea of sliding a remembered template over a larger image and scoring similarity at each position.
 
 <div class="row mt-3 justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
@@ -98,25 +145,40 @@ In this example, the best match is at the centre of the 5x5 image. That is where
 
 ## Why Intensity First?
 
-For the activity, I also explained why brightness or intensity is often a better first choice than exact colour matching. The same object can look different in colour when the light changes, when the camera exposure changes, or when clouds and shadows move across the scene. Colour can still be useful, but exact hue is fragile.
+Intensity is a simple brightness value. Colour can help, but colour is often less stable because sunlight, shadow, camera settings, and white balance can change it. For a first tracking method, brightness structure is often easier to reason about.
 
-Intensity structure is usually more stable. If a patch has a dark-left, bright-right pattern, that structure can remain recognisable even if the whole image becomes brighter, dimmer, or slightly tinted. That is why NCC is often introduced through brightness patterns: it teaches the idea of matching structure rather than trusting raw colour labels.
+If a patch has a dark-left, bright-right pattern, that structure can remain recognisable even if the whole image becomes brighter, dimmer, or slightly tinted. That is why the paper game uses `+1` and `-1`: it teaches the idea of matching structure rather than trusting raw colour labels.
 
-In the real project, this connects back to cloud imaging. The drone is not just taking photographs; it is collecting measurements. To turn images into physical information, the system must understand which parts of the image are comparable, which changes are caused by geometry or lighting, and which changes contain the scientific signal.
+## What Can Go Wrong?
 
-## Outreach Outcome
+NCC is useful, but it is not magic. It works best when the object looks similar between frames. It can struggle if the target rotates, changes size, becomes blurred, is partly hidden, or if another object has a similar pattern.
 
-The session was designed to show that engineering is not only about adding more hardware. It is about choosing the right measurements, understanding uncertainty, and combining imperfect clues carefully.
+This limitation is typical of basic template matching. It is fast and intuitive, but it is not robust to large changes in rotation, scale, or viewpoint.
 
-By the end of the activity, students had:
+That is why the payload design discussion matters. Image tracking is stronger when it is combined with other clues such as attitude, range, known drone motion, or repeated observations from different positions.
 
-- compared different drone payload designs under cost and practicality constraints;
-- discussed why sensor accuracy, weight, power, and calibration matter;
-- seen three different ways to retrieve relative-position information;
-- used a physical NCC game to understand image tracking;
-- connected a simple tree-tracking example to a real drone-based cloud observation project.
+## Activity Summary
 
-The drone design activity provided the systems-engineering context, while the NCC activity gave students a concrete way to experience the image-recognition idea. That balance was important: the drone made the problem tangible, but the main technical concept was that a computer can track visual patterns by comparing local intensity structure across images.
+The full activity moved through the following arc:
+
+1. A real project: drone-borne cloud observation needs images plus geometry.
+2. A simplified scenario: one drone, one tree, flat grassland.
+3. The engineering question: where is the tree relative to the drone?
+4. The data challenge: direction and distance must be inferred from imperfect clues.
+5. The design task: choose a payload under constraints.
+6. The software tool: NCC can track a target in images.
+7. The limitation: NCC can fail, so sensor fusion matters.
+8. Return to the real project: the tree becomes a cloud patch; the same logic helps combine repeated images and drone attitude data.
+
+By working through the case study, students could:
+
+- compare different drone payload designs under cost and practicality constraints;
+- discuss why sensor accuracy, weight, power, and calibration matter;
+- compare several ways to retrieve relative-position information;
+- use a physical NCC game to understand image tracking;
+- connect a simple tree-tracking example to a real drone-based cloud observation project.
+
+The drone design activity provides the systems-engineering context, while the NCC activity gives a concrete way to experience image recognition. The drone makes the problem tangible, but the main technical concept is that a computer can track visual patterns by comparing local intensity structure across images.
 
 <style>
   .ncc-demo {
