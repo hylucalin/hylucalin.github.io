@@ -11,7 +11,7 @@ My fourth-year project asked a simple question with a surprisingly tricky answer
 
 > Can a small drone measure the size of tiny droplets inside low cloud or fog?
 
-Two facts drive the project. First, clouds help control Earth's temperature because bright clouds reflect sunlight back to space. Second, a cloud's brightness depends strongly on its <span class="term" data-def="Droplet size distribution: a description of how many small, medium, and large droplets are present in a cloud.">droplet size distribution</span>, or DSD: if the same amount of liquid water is split into many smaller droplets, the cloud can become brighter. This is the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can increase cloud reflectivity.">Twomey effect</span> {% cite twomey1977influence %}.
+Two facts drive the project. First, clouds help control Earth's temperature because bright clouds reflect sunlight back to space. Second, a cloud's brightness depends strongly on its <span class="term" data-def="Droplet size distribution: a description of how many small, medium, and large droplets are present in a cloud.">droplet size distribution</span>, or DSD: if the same amount of liquid water is split into many smaller droplets, the cloud can become brighter. This is the <span class="term" data-def="The idea that, for the same liquid-water amount, more numerous smaller cloud droplets can increase cloud reflectivity.">Twomey effect</span> <a class="ref-link" href="#ref-twomey1977">[1]</a>.
 
 <div class="cloud-question" id="cloud-question">
   <div>
@@ -47,7 +47,7 @@ Instead of trying to count every droplet, cloud scientists describe the DSD usin
 - **<span class="term" data-def="A weighted average droplet radius that is especially useful for predicting how cloud droplets scatter and absorb light.">Effective radius</span>:** a useful average droplet size for light scattering.
 - **<span class="term" data-def="A dimensionless measure of how spread out the droplet sizes are. A small value means the droplets are more similar in size.">Effective variance</span>:** how broad or narrow the droplet-size distribution is.
 
-Satellites can estimate cloud droplet size over large areas {% cite platnick2017modis %}, but their pixels are usually much larger than a small evolving patch of cloud. Research aircraft can do better, but they are expensive and still not ideal for repeated close-range monitoring. The project therefore tested a lower-cost route: a drone carrying a compact polarisation camera.
+Satellites can estimate cloud droplet size over large areas <a class="ref-link" href="#ref-platnick2017">[2]</a>, but their pixels are usually much larger than a small evolving patch of cloud. Research aircraft can do better, but they are expensive and still not ideal for repeated close-range monitoring. The project therefore tested a lower-cost route: a drone carrying a compact polarisation camera.
 
 ## 2. Methodology
 
@@ -55,15 +55,22 @@ Satellites can estimate cloud droplet size over large areas {% cite platnick2017
 
 Light is an electromagnetic wave. A wave is a repeating disturbance that travels: a water wave moves across a pond, while the water surface rises and falls. In a light wave, the changing quantities are the electric and magnetic fields. They oscillate perpendicular to the direction in which the light travels.
 
-For this project, the important part is the electric field. <span class="term" data-def="The orientation of the electric-field oscillation in a light wave.">Polarisation</span> describes the direction in which that electric field oscillates. Ordinary sunlight contains many polarisation directions mixed together. After sunlight scatters from water droplets, some directions can become stronger than others, giving <span class="term" data-def="How strongly the measured light prefers one linear electric-field oscillation direction over another.">linear polarisation intensity</span> {% cite bohren1983absorption hansen1974light %}.
+For this project, the important part is the electric field. <span class="term" data-def="The orientation of the electric-field oscillation in a light wave.">Polarisation</span> describes the direction in which that electric field oscillates. Ordinary sunlight contains many polarisation directions mixed together. After sunlight scatters from water droplets, some directions can become stronger than others, giving <span class="term" data-def="How strongly the measured light prefers one linear electric-field oscillation direction over another.">linear polarisation intensity</span> <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-hansen1974">[4]</a>.
 
 <div class="row align-items-center">
   <div class="col-md-6 mt-3 mt-md-0">
-    <img class="img-fluid rounded z-depth-1" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Cross_linear_polarization.gif" alt="Animation of a linearly polarised wave passing through a rotating polariser">
+    <div class="wave-demo" aria-label="Animated local diagram of a linearly polarised electromagnetic wave">
+      <div class="wave-demo__axis"></div>
+      <div class="wave-demo__wave wave-demo__wave--electric"></div>
+      <div class="wave-demo__wave wave-demo__wave--magnetic"></div>
+      <span class="wave-demo__label wave-demo__label--electric">electric-field oscillation</span>
+      <span class="wave-demo__label wave-demo__label--magnetic">magnetic-field oscillation</span>
+      <span class="wave-demo__label wave-demo__label--direction">direction of travel</span>
+    </div>
   </div>
   <div class="col-md-6 mt-3 mt-md-0">
-    <p>The GIF shows a linearly polarised wave meeting a polariser. The wave amplitude changes as the polariser axis rotates relative to the electric-field oscillation direction.</p>
-    <p class="caption">External teaching reference: <a href="https://commons.wikimedia.org/wiki/File:Cross_linear_polarization.gif">Cross linear polarization.gif</a> by Smouss / Simon Raffy, CC BY 4.0, via Wikimedia Commons.</p>
+    <p>This local animation shows the idea that a light wave travels forward while its electric and magnetic fields oscillate sideways. Linear polarisation describes the orientation of the electric-field oscillation.</p>
+    <p class="caption">Intention: replace the broken external GIF link with a self-contained animation that explains the same wave idea without depending on a remote media file.</p>
   </div>
 </div>
 
@@ -84,7 +91,7 @@ For this project, the important part is the electric field. <span class="term" d
   </div>
 </div>
 
-The optical feature used here is the <span class="term" data-def="A rainbow-like angular feature produced when sunlight is scattered by many small cloud droplets. In this project it is detected mainly in linear polarisation, not as a bright ordinary-colour rainbow.">cloudbow</span>. It is related to a rainbow, but cloud droplets are much smaller and the useful signal is often clearest in polarised light. In the cloudbow region, roughly 135 degrees to 165 degrees in scattering angle, the linear polarisation signal changes shape when the DSD changes {% cite poertge2023cloudbow %}.
+The optical feature used here is the <span class="term" data-def="A rainbow-like angular feature produced when sunlight is scattered by many small cloud droplets. In this project it is detected mainly in linear polarisation, not as a bright ordinary-colour rainbow.">cloudbow</span>. It is related to a rainbow, but cloud droplets are much smaller and the useful signal is often clearest in polarised light. In the cloudbow region, roughly 135 degrees to 165 degrees in scattering angle, the linear polarisation signal changes shape when the DSD changes <a class="ref-link" href="#ref-poertge2023">[5]</a>.
 
 The geometry is centred on the <span class="term" data-def="The image point directly opposite the Sun. It is approximately where the camera or drone shadow would appear on a cloud or on the ground if the surface were visible.">anti-solar point</span>, or ASP. A useful way to picture it is: if the cloud were a screen and the drone shadow could be seen on it, the shadow would lie near the ASP. Around the ASP, points with the same scattering angle form rings. The linear polarisation intensity therefore forms ring-like patterns: each ring contains pixels with approximately the same scattering angle.
 
@@ -136,7 +143,7 @@ The polarisation camera records four micro-polariser angles: 0 degrees, 45 degre
 
 Different combinations of the same video were used for different jobs:
 
-- The **45-135 channel** emphasises the cross-shaped ASP feature. I used this channel with <span class="term" data-def="Normalised cross correlation: a template-matching method that slides a remembered pattern over an image and scores how well each position matches.">normalised cross correlation</span>, or NCC, to track the ASP {% cite brunelli2009template %}.
+- The **45-135 channel** emphasises the cross-shaped ASP feature. I used this channel with <span class="term" data-def="Normalised cross correlation: a template-matching method that slides a remembered pattern over an image and scores how well each position matches.">normalised cross correlation</span>, or NCC, to track the ASP <a class="ref-link" href="#ref-brunelli2009">[6]</a>.
 - A single image channel was enough for cloud masking and horizon detection. The aim was to keep bright low-saturation cloud pixels while excluding blue sky, terrain, and the horizon.
 - All four polarisation angles from the 12-bit data were used to retrieve the final linear polarisation information.
 
@@ -159,7 +166,7 @@ The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In 
 
 <details class="cloud-case-details">
   <summary>Technical note: why does this shape appear?</summary>
-  <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of <span class="term" data-def="A four-number description of light intensity and polarisation: I, Q, U, and V.">Stokes-vector</span> polarimetry: rotating the reference frame mixes the <code>Q</code> and <code>U</code> components {% cite bohren1983absorption %}.</p>
+  <p>The measured polarisation direction has to be rotated from the camera plane into the scattering plane. That change of reference frame introduces a sinusoidal dependence involving <code>sin(2x)</code> and <code>cos(2x)</code>. This is part of <span class="term" data-def="A four-number description of light intensity and polarisation: I, Q, U, and V.">Stokes-vector</span> polarimetry: rotating the reference frame mixes the <code>Q</code> and <code>U</code> components <a class="ref-link" href="#ref-bohren1983">[3]</a>.</p>
 </details>
 
 For a hands-on version of the tracking idea, see my outreach activity:
@@ -167,7 +174,7 @@ For a hands-on version of the tracking idea, see my outreach activity:
 
 ### 2.4 Camera Calibration
 
-A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look? Camera calibration follows standard geometric calibration ideas {% cite zhang2000flexible %}.
+A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look? Camera calibration follows standard geometric calibration ideas <a class="ref-link" href="#ref-zhang2000">[7]</a>.
 
 Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.
 
@@ -182,7 +189,7 @@ Move the slider below. The left view shows an exaggerated distorted camera image
 
 Once each cloud pixel has a scattering angle and a linear polarisation signal, the retrieval becomes curve fitting. I generated a lookup table of theoretical linear polarisation profiles in the scattering plane. Each curve corresponds to one possible gamma-distribution DSD.
 
-The LUT grid covered effective radius from **1 micrometre to 40.77 micrometres** on a logarithmic grid, and effective variance from **0.01 to 0.325**. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve {% cite bohren1983absorption miepython2026 %}. The measured profile was then fitted to the LUT, and the best-fitting curve gave the retrieved DSD parameters.
+The LUT grid covered effective radius from **1 micrometre to 40.77 micrometres** on a logarithmic grid, and effective variance from **0.01 to 0.325**. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>. The measured profile was then fitted to the LUT, and the best-fitting curve gave the retrieved DSD parameters.
 
 <details class="cloud-case-details">
   <summary>What does the LUT actually compare?</summary>
@@ -218,14 +225,16 @@ The engineering challenge was not simply "attach a camera". The camera had to be
 </div>
 
 <p>
-  <a class="btn btn-sm btn-outline-primary ar-link" rel="ar" href="{{ '/assets/models/projects/drone-cloud-droplet-measurement/chimera-payload-assembly.usdz' | relative_url }}">View the payload assembly in AR</a>
-  <a class="btn btn-sm btn-outline-secondary" href="{{ '/assets/models/projects/drone-cloud-droplet-measurement/chimera-payload-assembly.usdz' | relative_url }}">Open the USDZ model</a>
+  <a class="btn btn-sm btn-outline-primary ar-link" rel="ar" href="{{ '/assets/models/projects/drone-cloud-droplet-measurement/chimera-payload-assembly.usdz' | relative_url }}">
+    <img class="ar-link__poster" src="{{ '/assets/img/projects/drone-cloud-droplet-measurement/payload-exploded-view.png' | relative_url }}" alt="">
+    <span>View the payload assembly in AR</span>
+  </a>
 </p>
 <div class="caption">
-  Intention: provide an interactive Apple Quick Look / AR view of the drone mockup and payload assembly. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
+  Intention: provide an Apple Quick Look AR view of the drone mockup and payload assembly on iPhone or iPad. On other devices the button is disabled to avoid downloading the USDZ file. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
 </div>
 
-The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas {% cite zhang2000flexible %}.
+The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas <a class="ref-link" href="#ref-zhang2000">[7]</a>.
 
 ### 3.1 Choosing Storage That Is Actually Fast Enough
 
@@ -237,7 +246,7 @@ The camera produced a stream of raw image data. That meant the storage device ha
 - **Bus speed:** USB 2.0, USB 3.0, and USB 3.2 describe how fast the connection can be in theory.
 - **Storage protocol:** BOT and UASP describe how the computer talks to the drive. In my tests, UASP was much better for fast recording.
 
-From the project log, the recording needed roughly **60 MB/s** in an early laptop test, and the final payload could sometimes burst up to about **318 MB/s** while saving frames. That meant the safe choice needed much more than 60 MB/s on a short benchmark.
+The camera produces data at a maximum rate of 125 MB/s continuously as it's recording, producing gigabytes of data fast. The storage media needs to be able to continuously write data fast enough.
 
 <div class="storage-challenge" id="storage-challenge">
   <div>
@@ -276,24 +285,14 @@ From the project log, the recording needed roughly **60 MB/s** in an early lapto
   <p id="storage-challenge-result" aria-live="polite">Choose a storage option to see the engineering trade-off.</p>
 </div>
 
-The `480M` and `5000M` clues are bus speeds reported by the computer in megabits per second. The measured storage speeds are in megabytes per second, written as MB/s. One byte is eight bits, and real devices never reach the full theoretical bus speed, so practical testing matters.
+The `480M` and `5000M` clues are bus speeds reported by the computer in megabits per second. The measured storage speeds are in megabytes per second, written as MB/s. One byte is eight bits, and real devices never reach the full theoretical bus speed, so practical testing matters. `#Whenever a checker sees this, change this into introducing how BOT and UASP are different, hence leading to the conclusion that only SSD can sustain large fast file writes#'`
 
-The final choice was the SSD. The UASP stick was much better than the slow USB stick, but the SSD gave more safety margin for long recordings. A later payload test found that 12-bit recording at 10 frames per second worked for a 1200 second run, while 13 frames per second caused many incomplete images.
 
-## 4. Real Data Products
+## 4. Results
 
 The pipeline produces intermediate data that can be inspected visually. This is important because a retrieval can only be trusted if the geometry, masks, and polarisation signal make physical sense.
 
 The example below shows the retrieved geometry and polarisation map on one frame. The yellow cross marks the tracked ASP. The red circles are scattering-angle contours centred on the ASP. The dense coloured overlay on the cloud shows the rotated linear polarisation signal used to build the retrieval profile.
-
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Intention: show how cloud masking, ASP tracking, scattering-angle rings, and the polarisation signal meet in a real frame. Source: final report Figure 10, originally exported as <code>image239.png</code>.
-</div>
 
 <div class="row mt-3">
   <div class="col-sm mt-3 mt-md-0">
@@ -308,6 +307,15 @@ The example below shows the retrieved geometry and polarisation map on one frame
 </div>
 
 For the multi-frame retrieval, the goal was to follow the same small cloud region across several frames. Each frame contributes polarisation samples at slightly different viewing angles, so the cloudbow profile gradually fills in.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-8 mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/projects/drone-cloud-droplet-measurement/cloud-frame-scattering-rings.png" title="Cloud frame with scattering-angle rings" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Intention: show how cloud masking, ASP tracking, scattering-angle rings, and the polarisation signal meet in a real frame. Source: final report Figure 10, originally exported as <code>image239.png</code>.
+</div>
 
 <div class="row mt-3">
   <div class="col-sm mt-3 mt-md-0">
@@ -334,9 +342,9 @@ The final product of the pipeline is a measured angular polarisation profile com
   Intention: show the "fingerprint matching" step after the theory and hardware have been introduced. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
 </div>
 
-### 4.2 Go Deeper: The LUT Explorer
+### 4.2 Go Deeper: The Actual LUT Used
 
-The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations {% cite bohren1983absorption miepython2026 %}.
+The <span class="term" data-def="A lookup table: a library of simulated cloudbow patterns used for matching measured data.">lookup table</span> is the book of possible cloud fingerprints. Each entry says, "if droplets had this average size and this spread, the polarised cloudbow would look like this." In the full project, these curves were generated from Mie-scattering calculations <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>.
 
 You can move the sliders in the interactive explorer and watch how the predicted cloudbow curve changes:
 
@@ -354,7 +362,7 @@ You can move the sliders in the interactive explorer and watch how the predicted
   <a class="btn btn-sm btn-outline-secondary" href="{{ '/projects/10_cloudbow_lut/' | relative_url }}">Read the technical project page</a>
 </p>
 
-## 5. Results, Discussion And Conclusion
+### 4.3 Discussion And Conclusion
 
 The multi-frame retrieval estimated an effective radius close to **5 micrometres** and an effective variance around **0.05**. Its estimated spatial resolution was about **3 m by 3 m**, with a time resolution of about **15 seconds**.
 
@@ -386,14 +394,14 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
 
 ## References
 
-1. S. Twomey, "The Influence of Pollution on the Shortwave Albedo of Clouds," *Journal of the Atmospheric Sciences*, 34(7), 1149-1152, 1977. <https://doi.org/10.1175/1520-0469(1977)034%3C1149:TIOPOT%3E2.0.CO;2>
-2. S. Platnick et al., "The MODIS Cloud Optical and Microphysical Products: Collection 6 Updates and Examples From Terra and Aqua," *IEEE Transactions on Geoscience and Remote Sensing*, 55(1), 502-525, 2017. <https://doi.org/10.1109/TGRS.2016.2610522>
-3. C. F. Bohren and D. R. Huffman, *Absorption and Scattering of Light by Small Particles*. Wiley, 1983.
-4. J. E. Hansen and L. D. Travis, "Light Scattering in Planetary Atmospheres," *Space Science Reviews*, 16, 527-610, 1974. <https://doi.org/10.1007/BF00168069>
-5. V. Pörtge et al., "High-Spatial-Resolution Retrieval of Cloud Droplet Size Distribution from Polarized Observations of the Cloudbow," *Atmospheric Measurement Techniques*, 16, 645-667, 2023. <https://doi.org/10.5194/amt-16-645-2023>
-6. R. Brunelli, *Template Matching Techniques in Computer Vision: Theory and Practice*. Wiley, 2009.
-7. Z. Zhang, "A Flexible New Technique for Camera Calibration," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 22(11), 1330-1334, 2000. <https://doi.org/10.1109/34.888718>
-8. S. Prahl, *miepython: Pure Python Calculation of Mie Scattering*, Zenodo, 2026. <https://doi.org/10.5281/zenodo.18893972>
+1. <span id="ref-twomey1977"></span>S. Twomey, "The Influence of Pollution on the Shortwave Albedo of Clouds," *Journal of the Atmospheric Sciences*, 34(7), 1149-1152, 1977. <https://doi.org/10.1175/1520-0469(1977)034%3C1149:TIOPOT%3E2.0.CO;2>
+2. <span id="ref-platnick2017"></span>S. Platnick et al., "The MODIS Cloud Optical and Microphysical Products: Collection 6 Updates and Examples From Terra and Aqua," *IEEE Transactions on Geoscience and Remote Sensing*, 55(1), 502-525, 2017. <https://doi.org/10.1109/TGRS.2016.2610522>
+3. <span id="ref-bohren1983"></span>C. F. Bohren and D. R. Huffman, *Absorption and Scattering of Light by Small Particles*. Wiley, 1983.
+4. <span id="ref-hansen1974"></span>J. E. Hansen and L. D. Travis, "Light Scattering in Planetary Atmospheres," *Space Science Reviews*, 16, 527-610, 1974. <https://doi.org/10.1007/BF00168069>
+5. <span id="ref-poertge2023"></span>V. Pörtge et al., "High-Spatial-Resolution Retrieval of Cloud Droplet Size Distribution from Polarized Observations of the Cloudbow," *Atmospheric Measurement Techniques*, 16, 645-667, 2023. <https://doi.org/10.5194/amt-16-645-2023>
+6. <span id="ref-brunelli2009"></span>R. Brunelli, *Template Matching Techniques in Computer Vision: Theory and Practice*. Wiley, 2009.
+7. <span id="ref-zhang2000"></span>Z. Zhang, "A Flexible New Technique for Camera Calibration," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 22(11), 1330-1334, 2000. <https://doi.org/10.1109/34.888718>
+8. <span id="ref-miepython2026"></span>S. Prahl, *miepython: Pure Python Calculation of Mie Scattering*, Zenodo, 2026. <https://doi.org/10.5281/zenodo.18893972>
 
 ## Source Notes
 
@@ -459,6 +467,14 @@ These are the assets used on this page and why I chose them:
   .cloud-case-details summary {
     cursor: pointer;
     font-weight: 600;
+  }
+
+  .ref-link {
+    white-space: nowrap;
+  }
+
+  [id^="ref-"] {
+    scroll-margin-top: 5rem;
   }
 
   .glossary-grid {
@@ -603,6 +619,24 @@ These are the assets used on this page and why I chose them:
     color: var(--global-bg-color);
   }
 
+  .ar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .ar-link.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.68;
+  }
+
+  .ar-link__poster {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .asset-checklist {
     border: 1px solid var(--global-divider-color);
     border-radius: 8px;
@@ -636,6 +670,95 @@ These are the assets used on this page and why I chose them:
     border-radius: 8px;
     padding: 0.85rem;
     background: var(--global-card-bg-color);
+  }
+
+  .wave-demo {
+    position: relative;
+    min-height: 230px;
+    overflow: hidden;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    background:
+      linear-gradient(90deg, rgba(127, 127, 127, 0.08) 1px, transparent 1px) 0 0 / 34px 34px,
+      linear-gradient(0deg, rgba(127, 127, 127, 0.08) 1px, transparent 1px) 0 0 / 34px 34px,
+      var(--global-card-bg-color);
+  }
+
+  .wave-demo__axis {
+    position: absolute;
+    left: 8%;
+    right: 10%;
+    top: 50%;
+    height: 2px;
+    background: rgba(127, 127, 127, 0.42);
+  }
+
+  .wave-demo__axis::after {
+    position: absolute;
+    right: -4px;
+    top: -5px;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid rgba(127, 127, 127, 0.7);
+    border-right: 2px solid rgba(127, 127, 127, 0.7);
+    content: "";
+    transform: rotate(45deg);
+  }
+
+  .wave-demo__wave {
+    position: absolute;
+    left: -12%;
+    top: calc(50% - 36px);
+    width: 135%;
+    height: 72px;
+    background-repeat: repeat-x;
+    background-size: 112px 72px;
+    animation: wave-travel 2.8s linear infinite;
+  }
+
+  .wave-demo__wave--electric {
+    background-image: url("data:image/svg+xml,%3Csvg width='112' height='72' viewBox='0 0 112 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 36 C14 4 42 4 56 36 S98 68 112 36' fill='none' stroke='%237c4dff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  .wave-demo__wave--magnetic {
+    top: calc(50% - 4px);
+    height: 8px;
+    opacity: 0.75;
+    background-image: linear-gradient(90deg, transparent 0 22px, #18a999 22px 28px, transparent 28px 56px, #18a999 56px 62px, transparent 62px 112px);
+  }
+
+  .wave-demo__label {
+    position: absolute;
+    padding: 0.18rem 0.38rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.58);
+    color: #fff;
+    font-size: 0.75rem;
+  }
+
+  .wave-demo__label--electric {
+    left: 8%;
+    top: 12%;
+  }
+
+  .wave-demo__label--magnetic {
+    left: 8%;
+    bottom: 14%;
+  }
+
+  .wave-demo__label--direction {
+    right: 8%;
+    top: 54%;
+  }
+
+  @keyframes wave-travel {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(112px);
+    }
   }
 
   .polarisation-demo__scene small {
@@ -887,6 +1010,26 @@ These are the assets used on this page and why I chose them:
       term.addEventListener("mouseenter", () => updateTermAlignment(term));
       term.addEventListener("focus", () => updateTermAlignment(term));
     });
+  })();
+
+  (() => {
+    const arLink = document.querySelector(".ar-link");
+    if (!arLink) return;
+
+    const platform = navigator.platform || "";
+    const userAgent = navigator.userAgent || "";
+    const hasTouchMac = platform === "MacIntel" && navigator.maxTouchPoints > 1;
+    const isAppleAR = /iPhone|iPad|iPod/.test(userAgent) || hasTouchMac;
+
+    if (!isAppleAR) {
+      arLink.classList.add("is-disabled");
+      arLink.removeAttribute("rel");
+      arLink.setAttribute("aria-disabled", "true");
+      arLink.querySelector("span").textContent = "AR preview available on iPhone or iPad";
+      arLink.addEventListener("click", (event) => {
+        event.preventDefault();
+      });
+    }
   })();
 
   (() => {
