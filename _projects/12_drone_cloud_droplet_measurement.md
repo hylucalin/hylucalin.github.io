@@ -71,7 +71,7 @@ For this project, the important part is the electric field. <span class="term" d
   </div>
   <div class="col-md-6 mt-3 mt-md-0">
     <p>This animation shows light passing through linear polarisers. It gives a visual example of why the orientation of the electric-field oscillation matters when measuring polarised light.</p>
-    <p class="caption">Figure 2. Linear polarisers as a visual example of how polarisation direction affects transmitted light.</p>
+    <p class="caption">Figure 2. Linear polarisers as a visual example of how polarisation direction affects transmitted light. GIF credit: Institute of Noetic Sciences, <a href="https://noetic.org/wp-content/uploads/2021/04/Polarization-example-with-linear-polarizers.gif">Polarization example with linear polarizers</a>.</p>
   </div>
 </div>
 
