@@ -33,7 +33,7 @@ The submitted report used data from valley fog in the Yorkshire Dales National P
   </div>
 </div>
 <div class="caption">
-  Fieldwork site for the 8 March 2026 low-cloud and valley-fog measurements in the Yorkshire Dales. Source: final report Figure 6, originally exported as <code>image155.png</code>.
+  Figure 1. Fieldwork site for the 8 March 2026 low-cloud and valley-fog measurements in the Yorkshire Dales, showing why local terrain made low cloud and fog a useful test case.
 </div>
 
 The case study follows the same structure as an engineering report: why the measurement matters, what optical signal makes it possible, how the retrieval pipeline works, how the flying instrument was built, what the real data looked like, and what the result means.
@@ -71,7 +71,7 @@ For this project, the important part is the electric field. <span class="term" d
   </div>
   <div class="col-md-6 mt-3 mt-md-0">
     <p>This animation shows light passing through linear polarisers. It gives a visual example of why the orientation of the electric-field oscillation matters when measuring polarised light.</p>
-    <p class="caption">A visual example of linear polarisation using two polarisers. Source: Institute of Noetic Sciences, <a href="https://noetic.org/wp-content/uploads/2021/04/Polarization-example-with-linear-polarizers.gif">Polarization example with linear polarizers</a>.</p>
+    <p class="caption">Figure 2. Linear polarisers as a visual example of how polarisation direction affects transmitted light.</p>
   </div>
 </div>
 
@@ -140,7 +140,7 @@ The report used the convention that the ASP provides the reference for a 180 deg
   </div>
 </div>
 <div class="caption">
-  Main retrieval workflow: video pre-processing, camera calibration, and lookup-table fitting. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
+  Figure 3. Main retrieval workflow, showing how video pre-processing, camera calibration, and lookup-table fitting connect raw flight video to droplet-size estimates.
 </div>
 
 ### 2.3 Video Pre-processing
@@ -172,7 +172,7 @@ The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In 
   </div>
 </div>
 <div class="caption">
-  Example anti-solar-point tracking kernel used in the video-processing pipeline. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
+  Figure 4. Example anti-solar-point tracking kernel used to explain how the video-processing pipeline recognises the central optical pattern.
 </div>
 
 <details class="cloud-case-details">
@@ -238,7 +238,7 @@ The engineering challenge was not simply "attach a camera". The camera had to be
   </div>
 </div>
 <div class="caption">
-  Left: completed drone-camera assembly on a bench. Right: exploded CAD view of the camera, lens, onboard computer, power board, storage drive, battery, and protective cage. Sources: final report Figure 5 (<code>image153.jpg</code>) and Figure 4 (<code>image152.png</code>).
+  Figure 5. Drone-camera assembly and exploded payload view, showing how the camera, lens, onboard computer, power system, storage, and protective cage formed one measurement system.
 </div>
 
 <p>
@@ -247,10 +247,6 @@ The engineering challenge was not simply "attach a camera". The camera had to be
     <span>View the payload assembly in AR</span>
   </a>
 </p>
-<div class="caption">
-  Apple Quick Look AR view of the drone mockup and payload assembly on iPhone or iPad. On other devices the button is disabled to avoid downloading the USDZ file. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
-</div>
-
 The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas <a class="ref-link" href="#ref-zhang2000">[7]</a>.
 
 <details class="cloud-case-details">
@@ -332,7 +328,7 @@ The example below shows the retrieved geometry and polarisation map on one frame
   </div>
 </div>
 <div class="caption">
-  Video pre-processing on real flight data. Left: kernel/NCC-style ASP tracking output. Right: detection-overlay preview beginning at 327.2 seconds in the full processed flight video. Sources: trimmed from <code>kernel_tracking_annotated.mp4</code> and <code>detection_overlay.mp4</code>.
+  Figure 6. Video pre-processing on real flight data: anti-solar-point tracking on the left and detection overlay on the right.
 </div>
 
 For the multi-frame retrieval, the goal was to follow the same small cloud region across several frames. Each frame contributes polarisation samples at slightly different viewing angles, so the cloudbow profile gradually fills in.
@@ -343,7 +339,7 @@ For the multi-frame retrieval, the goal was to follow the same small cloud regio
   </div>
 </div>
 <div class="caption">
-  Example retrieval frame showing the tracked anti-solar point, scattering-angle contours, cloud mask, and processed polarisation signal. Source: final report Figure 10, originally exported as <code>image239.png</code>.
+  Figure 7. Example retrieval frame showing the tracked anti-solar point, scattering-angle contours, cloud mask, and processed polarisation signal.
 </div>
 
 <div class="row mt-3">
@@ -355,7 +351,7 @@ For the multi-frame retrieval, the goal was to follow the same small cloud regio
   </div>
 </div>
 <div class="caption">
-  Multi-frame retrieval preview. Left: manually tracked cloud region from <code>manual_tracking_overlay.mp4</code>, starting at 322.2 seconds. Right: matching <code>profile_build_window_1_region_1.mp4</code>, where the scattering-angle profile accumulates across frames.
+  Figure 8. Multi-frame retrieval preview: the tracked cloud region on the left and the accumulating scattering-angle profile on the right.
 </div>
 
 ### 4.1 Final LUT Comparison
@@ -368,7 +364,7 @@ The final product of the pipeline is a measured angular polarisation profile com
   </div>
 </div>
 <div class="caption">
-  Final fingerprint-matching step. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
+  Figure 9. Final fingerprint-matching step, where measured cloud data are compared with the best matching lookup-table simulation.
 </div>
 
 ### 4.2 Go Deeper: The Actual LUT Used
@@ -383,7 +379,7 @@ You can move the sliders in the interactive explorer and watch how the predicted
   </div>
 </div>
 <div class="caption">
-  Preview of the optional Cloudbow Polarisation LUT Explorer, where the lookup-table idea can be explored with sliders.
+  Figure 10. Preview of the optional Cloudbow Polarisation LUT Explorer, where the lookup-table idea can be explored with sliders.
 </div>
 
 <p>
@@ -436,34 +432,6 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
 6. <span id="ref-brunelli2009"></span>R. Brunelli, *Template Matching Techniques in Computer Vision: Theory and Practice*. Wiley, 2009.
 7. <span id="ref-zhang2000"></span>Z. Zhang, "A Flexible New Technique for Camera Calibration," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 22(11), 1330-1334, 2000. <https://doi.org/10.1109/34.888718>
 8. <span id="ref-miepython2026"></span>S. Prahl, *miepython: Pure Python Calculation of Mie Scattering*, Zenodo, 2026. <https://doi.org/10.5281/zenodo.18893972>
-
-## Source Notes
-
-The diagnostic asset checklist is hidden by default because it is mainly for checking source choices during editing.
-
-<details class="asset-checklist">
-  <summary>Show Diagnostic Asset Use Checklist</summary>
-
-These are the assets used on this page and why I chose them:
-
-| Page asset | Original source | Intended use |
-| --- | --- | --- |
-| <code>drone-camera-assembly.jpg</code> | Final report Figure 5, <code>image153.jpg</code> | Main project thumbnail and hardware photo; shows the real drone payload. |
-| <code>payload-exploded-view.png</code> | Final report Figure 4, <code>image152.png</code> | Explains the instrument stack: camera, lens, onboard computer, storage drive, battery, and protective cage. |
-| <code>chimera-payload-assembly.usdz</code> | Downloads folder, <code>Assembly for Chimera Payload (with drone mockup).usdz</code> | Provides the Apple Quick Look / AR model for inspecting the drone and payload assembly. |
-| <code>fieldwork-site-topography.png</code> | Final report Figure 6, <code>image155.png</code> | Shows the real outdoor location and why terrain/low cloud mattered. |
-| <code>main-retrieval-flowchart.jpg</code> | Final report figures folder, <code>Main Flow-Chart.jpg</code> | Shows the complete retrieval sequence: pre-processing, calibration, tracking, Stokes construction, and LUT fitting. |
-| <code>polarization-linear-polarizers.gif</code> | Institute of Noetic Sciences, <code>Polarization-example-with-linear-polarizers.gif</code> | Complements the polarisation explanation with a visual example of linear polarisers. |
-| <code>filtered-asp-kernel.png</code> | <code>cloudbow_detection/core/kernel_45_135/filtered_kernel_example.png</code> | Shows the real 80 by 80 filtered ASP kernel used to explain the larger version of the simple 3 by 3 pattern-matching example. |
-| <code>cloud-frame-scattering-rings.png</code> | Final report Figure 10, <code>image239.png</code> | Shows the anti-solar point, scattering-angle rings, and processed cloud image in one visual. |
-| <code>lut-fit-example.png</code> | Final report Figure 20, <code>image356.png</code> | Gives a single "measured curve versus model curve" example for the cloud fingerprint idea. |
-| <code>cloudbow-lut-thumb.png</code> | Existing site asset <code>assets/img/project_thumbnails/cloudbow_lut_thumb.png</code> | Previews the optional interactive LUT explorer linked from this resource. |
-| <code>kernel-tracking-preview.mp4</code> | Trimmed from <code>kernel_tracking_annotated.mp4</code> | Shows tracking on real flight imagery without embedding the full 36 MB analysis video. |
-| <code>detection-overlay-preview.mp4</code> | Trimmed from <code>detection_overlay.mp4</code>, starting at 327.2 seconds | Shows the processed detection overlay without embedding the full 32 MB analysis video; the time window is intended to match the kernel-detection choice. |
-| <code>manual-tracking-overlay-322p2-preview.mp4</code> | Trimmed from <code>manual_tracking_overlay.mp4</code>, starting at 322.2 seconds | Shows the manually tracked cloud region in the same time window as the profile-build visual. |
-| <code>profile-build-window-1-region-1.mp4</code> | Re-encoded from <code>profile_build_window_1_region_1.mp4</code> | Shows how the multi-frame retrieval gradually builds a cloudbow profile from tracked frames. |
-
-</details>
 
 <style>
   .cloud-question {
@@ -700,24 +668,6 @@ These are the assets used on this page and why I chose them:
     height: 1px;
     opacity: 0;
     pointer-events: none;
-  }
-
-  .asset-checklist {
-    border: 1px solid var(--global-divider-color);
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    margin: 1.25rem 0 1.5rem;
-    background: var(--global-card-bg-color);
-  }
-
-  .asset-checklist summary {
-    cursor: pointer;
-    font-weight: 700;
-  }
-
-  .asset-checklist table {
-    width: 100%;
-    margin-top: 0.9rem;
   }
 
   .polarisation-demo {
@@ -962,6 +912,12 @@ These are the assets used on this page and why I chose them:
 
     .hardware-preview {
       grid-template-columns: 1fr;
+    }
+
+    .polarisation-demo__scene small,
+    .polarisation-demo__bundle {
+      grid-column: 1;
+      grid-row: auto;
     }
   }
 </style>
