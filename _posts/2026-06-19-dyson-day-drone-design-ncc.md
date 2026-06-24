@@ -147,6 +147,24 @@ The drone design activity provides the systems-engineering context, while the NC
 The drone makes the problem tangible, but the main technical concept is that a computer can track visual patterns by comparing local intensity structure across images.
 
 <style>
+  #markdown-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0 1.25rem;
+  }
+
+  #markdown-content th,
+  #markdown-content td {
+    border: 1px solid var(--global-divider-color);
+    padding: 0.65rem 0.75rem;
+    vertical-align: top;
+  }
+
+  #markdown-content th {
+    background: rgba(31, 143, 120, 0.10);
+    font-weight: 700;
+  }
+
   .ncc-demo {
     border: 1px solid var(--global-divider-color);
     border-radius: 8px;
