@@ -33,10 +33,18 @@ The submitted report used data from valley fog in the Yorkshire Dales National P
   </div>
 </div>
 <div class="caption">
-  Intention: introduce the real field experiment at the point where the Yorkshire Dales site is first mentioned. This map marks the 8 March 2026 low-cloud and valley-fog fieldwork location in hilly terrain. Source: final report Figure 6, originally exported as <code>image155.png</code>.
+  Fieldwork site for the 8 March 2026 low-cloud and valley-fog measurements in the Yorkshire Dales. Source: final report Figure 6, originally exported as <code>image155.png</code>.
 </div>
 
 The case study follows the same structure as an engineering report: why the measurement matters, what optical signal makes it possible, how the retrieval pipeline works, how the flying instrument was built, what the real data looked like, and what the result means.
+
+<div class="student-prompt">
+  <strong>The measurement system</strong>
+  <div class="hardware-preview">
+    <img src="{{ '/assets/img/projects/drone-cloud-droplet-measurement/drone-camera-assembly.jpg' | relative_url }}" alt="Drone and camera payload assembly">
+    <p>The flying instrument combined a pre-built FPV drone, a polarisation camera, a small onboard computer, an SSD, batteries, and a rigid payload mount. The method below explains why each part was needed; the full build is shown in <a href="#flying-system">Section 3</a>.</p>
+  </div>
+</div>
 
 ## 1. Scientific Motivation
 
@@ -63,7 +71,7 @@ For this project, the important part is the electric field. <span class="term" d
   </div>
   <div class="col-md-6 mt-3 mt-md-0">
     <p>This animation shows light passing through linear polarisers. It gives a visual example of why the orientation of the electric-field oscillation matters when measuring polarised light.</p>
-    <p class="caption">Intention: complement the text explanation of polarisation using a locally stored GIF. Source: Institute of Noetic Sciences, <a href="https://noetic.org/wp-content/uploads/2021/04/Polarization-example-with-linear-polarizers.gif">Polarization example with linear polarizers</a>.</p>
+    <p class="caption">A visual example of linear polarisation using two polarisers. Source: Institute of Noetic Sciences, <a href="https://noetic.org/wp-content/uploads/2021/04/Polarization-example-with-linear-polarizers.gif">Polarization example with linear polarizers</a>.</p>
   </div>
 </div>
 
@@ -96,6 +104,11 @@ The easiest way to connect the optical signal to DSD is to look at the ring of m
 
 Try moving the sliders. This is a simplified teaching model, not the exact physics code from the final report. The droplet preview uses the same broad gamma-distribution idea as the LUT explorer, while the bright ring remains a separate optical sketch.
 
+<div class="student-prompt">
+  <strong>Try this</strong>
+  <p>Move the effective-radius slider first. What happens to the bright ring? Then increase effective variance. Does the ring become sharper or blurrier?</p>
+</div>
+
 <div class="cloudbow-lab" id="cloudbow-lab">
   <div class="cloudbow-lab__visual" aria-label="Interactive cloudbow ring model">
     <div class="cloudbow-lab__asp">ASP</div>
@@ -127,7 +140,7 @@ The report used the convention that the ASP provides the reference for a 180 deg
   </div>
 </div>
 <div class="caption">
-  Intention: present the whole method before the detailed subsections. The flowchart groups the work into video pre-processing, camera calibration, and lookup-table fitting. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
+  Main retrieval workflow: video pre-processing, camera calibration, and lookup-table fitting. Source: <code>Main Flow-Chart.jpg</code> from the final report figures folder.
 </div>
 
 ### 2.3 Video Pre-processing
@@ -142,6 +155,11 @@ Different combinations of the same video were used for different jobs:
 
 Cloud masking is important because the LUT should only be fitted to cloud pixels. If sky, hillside, horizon, or non-cloud artefacts are included, the angular profile stops representing the cloud droplet population.
 
+<div class="student-prompt">
+  <strong>Pattern challenge</strong>
+  <p>How could a computer find the same cloud feature in the next frame if the drone moves and the cloud drifts?</p>
+</div>
+
 The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In the actual project, an equivalent idea appears as a larger circular pattern with a dark cross at the centre. The kernel is still just a small pattern that the computer compares against an image.
 
 <div class="kernel-note">
@@ -154,7 +172,7 @@ The outreach activity used a tiny 3 by 3 kernel to explain pattern matching. In 
   </div>
 </div>
 <div class="caption">
-  Intention: show the actual ASP tracking kernel used by the project. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
+  Example anti-solar-point tracking kernel used in the video-processing pipeline. Source: <code>filtered_kernel_example.png</code> from <code>core/kernel_45_135</code>.
 </div>
 
 <details class="cloud-case-details">
@@ -167,28 +185,34 @@ For a hands-on version of the tracking idea, see my outreach activity:
 
 ### 2.4 Camera Calibration
 
-A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration uses a known printed pattern to estimate this distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look? Camera calibration follows standard geometric calibration ideas <a class="ref-link" href="#ref-zhang2000">[7]</a>.
+A camera does not see the world as a perfect flat grid. The lens bends rays slightly, especially near the image edges. Calibration corrects that distortion so each cloud pixel can be linked to a viewing direction <a class="ref-link" href="#ref-zhang2000">[7]</a>.
 
-Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.
-
-<div class="calibration-demo" id="calibration-demo">
-  <canvas id="calibration-canvas" width="720" height="260" aria-label="Interactive camera distortion correction demonstration"></canvas>
-  <label for="distortion-control">Distortion strength: <strong id="distortion-label">0.45</strong></label>
-  <input id="distortion-control" type="range" min="0" max="0.9" step="0.05" value="0.45">
-  <p id="calibration-note">Calibration turns bent image coordinates into viewing rays. The viewing-angle difference between the ASP ray and each cloud-pixel ray then gives the scattering angle.</p>
+<div class="student-prompt">
+  <strong>Design challenge</strong>
+  <p>What data would a drone need to know where each cloud pixel is in space?</p>
 </div>
+
+<details class="cloud-case-details">
+  <summary>Go deeper: camera distortion and viewing rays</summary>
+  <p>Calibration uses a known printed pattern to estimate lens distortion, then builds a ray map: for each image pixel, what direction in space did that pixel look? Move the slider below. The left view shows an exaggerated distorted camera image; the right view shows why correction matters before calculating scattering angle.</p>
+  <div class="calibration-demo" id="calibration-demo">
+    <canvas id="calibration-canvas" width="720" height="260" aria-label="Interactive camera distortion correction demonstration"></canvas>
+    <label for="distortion-control">Distortion strength: <strong id="distortion-label">0.45</strong></label>
+    <input id="distortion-control" type="range" min="0" max="0.9" step="0.05" value="0.45">
+    <p id="calibration-note">Calibration turns bent image coordinates into viewing rays. The viewing-angle difference between the ASP ray and each cloud-pixel ray then gives the scattering angle.</p>
+  </div>
+</details>
 
 ### 2.5 Lookup Table Fitting
 
-Once each cloud pixel has a scattering angle and a linear polarisation signal, the retrieval becomes curve fitting. I generated a lookup table of theoretical linear polarisation profiles in the scattering plane. Each curve corresponds to one possible gamma-distribution DSD.
-
-The LUT grid covered effective radius from **1 micrometre to 40.77 micrometres** on a logarithmic grid, and effective variance from **0.01 to 0.325**. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>. The measured profile was then fitted to the LUT, and the best-fitting curve gave the retrieved DSD parameters.
+Once each cloud pixel has a scattering angle and a linear polarisation signal, the retrieval becomes curve fitting. I compared the measured cloudbow profile with a lookup table of simulated profiles and chose the closest match.
 
 <details class="cloud-case-details">
-  <summary>What does the LUT actually compare?</summary>
-  <p>The measured scattering-plane signal is compared with many simulated <code>P12(theta)</code> curves. The fitting allows scale and background terms, then looks for the effective radius and effective variance whose curve has the lowest error against the measured cloudbow profile.</p>
+  <summary>Go deeper: P12, Mie scattering, and the LUT grid</summary>
+  <p>The LUT grid covered effective radius from <strong>1 micrometre to 40.77 micrometres</strong> on a logarithmic grid, and effective variance from <strong>0.01 to 0.325</strong>. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>. The measured scattering-plane signal was compared with many simulated <code>P12(theta)</code> curves. The fitting allows scale and background terms, then looks for the effective radius and effective variance whose curve has the lowest error against the measured cloudbow profile.</p>
 </details>
 
+<a id="flying-system"></a>
 ## 3. Building The Flying Measurement System
 
 After the optical idea was clear, the engineering job was to build a platform that could collect the right kind of data in real cloud or fog. The drone was not just taking pretty videos. It had to carry a measurement system:
@@ -214,7 +238,7 @@ The engineering challenge was not simply "attach a camera". The camera had to be
   </div>
 </div>
 <div class="caption">
-  Intention: connect the accessible story to the actual hardware. Left: the completed drone-camera assembly on a bench. Right: the exploded CAD view showing the camera, lens, onboard computer, power board, storage drive, battery, and protective cage. Sources: final report Figure 5 (<code>image153.jpg</code>) and Figure 4 (<code>image152.png</code>).
+  Left: completed drone-camera assembly on a bench. Right: exploded CAD view of the camera, lens, onboard computer, power board, storage drive, battery, and protective cage. Sources: final report Figure 5 (<code>image153.jpg</code>) and Figure 4 (<code>image152.png</code>).
 </div>
 
 <p>
@@ -224,22 +248,24 @@ The engineering challenge was not simply "attach a camera". The camera had to be
   </a>
 </p>
 <div class="caption">
-  Intention: provide an Apple Quick Look AR view of the drone mockup and payload assembly on iPhone or iPad. On other devices the button is disabled to avoid downloading the USDZ file. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
+  Apple Quick Look AR view of the drone mockup and payload assembly on iPhone or iPad. On other devices the button is disabled to avoid downloading the USDZ file. Source: <code>Assembly for Chimera Payload (with drone mockup).usdz</code> from the Downloads folder.
 </div>
 
 The retrieval did not need a separate range finder. The plan was to use a calibrated camera and computer vision to recover the image geometry needed for cloudbow fitting: where the ASP sits in the frame, which pixels are cloud, and how the useful cloud features move between frames. Camera calibration was based on standard geometric calibration ideas <a class="ref-link" href="#ref-zhang2000">[7]</a>.
 
-### 3.1 Choosing Storage That Is Actually Fast Enough
+<details class="cloud-case-details">
+  <summary>Engineering side quest: why storage speed mattered</summary>
+  <p>One surprisingly important part of the project was the storage drive. The camera could produce raw 12-bit data at up to about <strong>125 MB/s</strong>, so the payload needed storage that could sustain large, fast file writes during the whole recording.</p>
 
-One surprisingly important part of the project was the storage drive. The camera could produce raw 12-bit data at up to about **125 MB/s**, so the payload needed storage that could sustain large, fast file writes during the whole recording.
+  <p>A product label such as "USB 3.0" was not enough information. Three different things matter:</p>
 
-A product label such as "USB 3.0" was not enough information. Three different things matter:
+  <ul>
+    <li><strong>Connector shape:</strong> USB-A and USB-C describe the plug shape. They do not guarantee the speed.</li>
+    <li><strong>Bus speed:</strong> USB 2.0, USB 3.0, and USB 3.2 describe how fast the connection can be in theory.</li>
+    <li><strong>Storage protocol:</strong> BOT and UASP describe how the computer talks to the drive.</li>
+  </ul>
 
-- **Connector shape:** USB-A and USB-C describe the plug shape. They do not guarantee the speed.
-- **Bus speed:** USB 2.0, USB 3.0, and USB 3.2 describe how fast the connection can be in theory.
-- **Storage protocol:** BOT and UASP describe how the computer talks to the drive.
-
-BOT, or Bulk-Only Transport, is the older USB storage protocol. It handles commands more simply and tends to perform poorly when the computer has to keep sending a stream of large writes. UASP, or USB Attached SCSI Protocol, is newer and can queue commands more efficiently, so it usually gives better real write performance. After that protocol bottleneck is reduced, the limiting factor shifts to the storage device itself: its controller, cache or write buffer, and whether it can keep writing after any short burst buffer has filled.
+  <p>BOT, or Bulk-Only Transport, is the older USB storage protocol. It handles commands more simply and tends to perform poorly when the computer has to keep sending a stream of large writes. UASP, or USB Attached SCSI Protocol, is newer and can queue commands more efficiently, so it usually gives better real write performance. After that protocol bottleneck is reduced, the limiting factor shifts to the storage device itself: its controller, cache or write buffer, and whether it can keep writing after any short burst buffer has filled.</p>
 
 <div class="storage-challenge" id="storage-challenge">
   <div>
@@ -282,7 +308,8 @@ BOT, or Bulk-Only Transport, is the older USB storage protocol. It handles comma
   <p id="storage-challenge-result" aria-live="polite">Choose a storage option to see the engineering trade-off.</p>
 </div>
 
-The `480M` and `5000M` clues are bus speeds in megabits per second, while the measured write speeds are in megabytes per second. They are not the same unit, and real devices never reach the ideal bus speed. The lesson was simple: UASP helped, but only the SSD could sustain large fast file writes with a comfortable safety margin.
+  <p>The <code>480M</code> and <code>5000M</code> clues are bus speeds in megabits per second, while the measured write speeds are in megabytes per second. They are not the same unit, and real devices never reach the ideal bus speed. The lesson was simple: UASP helped, but only the SSD could sustain large fast file writes with a comfortable safety margin. That made the storage choice part of turning the drone into a real measurement system.</p>
+</details>
 
 
 ## 4. Results
@@ -290,6 +317,11 @@ The `480M` and `5000M` clues are bus speeds in megabits per second, while the me
 The pipeline produces intermediate data that can be inspected visually. This is important because a retrieval can only be trusted if the geometry, masks, and polarisation signal make physical sense.
 
 The example below shows the retrieved geometry and polarisation map on one frame. The yellow cross marks the tracked ASP. The red circles are scattering-angle contours centred on the ASP. The dense coloured overlay on the cloud shows the rotated linear polarisation signal used to build the retrieval profile.
+
+<div class="student-prompt">
+  <strong>Think like an engineer</strong>
+  <p>Before trusting the final droplet size, what intermediate outputs would you inspect: tracking, cloud mask, scattering-angle rings, polarisation map, or all of them?</p>
+</div>
 
 <div class="row mt-3">
   <div class="col-sm mt-3 mt-md-0">
@@ -300,7 +332,7 @@ The example below shows the retrieved geometry and polarisation map on one frame
   </div>
 </div>
 <div class="caption">
-  Intention: show video pre-processing on real flight data. Left: kernel/NCC-style ASP tracking output. Right: a detection-overlay preview beginning at 327.2 seconds in the full processed flight video, chosen to match the kernel-detection example. Sources: trimmed from <code>kernel_tracking_annotated.mp4</code> and <code>detection_overlay.mp4</code>.
+  Video pre-processing on real flight data. Left: kernel/NCC-style ASP tracking output. Right: detection-overlay preview beginning at 327.2 seconds in the full processed flight video. Sources: trimmed from <code>kernel_tracking_annotated.mp4</code> and <code>detection_overlay.mp4</code>.
 </div>
 
 For the multi-frame retrieval, the goal was to follow the same small cloud region across several frames. Each frame contributes polarisation samples at slightly different viewing angles, so the cloudbow profile gradually fills in.
@@ -311,7 +343,7 @@ For the multi-frame retrieval, the goal was to follow the same small cloud regio
   </div>
 </div>
 <div class="caption">
-  Intention: show how cloud masking, ASP tracking, scattering-angle rings, and the polarisation signal meet in a real frame. Source: final report Figure 10, originally exported as <code>image239.png</code>.
+  Example retrieval frame showing the tracked anti-solar point, scattering-angle contours, cloud mask, and processed polarisation signal. Source: final report Figure 10, originally exported as <code>image239.png</code>.
 </div>
 
 <div class="row mt-3">
@@ -323,7 +355,7 @@ For the multi-frame retrieval, the goal was to follow the same small cloud regio
   </div>
 </div>
 <div class="caption">
-  Intention: show how manual cloud-region tracking and profile construction correspond in time. Left: a 7.3 second clip from <code>manual_tracking_overlay.mp4</code> starting at 322.2 seconds. Right: the matching profile-build video <code>profile_build_window_1_region_1.mp4</code>, where the multi-frame scattering-angle profile accumulates.
+  Multi-frame retrieval preview. Left: manually tracked cloud region from <code>manual_tracking_overlay.mp4</code>, starting at 322.2 seconds. Right: matching <code>profile_build_window_1_region_1.mp4</code>, where the scattering-angle profile accumulates across frames.
 </div>
 
 ### 4.1 Final LUT Comparison
@@ -336,7 +368,7 @@ The final product of the pipeline is a measured angular polarisation profile com
   </div>
 </div>
 <div class="caption">
-  Intention: show the "fingerprint matching" step after the theory and hardware have been introduced. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
+  Final fingerprint-matching step. The blue points are measured cloud data; the orange curve is the best matching lookup-table simulation. In this example the fitted effective radius is about 4.82 micrometres. Source: final report Figure 20, originally exported as <code>image356.png</code>.
 </div>
 
 ### 4.2 Go Deeper: The Actual LUT Used
@@ -351,7 +383,7 @@ You can move the sliders in the interactive explorer and watch how the predicted
   </div>
 </div>
 <div class="caption">
-  Intention: preview the optional advanced interactive tool after the page has introduced the full retrieval chain. This thumbnail belongs to the existing Cloudbow Polarisation LUT Explorer project and is used here as a signpost for readers who want to explore the lookup-table idea with sliders.
+  Preview of the optional Cloudbow Polarisation LUT Explorer, where the lookup-table idea can be explored with sliders.
 </div>
 
 <p>
@@ -365,7 +397,12 @@ The multi-frame retrieval estimated an effective radius close to **5 micrometres
 
 The significance is the resolution. In the submitted report, this was estimated to be one to two orders of magnitude finer than existing space-borne and airborne cloud DSD retrieval methods. That kind of local measurement could help future MCB fieldwork track how small cloud patches evolve over time, and it could also help with fog studies, satellite validation, and high-resolution model evaluation.
 
-The project does not prove that drone retrieval is already a finished operational method. Real clouds are messy, and future work should improve radiometric calibration, focus control, automated cloud-patch tracking, and cloud-motion correction. But it does show that a low-cost drone-borne polarisation camera can collect cloudbow-region measurements and retrieve physically plausible metre-scale cloud droplet size information.
+The project does not prove that drone retrieval is already a finished operational method. But it does show that a low-cost drone-borne polarisation camera can collect cloudbow-region measurements and retrieve physically plausible metre-scale cloud droplet size information.
+
+<details class="cloud-case-details">
+  <summary>Go deeper: what could make this measurement wrong?</summary>
+  <p>Real clouds are messy. Future work should improve radiometric calibration, focus control, automated cloud-patch tracking, and cloud-motion correction. The diagnostic Stokes component after rotation should also be checked carefully, because it can reveal errors in polarisation calibration or reference-frame rotation.</p>
+</details>
 
 ## Glossary
 
@@ -465,6 +502,36 @@ These are the assets used on this page and why I chose them:
   .cloud-case-details summary {
     cursor: pointer;
     font-weight: 600;
+  }
+
+  .student-prompt {
+    border: 1px solid rgba(80, 130, 180, 0.45);
+    border-left: 4px solid var(--global-theme-color);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin: 1rem 0 1.35rem;
+    background: rgba(80, 130, 180, 0.08);
+  }
+
+  .student-prompt strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .student-prompt p {
+    margin: 0;
+  }
+
+  .hardware-preview {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr;
+    gap: 0.85rem;
+    align-items: center;
+  }
+
+  .hardware-preview img {
+    width: 100%;
+    border-radius: 8px;
   }
 
   .ref-link {
@@ -891,6 +958,10 @@ These are the assets used on this page and why I chose them:
     .storage-challenge button {
       width: 100%;
       margin-right: 0;
+    }
+
+    .hardware-preview {
+      grid-template-columns: 1fr;
     }
   }
 </style>
