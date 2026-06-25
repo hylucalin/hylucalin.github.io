@@ -108,6 +108,11 @@ ninja.data = [{
           description: "An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/12_drone_cloud_droplet_measurement/";
+            },},{id: "projects-climate-and-nature-research-showcase-poster",
+          title: 'Climate and Nature Research Showcase Poster',
+          description: "Poster for my 26 June 2026 Climate and Nature Research Showcase presentation on drone-borne polarimetric cloud droplet retrieval.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/13_climate_nature_research_showcase_poster/";
             },},{id: "projects-project-1",
           title: 'project 1',
           description: "with background image",
