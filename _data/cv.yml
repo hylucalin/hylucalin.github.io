@@ -1,97 +1,156 @@
-- title: General Information
+- title: Engineering Story
+  type: list
+  contents:
+    - "I build airborne measurement systems where mechanics, electronics, optics, and code all have to work at the same time. Most of my recent work sits around drones for climate and atmospheric science: small payloads, polarimetric imagery, high-rate data capture, CFD, controls, and field measurements that turn a flying platform into an instrument."
+    - "The common thread is practical research engineering. I like problems where a sensor has to survive the flight, a model has to explain the physics, and the software has to recover meaning from imperfect field data."
+
+- title: At a Glance
   type: map
   contents:
-    - name: Full Name
-      value: Albert Einstein
-    - name: Date of Birth
-      value: 14th March 1879
-    - name: Languages
-      value: English, German
+    - name: Name
+      value: Hongyan (Luca) Lin
+    - name: Base
+      value: Lucy Cavendish College, University of Cambridge
+    - name: Focus
+      value: Mechanical and aerospace engineering, UAV instrumentation, atmospheric measurement, remote sensing, fluid dynamics, controls, and scientific computing.
+    - name: Contact
+      value: hl667@cam.ac.uk
 
 - title: Education
   type: time_table
   contents:
-    - title: PhD
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1905
+    - title: MEng and BA in Engineering, Mechanical and Aerospace
+      institution: Lucy Cavendish College, University of Cambridge
+      year: 2023-26
       description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Federal teaching diploma
-      institution: Eidgenössische Technische Hochschule, Zurich, Switzerland
-      year: 1900
+        - "First Class, Top 1%."
+        - "Fourth-year project: drone-borne retrieval of cloud droplet size distributions using polarimetric imagery, supervised by Professor Hugh Hunt."
+        - "Core modules and project work across mechanics, fluid dynamics, mathematics, control systems, computer vision, electronics, materials, structures, aircraft performance, and experimental aerodynamics."
+    - title: BEng in Mechanical Engineering, minor in Electrical and Electronic Engineering
+      institution: The University of Hong Kong
+      year: 2021-23
       description:
-        - Description 1.
-        - Description 2.
+        - "CGPA 4.14, with Dean's Honours List recognition in both 2021-2022 and 2022-2023."
+        - "Joined Cambridge through the 2+3 HKU-Cambridge Undergraduate Joint Recruitment Scheme in Engineering."
 
-- title: Experience
+- title: Research and Engineering Experience
   type: time_table
   contents:
-    - title: Professor of Theoretical Physics
-      institution: Institute for Advanced Study, Princeton University
-      year: 1933 - 1955
+    - title: Drone-borne Cloud Droplet Retrieval
+      institution: University of Cambridge, Centre for Climate Repair context
+      year: 2025-26
       description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Visiting Professor
-      institution: California Institute of Technology, Pasadena, California, US
-      year: 1933
+        - "Built the measurement system for a difficult question in marine cloud brightening: can a small drone resolve cloud droplet size changes finely enough to follow a field experiment?"
+        - "Developed a 500 g optical payload for a 7.5 inch drone, combining a polarisation camera, Raspberry Pi 4, SSD storage, separate flight and payload power, and a protective mechanical assembly."
+        - "Processed and stored up to 125 MB/s of camera data in real time, then wrote the Python retrieval pipeline for video processing, computer vision, angular profile extraction, and lookup-table fitting."
+        - "Retrieved droplet size distributions at about 3 m by 3 m spatial resolution, roughly one to two orders of magnitude finer than current satellite and aircraft approaches, with fitting RMSE below 1% of peak signal magnitude."
+      linkitems:
+        - link: "/projects/12_drone_cloud_droplet_measurement/"
+          linkname: case study
+        - link: "/projects/10_cloudbow_lut/"
+          linkname: LUT explorer
+        - link: "https://www.climaterepair.cam.ac.uk/"
+          linkname: CCR
+    - title: Funded Summer Researcher
+      institution: Centre for Climate Repair, University of Cambridge
+      year: Jul-Aug 2025
       description:
-        - Description 1.
-        - Description 2.
-
-    - title: Director
-      institution: Kaiser Wilhelm Institute for Physics, Berlin, Germany.
-      year: 1917-1933
-
-    - title: Professor of Theoretical Physics
-      institution: Karl-Ferdinand University, Prague, Czechoslovakia
-      year: 1911 - 1917
+        - "Worked on remote sensing of cloud microphysical properties for marine cloud brightening, supervised by Professor Hugh Hunt."
+        - "Designed early integrations for nanoparticle size distribution sensors and a polarisation camera on a compact UAV, linking payload mass, optics, sensing requirements, and flight constraints."
+      linkitems:
+        - link: "https://www.climaterepair.cam.ac.uk/"
+          linkname: CCR
+    - title: Project Manager of Feed Systems
+      institution: Cambridge University Spaceflight
+      year: 2023-26
       description:
+        - "Led actuated high-pressure flow regulation work for the society's upcoming propulsive landing rocket, turning throttling requirements into feed-system architecture."
+        - "Built feed systems for a NASA hydrogen torch ignitor used in the society's most powerful engine work, balancing choked-flow analysis, orifice sizing, pressure ratings, cost, and assembly practicality."
+        - "Produced CAD, P&IDs, component selections, and build plans that let other teams request and trust the flow conditions they needed."
+      linkitems:
+        - link: "https://www.cusf.co.uk/"
+          linkname: CUSF
+    - title: Summer Engineering Intern
+      institution: Limosaero Ltd.
+      year: Jul-Sep 2024
+      description:
+        - "Worked on the company's 6 m wingspan solar UAV and atmospheric monitoring payload, spanning design, simulation, manufacture, and tool-building."
+        - "Used SolidWorks CFD and boundary-layer theory to shape a sensor housing that delivered the required inlet flow, slowed and directed the sample for accurate retrieval, and returned higher-momentum air into the boundary layer to reduce drag."
+        - "Built the company's first aeroelasticity design tool in Python, about 2000 lines, modelling carbon-fibre layup stiffness and aero-mechanical load response so design changes could be explored interactively."
+        - "Structured the tool with clear data classes and visual failure alerts, making the code easier to extend and the design trade-offs easier to see."
+      linkitems:
+        - link: "https://www.limosaero.co.uk"
+          linkname: Limosaero
+    - title: CUES-funded Atmospheric Profiling Drone
+      institution: Cambridge University Engineering Society funded personal project
+      year: 2025-26
+      description:
+        - "Built an ESP32-based atmospheric profiling payload for a sub-250 g drone, with inertial sensing, temperature and humidity sensing, microSD logging, and ground telemetry."
+        - "Turned raw logs into altitude-resolved profiles by synchronising payload data with drone flight records, then used field runs to characterise a nocturnal temperature inversion, daytime temperature profile, and near-ground wind-velocity structure."
+      linkitems:
+        - link: "/projects/11_atmospheric_profiling_drone/"
+          linkname: project page
+    - title: Weather Drone Design and Research Assistant
+      institution: The University of Hong Kong
+      year: Jul-Sep 2023
+      description:
+        - "Collaborated with Professor Chun-Ho Liu's air pollution lab on drone-based atmospheric turbulence measurement for urban pollutant transport research."
+        - "Integrated a third-party anemometer onto a DJI drone through lightweight mechanical changes and custom logging code."
+        - "Designed and built a lightweight data logger for 100 Hz multi-sensor logging, then supported test flights and Hong Kong government site visits."
 
-    - title: Associate Professor of Theoretical Physics
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1909 - 1911
-
-- title: Open Source Projects
+- title: Selected Technical Projects
   type: time_table
   contents:
-    - title: <a href="https://github.com/alshedivat/al-folio">al-folio</a>
-      year: 2015-now
-      description: A beautiful, simple, clean, and responsive Jekyll theme for academics.
+    - title: Supersonic Wind Tunnel CFD
+      year: 2026
+      description:
+        - "Wrote a Fortran finite-volume Euler solver and extended it until it could simulate a supersonic wind tunnel starting, running, and shutting down."
+      linkitems:
+        - link: "/projects/14_4a2_supersonic_wind_tunnel/"
+          linkname: project page
+    - title: Aircraft, Robotics, Controls, and Experiments
+      year: 2024-26
+      description:
+        - "Optimised aircraft wing lift-to-drag ratio in MATLAB using the panel method."
+        - "Designed digital control systems for aircraft autopilot and inverted pendulum problems."
+        - "Led a team project to design, build, and test an autonomous robot, contributing C++ programming and Arduino soldering."
+        - "Experimentally evaluated radial compressor performance and used wind-tunnel probes and Schlieren imaging to study boundary layers and shockwaves."
 
-- title: Honors and Awards
+- title: Awards and Scholarships
   type: time_table
   contents:
-    - year: 1921
+    - year: Cambridge
       items:
-        - Nobel Prize in Physics
-        - Matteucci Medal
-    - year: 2029
+        - "Best Student in Aerospace and Aerothermal Engineering."
+        - "David Newland Prize for Mechanics."
+        - "FEH Scholarship, entrance scholarship."
+        - "Marie Lawrence Prize for gaining a First in Tripos."
+    - year: HKU
       items:
-        - Max Planck Medal
+        - "Dean's Honours List, 2021-2022 and 2022-2023."
+        - "Young Tsun Dart Scholarship, 2023-2024."
+        - "PineBridge Foundation Scholarship, 2022-2023."
+        - "Mechanical Engineering Scholarship for Undergraduate Students, 2023-2024."
 
-- title: Academic Interests
+- title: Technical Range
   type: nested_list
   contents:
-    - title: Topic 1.
+    - title: Computation
       items:
-        - Description 1.
-        - Description 2.
-    - title: Topic 2.
+        - "Python for computer vision, data processing, aeroelastic design tooling, and field-log synchronisation."
+        - "Fortran CFD, MATLAB analysis and optimisation, Simulink control design, and C++/Arduino robotics."
+    - title: Hardware and Field Systems
       items:
-        - Description 1.
-        - Description 2.
+        - "Drone payload integration, Raspberry Pi and ESP32 systems, SD/SSD data logging, power separation, telemetry, sensors, and field-test workflows."
+        - "CAD, P&IDs, high-pressure fittings and valves, optical payloads, sensor housings, and lightweight mechanical assemblies."
+    - title: Aerospace and Fluids
+      items:
+        - "Remote sensing, atmospheric profiling, cloud microphysics, boundary layers, compressible flow, choked-flow sizing, wind-tunnel testing, and compressor experiments."
 
-- title: Other Interests
+- title: Service and Outreach
   type: list
   contents:
-    - <u>Hobbies:</u> Hobby 1, Hobby 2, etc.
+    - "Lucy Cavendish College volunteer and helper, 2025."
+    - "Co-founder of the HKU Wei Lun Photography Interest Group, organising events and socials, 2022-2023."
+    - "HKU Student Ambassador, contributing to official university outreach from 2022 onward."
+    - "Amoy Youth Elites Summit participant, 2022, 2023, and 2024."
