@@ -5,7 +5,7 @@ permalink: /projects/
 description: A growing collection of my projects.
 nav: true
 nav_order: 3
-display_categories: [cam-coursework, cam-4th-year-project, fun]
+display_categories: [cam-4th-year-project, fun, cam-coursework]
 horizontal: false
 published: true
 ---
