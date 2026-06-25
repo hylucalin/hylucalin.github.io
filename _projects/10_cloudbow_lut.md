@@ -3,7 +3,7 @@ layout: page
 title: Cloudbow Polarisation LUT Explorer
 description: Interactive lookup-table viewer for how cloud droplet size distributions shape the P12 cloudbow signal.
 img: assets/img/project_thumbnails/cloudbow_lut_thumb.png
-importance: 0
+importance: 1
 category: cam-4th-year-project
 ---
 

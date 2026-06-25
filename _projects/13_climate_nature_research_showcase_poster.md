@@ -3,7 +3,7 @@ layout: page
 title: Climate and Nature Research Showcase Poster
 description: Poster for my 26 June 2026 Climate and Nature Research Showcase presentation on drone-borne polarimetric cloud droplet retrieval.
 img: assets/img/projects/climate-nature-research-showcase-poster/poster-thumb.jpg
-importance: 1
+importance: 0
 category: cam-4th-year-project
 ---
 
