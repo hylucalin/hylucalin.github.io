@@ -40,10 +40,26 @@
       institution: University of Cambridge, Centre for Climate Repair context
       year: 2025-26
       description:
-        - "Built the measurement system for a difficult question in marine cloud brightening: can a small drone resolve cloud droplet size changes finely enough to follow a field experiment?"
-        - "Developed a 500 g optical payload for a 7.5 inch drone, combining a polarisation camera, Raspberry Pi 4, SSD storage, separate flight and payload power, and a protective mechanical assembly."
-        - "Processed and stored up to 125 MB/s of camera data in real time, then wrote the Python retrieval pipeline for video processing, computer vision, angular profile extraction, and lookup-table fitting."
-        - "Retrieved droplet size distributions at about 3 m by 3 m spatial resolution, roughly one to two orders of magnitude finer than current satellite and aircraft approaches, with fitting RMSE below 1% of peak signal magnitude."
+        - title: Motivation and background
+          contents:
+            - "Marine cloud brightening research needs to know whether making cloud droplets smaller actually changes a cloud in the intended way during a field experiment."
+            - "Existing satellite and aircraft techniques are too coarse, expensive, or sparse to follow droplet-size changes across the small, evolving patches of cloud that matter."
+        - title: Payload challenge
+          contents:
+            - "Developed a 500 g optical payload for a 7.5 inch drone, combining a polarisation camera, Raspberry Pi 4, SSD storage, separate flight and payload power, and a protective mechanical assembly."
+            - "Kept the sensing system independent from flight-critical power so the aircraft could stay safe while the camera and computer handled high-rate measurement."
+        - title: Data challenge
+          contents:
+            - "Built the real-time capture path around the Raspberry Pi 4 to process and store up to 125 MB/s of polarimetric camera data without dropping the measurement stream."
+            - "Used the drone as a low-cost field platform while keeping the payload compact enough for repeated deployment."
+        - title: Geometry and vision challenge
+          contents:
+            - "Wrote the Python video-processing pipeline for cloud masking, camera geometry, anti-solar-point tracking, angular profile extraction, and lookup-table fitting."
+            - "Used computer vision to turn unstable flight footage into calibrated cloudbow-region signals that could be compared with scattering-model predictions."
+        - title: Most significant result
+          contents:
+            - "Retrieved cloud droplet size distributions at about 3 m by 3 m spatial resolution, roughly one to two orders of magnitude finer than current satellite and aircraft approaches."
+            - "Achieved fitting RMSE below 1% of peak signal magnitude and a measurement route that can cost less than 10% of current techniques."
       linkitems:
         - link: "/projects/12_drone_cloud_droplet_measurement/"
           linkname: case study

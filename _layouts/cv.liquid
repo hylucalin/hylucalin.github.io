@@ -1,7 +1,11 @@
 ---
 layout: default
 ---
-{% unless site.data.resume %}
+{% assign use_cv_data = false %}
+{% if page.cv_data == 'cv' or site.data.resume == nil %}
+  {% assign use_cv_data = true %}
+{% endif %}
+{% if use_cv_data %}
   <div class="post">
     <header class="post-header">
       <h1 class="post-title">
@@ -124,4 +128,4 @@ layout: default
       </div>
     </article>
   </div>
-{% endunless %}
+{% endif %}
