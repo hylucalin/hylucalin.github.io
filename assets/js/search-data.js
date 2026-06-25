@@ -44,7 +44,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/external_links/";
               },
-            },{id: "post-dyson-day-outreach-introduction-to-my-4th-year-project",
+            },{id: "post-climate-and-nature-research-showcase-poster",
+        
+          title: "Climate and Nature Research Showcase Poster",
+        
+        description: "A brief note on my poster for the 26 June 2026 Climate and Nature Research Showcase.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/climate-nature-research-showcase-poster/";
+          
+        },
+      },{id: "post-dyson-day-outreach-introduction-to-my-4th-year-project",
         
           title: "Dyson Day Outreach: Introduction to My 4th Year Project",
         
