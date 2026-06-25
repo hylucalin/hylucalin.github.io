@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "Measuring Cloud Droplets From a Drone"
-description: An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.
+title: "Outreach Activity: Measuring Cloud Droplets From a Drone"
+description: An accessible case study about using drones to record polarised light, and to measure tiny cloud droplets with these information.
 img: assets/img/projects/drone-cloud-droplet-measurement/drone-camera-assembly.jpg
 importance: 1
 category: cam-4th-year-project
@@ -136,13 +136,133 @@ The retrieval needs an angular profile: linear polarisation intensity plotted ag
 
 The report used the convention that the ASP provides the reference for a 180 degree scattering angle. If the camera ray to a cloud pixel is separated from the ASP ray by an angle gamma, then the scattering angle is approximately 180 degrees minus gamma.
 
+<div class="retrieval-flowchart-wrap">
+  <svg class="retrieval-flowchart" viewBox="0 0 1280 760" role="img" aria-label="Flowchart showing how video pre-processing, camera calibration, and lookup-table fitting data products combine">
+    <defs>
+      <marker id="arrow-video" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      </marker>
+      <marker id="arrow-calibration" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      </marker>
+      <marker id="arrow-lut" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      </marker>
+      <marker id="arrow-fit" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      </marker>
+    </defs>
+
+    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 110 V 210" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 280 V 210" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 110 V 315" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 280 V 315" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 110 268 V 420" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 280 268 V 420" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 110 373 V 535" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 280 373 V 535" marker-end="url(#arrow-video)"></path>
+
+    <path class="flow-arrow flow-arrow--calibration" d="M 650 150 V 210" marker-end="url(#arrow-calibration)"></path>
+    <path class="flow-arrow flow-arrow--calibration" d="M 650 268 V 335" marker-end="url(#arrow-calibration)"></path>
+    <path class="flow-arrow flow-arrow--calibration" d="M 650 413 V 480" marker-end="url(#arrow-calibration)"></path>
+
+    <path class="flow-arrow flow-arrow--lut" d="M 1070 150 V 210" marker-end="url(#arrow-lut)"></path>
+    <path class="flow-arrow flow-arrow--lut" d="M 1070 268 V 335" marker-end="url(#arrow-lut)"></path>
+    <path class="flow-arrow flow-arrow--lut" d="M 1070 393 V 610" marker-end="url(#arrow-lut)"></path>
+
+    <path class="flow-arrow flow-arrow--video" d="M 190 452 H 435 V 514 H 500" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 360 452 H 425 V 646 H 500" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 190 567 H 415 V 646 H 500" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--video" d="M 360 567 H 425 V 646 H 500" marker-end="url(#arrow-video)"></path>
+    <path class="flow-arrow flow-arrow--calibration" d="M 650 548 V 610" marker-end="url(#arrow-calibration)"></path>
+    <path class="flow-arrow flow-arrow--fit" d="M 650 548 V 585 H 500 V 610" marker-end="url(#arrow-fit)"></path>
+    <path class="flow-arrow flow-arrow--fit" d="M 800 646 H 910" marker-end="url(#arrow-fit)"></path>
+    <path class="flow-arrow flow-arrow--fit" d="M 1070 678 V 705" marker-end="url(#arrow-fit)"></path>
+
+    <foreignObject x="35" y="20" width="360" height="48">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--video">Video pre-processing</div>
+    </foreignObject>
+    <foreignObject x="475" y="20" width="350" height="48">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--calibration">Camera calibration</div>
+    </foreignObject>
+    <foreignObject x="900" y="20" width="340" height="48">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--lut">Lookup table</div>
+    </foreignObject>
+
+    <foreignObject x="60" y="92" width="300" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Raw 12-bit polarisation video</div>
+    </foreignObject>
+    <foreignObject x="35" y="210" width="150" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">45-135 channel</div>
+    </foreignObject>
+    <foreignObject x="205" y="210" width="150" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Single image channel</div>
+    </foreignObject>
+    <foreignObject x="35" y="315" width="150" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Manual cloud tracking</div>
+    </foreignObject>
+    <foreignObject x="205" y="315" width="150" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">All polariser angles</div>
+    </foreignObject>
+    <foreignObject x="35" y="420" width="150" height="64">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">NCC ASP tracking</div>
+    </foreignObject>
+    <foreignObject x="205" y="420" width="150" height="64">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Cloud mask and horizon</div>
+    </foreignObject>
+    <foreignObject x="35" y="535" width="150" height="64">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Same cloud patch over time</div>
+    </foreignObject>
+    <foreignObject x="205" y="535" width="150" height="64">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Linear polarisation intensity</div>
+    </foreignObject>
+
+    <foreignObject x="510" y="92" width="280" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Calibration pattern images</div>
+    </foreignObject>
+    <foreignObject x="510" y="210" width="280" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Distortion correction</div>
+    </foreignObject>
+    <foreignObject x="510" y="335" width="280" height="78">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Distortion-free frame information and camera ray map</div>
+    </foreignObject>
+    <foreignObject x="500" y="480" width="300" height="68">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--join">Scattering angle at each cloud pixel</div>
+    </foreignObject>
+
+    <foreignObject x="930" y="92" width="280" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Grid of possible DSDs</div>
+    </foreignObject>
+    <foreignObject x="930" y="210" width="280" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Mie-scattering calculation</div>
+    </foreignObject>
+    <foreignObject x="930" y="335" width="280" height="58">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Theoretical polarisation curves</div>
+    </foreignObject>
+
+    <foreignObject x="500" y="610" width="300" height="68">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--join">Measured cloudbow profile</div>
+    </foreignObject>
+    <foreignObject x="910" y="610" width="320" height="68">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--fit">Fit measured profile to theoretical LUT curves</div>
+    </foreignObject>
+    <foreignObject x="930" y="705" width="280" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--output">Effective radius and effective variance</div>
+    </foreignObject>
+  </svg>
+</div>
+
+<div class="caption">
+  Figure 3a. Equivalent three-pipeline retrieval flowchart, showing how video pre-processing, camera calibration, and lookup-table fitting combine to produce droplet-size estimates.
+</div>
+
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
     {% include figure.liquid loading="eager" path="assets/img/projects/drone-cloud-droplet-measurement/main-retrieval-flowchart.jpg" title="Main retrieval flowchart" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">
-  Figure 3. Main retrieval workflow, showing how video pre-processing, camera calibration, and lookup-table fitting connect raw flight video to droplet-size estimates.
+  Figure 3b. Original report-style retrieval workflow, kept here for comparison with the webpage-native flowchart above.
 </div>
 
 ### 2.3 Video Pre-processing
@@ -502,6 +622,120 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   .hardware-preview img {
     width: 100%;
     border-radius: 8px;
+  }
+
+  .retrieval-flowchart {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1.25rem 0 0.6rem;
+    align-items: stretch;
+  }
+
+  .flow-lane,
+  .flow-merge {
+    position: relative;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 0.85rem;
+    background: var(--global-card-bg-color);
+  }
+
+  .flow-lane::after {
+    position: absolute;
+    right: -0.62rem;
+    top: 50%;
+    z-index: 1;
+    width: 1rem;
+    height: 1rem;
+    border-top: 2px solid var(--global-theme-color);
+    border-right: 2px solid var(--global-theme-color);
+    content: "";
+    transform: translateY(-50%) rotate(45deg);
+    background: var(--global-card-bg-color);
+  }
+
+  .flow-lane--lut::after {
+    display: none;
+  }
+
+  .flow-lane h4 {
+    margin: 0 0 0.65rem;
+    font-size: 1rem;
+  }
+
+  .flow-lane--video {
+    border-top: 4px solid #3b82a6;
+  }
+
+  .flow-lane--calibration {
+    border-top: 4px solid #2f9d68;
+  }
+
+  .flow-lane--lut {
+    border-top: 4px solid #b57a2a;
+  }
+
+  .flow-node {
+    border: 1px solid var(--global-divider-color);
+    border-radius: 8px;
+    padding: 0.55rem 0.65rem;
+    margin: 0.45rem 0;
+    background: rgba(127, 127, 127, 0.07);
+    line-height: 1.35;
+  }
+
+  .flow-node + .flow-node {
+    position: relative;
+  }
+
+  .flow-node + .flow-node::before {
+    position: absolute;
+    left: 50%;
+    top: -0.48rem;
+    width: 2px;
+    height: 0.48rem;
+    background: var(--global-divider-color);
+    content: "";
+  }
+
+  .flow-branches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-top: 0.45rem;
+  }
+
+  .flow-node--small {
+    margin: 0;
+    font-size: 0.88rem;
+  }
+
+  .flow-merge {
+    display: grid;
+    align-content: start;
+    min-height: 100%;
+  }
+
+  .flow-merge strong {
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .flow-merge span {
+    line-height: 1.35;
+  }
+
+  .flow-merge--geometry {
+    border-top: 4px solid #4f7dbb;
+  }
+
+  .flow-merge--profile {
+    border-top: 4px solid #8b66b0;
+  }
+
+  .flow-merge--fit {
+    border-top: 4px solid #7b8f2a;
   }
 
   .ref-link {
@@ -920,6 +1154,18 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     .polarisation-demo__bundle {
       grid-column: 1;
       grid-row: auto;
+    }
+
+    .retrieval-flowchart,
+    .flow-branches {
+      grid-template-columns: 1fr;
+    }
+
+    .flow-lane::after {
+      right: 50%;
+      top: auto;
+      bottom: -0.65rem;
+      transform: translateX(50%) rotate(135deg);
     }
   }
 </style>
