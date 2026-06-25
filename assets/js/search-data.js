@@ -124,6 +124,11 @@ ninja.data = [{
           description: "Poster for my 26 June 2026 Climate and Nature Research Showcase presentation on drone-borne polarimetric cloud droplet retrieval.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/13_climate_nature_research_showcase_poster/";
+            },},{id: "projects-4a2-supersonic-wind-tunnel-cfd",
+          title: '4A2 Supersonic Wind Tunnel CFD',
+          description: "Fortran finite-volume Euler solver extended with Runge-Kutta stepping, residual smoothing, and tanh-refined non-uniform meshes.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/14_4a2_supersonic_wind_tunnel/";
             },},{id: "projects-project-1",
           title: 'project 1',
           description: "with background image",
