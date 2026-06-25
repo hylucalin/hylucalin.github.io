@@ -4,7 +4,7 @@ title: Cloudbow Polarisation LUT Explorer
 description: Interactive lookup-table viewer for how cloud droplet size distributions shape the P12 cloudbow signal.
 img: assets/img/project_thumbnails/cloudbow_lut_thumb.png
 importance: 0
-category: uni
+category: cam-4th-year-project
 ---
 
 This interactive viewer presents the lookup table used in my fourth-year project, **Drone-borne Retrieval of Cloud Droplet Size Distributions Using Polarimetric Imagery**. The report asks whether a low-cost drone-borne polarisation camera can retrieve high-spatial-resolution cloud droplet size distributions from cloudbow-region observations of low cloud or fog.

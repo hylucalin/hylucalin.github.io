@@ -48,7 +48,7 @@
         muted
       {% endif %}
       {% if include.poster %}
-        poster="{{ include.poster }}"
+        poster="{% if include.cache_bust %}{{ include.poster | relative_url | bust_file_cache }}{% else %}{{ include.poster | relative_url }}{% endif %}"
       {% endif %}
     />
 

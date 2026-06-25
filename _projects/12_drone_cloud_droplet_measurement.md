@@ -4,7 +4,7 @@ title: "Measuring Cloud Droplets From a Drone"
 description: An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.
 img: assets/img/projects/drone-cloud-droplet-measurement/drone-camera-assembly.jpg
 importance: 0
-category: uni
+category: cam-4th-year-project
 ---
 
 My fourth-year project asked a simple question with a surprisingly tricky answer:
