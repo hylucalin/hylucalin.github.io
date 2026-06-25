@@ -7,6 +7,8 @@ importance: 0
 category: cam-4th-year-project
 ---
 
+This material is primarily prepared for the Dyson Day outreach event. It is intended to be an accessible, interactive case study for people to get to know more about my project. To see others' projects this year and past projects, please visit <a href="https://www.dysoncentre.eng.cam.ac.uk/james-dyson-foundation-undergraduate-bursary-historical-projects-collection">James Dyson Foundation Bursary Historical Projects Collection</a>.
+
 My fourth-year project asked a simple question with a surprisingly tricky answer:
 
 > Can a small drone measure the size of tiny droplets inside low cloud or fog?
