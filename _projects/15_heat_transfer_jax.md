@@ -29,17 +29,32 @@ The GitHub repository is included for the source code, but the story here is the
 
 ## 1. Polar Coordinates Looked Natural, But Were Fragile
 
-For a circular cross-section, polar coordinates were the tempting first choice. The heat-equation stencil included the expected $1/r$ and $1/r^2$ terms:
+For a circular cross-section, polar coordinates were the tempting first choice. The governing equation I was discretising was the transient heat equation in polar coordinates:
+
+$$
+\frac{\partial T}{\partial t}
+= \alpha \left[
+\frac{1}{r}\frac{\partial T}{\partial r}
++ \frac{\partial^2 T}{\partial r^2}
++ \frac{1}{r^2}\frac{\partial^2 T}{\partial \theta^2}
+\right]
++ \frac{\dot{q}}{\rho c_p}.
+$$
+
+The heat-equation stencil therefore included the expected $1/r$ and $1/r^2$ terms:
 
 ```python
+# Radial second derivative, written as gradients across neighbouring cells.
 dT_dr = (T[r_index, theta_index] - T[r_index-1, theta_index]) / cell_size_r
 dT_dr_next = (T[r_index+1, theta_index] - T[r_index, theta_index]) / cell_size_r
 d2T_dr2 = (dT_dr_next - dT_dr) / cell_size_r
 
+# Angular second derivative with periodic indexing in theta.
 dT_dtheta = (T[r_index, (theta_index+1)%Num_of_theta_cell] - T[r_index, theta_index]) / cell_size_theta
 dT_dtheta_next = (T[r_index, (theta_index+2)%Num_of_theta_cell] - T[r_index, (theta_index+1)%Num_of_theta_cell]) / cell_size_theta
 d2T_dtheta2 = (dT_dtheta_next - dT_dtheta) / cell_size_theta
 
+# Polar-coordinate heat equation.
 T_Lagrangian = (1/r) * dT_dr + d2T_dr2 + (1/r**2) * d2T_dtheta2
 dT_dt = alpha * T_Lagrangian + g_dot / pho_cp
 ```
@@ -63,23 +78,43 @@ This was a good lesson: matching the coordinate system to the geometry does not 
 
 ## 2. Cartesian Grids Made The Solver Easier To Trust
 
-The next version used a Cartesian grid and the standard five-point Laplacian. The circular or semicircular domain is handled by a mask, so the numerical update stays simple even when the geometry is curved.
+The next version used a Cartesian grid and the standard five-point Laplacian. The governing equation became:
+
+$$
+\frac{\partial T}{\partial t}
+= \alpha \left(
+\frac{\partial^2 T}{\partial x^2}
++ \frac{\partial^2 T}{\partial y^2}
+\right)
++ \frac{\dot{q}}{\rho c_p}.
+$$
+
+The circular or semicircular domain is handled by a mask, so the numerical update stays simple even when the geometry is curved.
 
 ```python
+# x-direction contribution to the five-point Laplacian.
 dT_dx = (T[x_index, y_index] - T[x_index-1, y_index]) / cell_size_x
 dT_dx_next = (T[x_index+1, y_index] - T[x_index, y_index]) / cell_size_x
 d2T_dx2 = (dT_dx_next - dT_dx) / cell_size_x
 
+# y-direction contribution to the five-point Laplacian.
 dT_dy = (T[x_index, y_index] - T[x_index, y_index-1]) / cell_size_y
 dT_dy_next = (T[x_index, y_index+1] - T[x_index, y_index]) / cell_size_y
 d2T_dy2 = (dT_dy_next - dT_dy) / cell_size_y
 
+# Cartesian transient heat equation with volumetric heat generation.
 dT_dt = alpha * (d2T_dx2 + d2T_dy2) + g_dot / pho_cp
 ```
 
 For EP1 Q2e, I modelled a semicircle heated along the diameter and held near ambient on the arc. For Q2f, I added a convective boundary term on the curved edge:
 
+$$
+-\lambda \frac{\partial T}{\partial n}
+= h(T - T_\infty).
+$$
+
 ```python
+# Boundary-cell energy balance: conduction in minus convection out.
 dT_dt = (
     qx/cell_size_x
     + qy/cell_size_y
@@ -106,6 +141,7 @@ The original Python loops were useful for debugging because every derivative was
 ```python
 @jit
 def jax_laplacian(T, ds=cell_size_x):
+  # Five-point Laplacian written with array shifts so JAX can compile it.
   return (
       -4*T
       + jnp.roll(T, 1, axis=0) + jnp.roll(T, -1, axis=0)
@@ -114,8 +150,10 @@ def jax_laplacian(T, ds=cell_size_x):
 
 @jit
 def step(T, mask, dt=time_step):
+  # Update only the physical domain; leave masked-out cells unchanged.
   dT = dt * (alpha * jax_laplacian(T) + g_dot/pho_cp)
   T = jnp.where(mask, T + dT, T)
+  # Symmetry boundary on the heated diameter.
   T = T.at[0, :].set(T[1, :])
   return T
 ```
