@@ -126,9 +126,14 @@ ninja.data = [{
               window.location.href = "/projects/13_climate_nature_research_showcase_poster/";
             },},{id: "projects-4a2-supersonic-wind-tunnel-cfd",
           title: '4A2 Supersonic Wind Tunnel CFD',
-          description: "Fortran finite-volume Euler solver extended with Runge-Kutta stepping, residual smoothing, and tanh-refined non-uniform meshes.",
+          description: "My Fortran finite-volume Euler solver, extended with higher-order time marching, residual smoothing, and tanh-refined non-uniform meshes.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/14_4a2_supersonic_wind_tunnel/";
+            },},{id: "projects-jax-accelerated-heat-transfer-solver",
+          title: 'JAX-Accelerated Heat Transfer Solver',
+          description: "Explicit finite-difference heat-conduction solvers, from unstable polar grids to Cartesian masks and JAX-accelerated stencil updates.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/15_heat_transfer_jax/";
             },},{id: "projects-project-1",
           title: 'project 1',
           description: "with background image",
