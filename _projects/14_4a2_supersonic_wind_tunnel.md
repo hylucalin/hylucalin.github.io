@@ -1,15 +1,15 @@
 ---
 layout: page
 title: 4A2 Supersonic Wind Tunnel CFD
-description: Fortran finite-volume Euler solver extended with Runge-Kutta stepping, residual smoothing, and tanh-refined non-uniform meshes.
+description: My Fortran finite-volume Euler solver, extended with higher-order time marching, residual smoothing, and tanh-refined non-uniform meshes.
 img: assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-started-up.png
 importance: 0
 category: cam-coursework
 ---
 
-This coursework extended a Fortran CFD solver for 2D inviscid compressible Euler flow. The solver is finite-volume at heart: fluxes are summed through the cell faces, converted into cell residuals, then distributed back to the surrounding nodes.
+I built this for the 4A2 Computational Fluid Dynamics coursework: a Fortran solver for two-dimensional inviscid compressible Euler flow, then extended it until it could simulate a supersonic wind tunnel starting, running, and shutting down.
 
-The final goal was not just to make the bump case converge faster. The interesting test was a generated Mach 2.5 supersonic wind tunnel, where the shock had to start in the first nozzle, travel through the working section, pass the second nozzle, and then shut down again as the back pressure was raised.
+The most important result is the video below. A normal shock starts in the first nozzle, moves through the working section, passes the second nozzle, and then returns during shut-down. Getting this to run was mostly a numerical-method problem: too much artificial viscosity made the tunnel lose stagnation pressure and no-start.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-11 mt-3 mt-md-0">
@@ -17,27 +17,31 @@ The final goal was not just to make the bump case converge faster. The interesti
   </div>
 </div>
 <div class="caption">
-  Supersonic wind tunnel start-up and shut-down. The hard part was avoiding enough artificial-viscosity loss that the second nozzle choked too early and prevented the tunnel from starting.
+  Supersonic wind tunnel start-up and shut-down from my unsteady Euler solver.
 </div>
 
-## What Changed
+## The FVM Core
 
-The final report grouped the solver improvements into three parts: Runge-Kutta time marching, residual smoothing, and refined non-uniform meshing. Git history lines up with that story:
+The handout starts from a simple finite-volume Euler solver. The version I worked with stores flow variables at nodes, but computes the change in each cell from the flux imbalance through its four faces.
 
-- `65ed891` added the working RK implementation; `8f86e67` merged it into the residual-smoothing branch.
-- `4d451ff` added residual smoothing, with `sfac_res` read from the input and applied to residuals.
-- `7288d4a`, `2475a16`, and `61cdfb0` built the `tanh` mesh workflow; `bf4702e` records settings that made the original tunnel start.
+In compact form, the solver does this:
 
-## Finite-Volume Core
+$$
+\Delta U =
+\frac{\Delta t}{A}
+\left(
+F_{i-1/2} - F_{i+1/2}
++ F_{j-1/2} - F_{j+1/2}
+\right)
+$$
 
-The finite-volume update lives in `flux_stencil.f90`. The important line is the residual calculation: flux entering from the lower-index faces minus flux leaving through the higher-index faces, scaled by the local cell area and time step.
+and then distributes that cell change back to the four surrounding nodes.
 
 ```fortran
+! flux_stencil.f90
 dcell = av%dt/area * ( &
       flux_i(1:ni-1,:)-flux_i(2:ni,:) + &
       flux_j(:,1:nj-1)-flux_j(:,2:nj))
-
-call smooth_array(dcell,av%sfac_res)
 
 dnode(2:ni-1,2:nj-1) = 0.25 * ( &
       dcell(1:ni-2,2:nj-1) + dcell(2:ni-1,2:nj-1) + &
@@ -46,13 +50,14 @@ dnode(2:ni-1,2:nj-1) = 0.25 * ( &
 prop = prop + dnode
 ```
 
-That structure made the later changes fairly clean: higher-order time stepping changed how each main step was marched, residual smoothing changed the `dcell` field before distribution, and mesh refinement changed the geometry and cell areas feeding the same flux machinery.
+This is the part I want a viewer to see first: every later improvement still feeds this same finite-volume update. I changed how the time derivative was estimated, how residuals were stabilised, and how the mesh placed cells around difficult geometry.
 
-## 1. Runge-Kutta Time Marching
+## Higher-Order Time Marching
 
-The basic explicit step was CFL-limited. The report records that RK increased the maximum stable CFL from 0.62 to 4.7 at `sfac=0.21`, roughly a 7.6x increase in allowable CFL. Each main step became more expensive, but the net result was still about twice as fast for comparable smoothing.
+The handout presents Runge-Kutta as a way to improve temporal accuracy and stability. I implemented it by storing the state at the beginning of a main time step, then taking multiple substeps with fractional time steps.
 
 ```fortran
+! solver.f90
 g%ro_start = g%ro; g%roe_start = g%roe
 g%rovx_start = g%rovx; g%rovy_start = g%rovy
 
@@ -65,12 +70,15 @@ do nrkut = 1, nrkuts
 end do
 ```
 
-Inside `euler_iteration.f90`, each conserved variable is restored to the start-of-main-step value before applying the substep residual:
+Inside the Euler iteration, the conserved variable is restored to the start-of-step state before applying the current substep residual:
 
 ```fortran
+! euler_iteration.f90
 g%ro = g%ro_start
 call sum_fluxes(av,mass_i,mass_j,g%area,g%ro,g%dro)
 ```
+
+This made the solver tolerate much larger CFL numbers. That mattered because the unsteady wind tunnel needed many frames: a stable larger time step meant I could simulate the full start-up and shut-down sequence without the run becoming painfully slow.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-6 mt-3 mt-md-0">
@@ -81,12 +89,14 @@ call sum_fluxes(av,mass_i,mass_j,g%area,g%ro,g%dro)
   </div>
 </div>
 <div class="caption">
-  CFL sweeps from the interim analysis: smaller CFL improves accuracy but costs runtime; RK made much larger stable CFL values usable.
+  CFL diagnostics from the bump case. Higher-order time marching lets the solver use larger stable time steps.
 </div>
 
-## 2. Residual Smoothing
+## Residual Smoothing
 
-The basic solver already used smoothing as artificial viscosity on the primary variables. That stabilised shocks, but it also caused unphysical stagnation-pressure loss. The residual-smoothing improvement instead smooths the residual before nodal distribution:
+The original solver used artificial-viscosity smoothing on the flow variables. That stabilises the calculation, but it also changes the solution directly. For the tunnel this is dangerous: excessive numerical diffusion becomes an artificial stagnation-pressure loss.
+
+The handout distinguishes residual averaging from ordinary smoothing: smooth the changes, not the state. I added a separate residual smoothing factor and applied it inside the finite-volume update before the cell residuals are distributed to nodes.
 
 ```fortran
 ! read_settings.f90
@@ -100,7 +110,7 @@ dcell = av%dt/area * ( &
 call smooth_array(dcell,av%sfac_res)
 ```
 
-In the final report, adding residual smoothing at `sfac_res=0.5` raised the maximum CFL from 4.7 to 7.2, and reduced the minimum stable primary smoothing factor from `0.0005` to `0.0002`.
+This was a stability tool for the higher-order time scheme. It let me reduce the primary smoothing factor while keeping the solver usable around shocks.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-6 mt-3 mt-md-0">
@@ -111,14 +121,15 @@ In the final report, adding residual smoothing at `sfac_res=0.5` raised the maxi
   </div>
 </div>
 <div class="caption">
-  Smoothing-factor sweeps show the accuracy-stability trade-off: less smoothing reduces artificial diffusion, until the solver becomes unstable.
+  Smoothing diagnostics. Lower smoothing reduces artificial diffusion, but if it is pushed too far the residuals stop behaving.
 </div>
 
-## 3. Non-Uniform Tanh Meshing
+## Tanh Non-Uniform Mesh
 
-The most visible improvement was the mesh. I used constant-density sections joined by smooth `tanh` patches, so cells could be concentrated where the geometry and flow direction changed quickly without introducing abrupt jumps in cell size.
+The handout suggests refined mesh density as a route to spatial accuracy or reduced cost. My version uses constant-density sections joined by smooth `tanh` patches. This let me place cells around geometry changes without introducing abrupt jumps in spacing.
 
 ```fortran
+! routines.f90
 subroutine tanh_patch(dx1,dx2,x)
   s = atanh(1/(1+epsilon))
 
@@ -132,16 +143,37 @@ subroutine tanh_patch(dx1,dx2,x)
 end subroutine tanh_patch
 ```
 
-Because the number of cells in a `tanh` patch is discrete, I added a Python helper to iteratively adjust segment boundaries and reduce truncation error before the Fortran solver read the mesh definition. The Fortran side then computed the number of patch cells and rejected sharp transitions:
+The generated `si` and `sj` spacing vectors are then used exactly where the basic solver used uniform `linspace`:
 
 ```fortran
-call fill_tanh_num_of_cell(av%si_geom_start,av%si_geom_end,av%ni_cells,&
-      rounding_error)
+! generate_mesh.f90
+do i = 1, av%ni_segs, 2
+      call linspace(av%si_geom_start(i),av%si_geom_end(i),&
+            si(av%ni_node_start(i):av%ni_node_end(i)))
+end do
 
-if (rounding_error > 0.1) then
-      write(6,*) '  Sharp Cell size change expected! Adjust mesh input!'
-      do; end do;
-end if
+do i = 2, av%ni_segs, 2
+      call tanh_patch( &
+            si(av%ni_node_start(i))-si(av%ni_node_start(i)-1), &
+            si(av%ni_node_end(i)+1)-si(av%ni_node_end(i)), &
+            si(av%ni_node_start(i):av%ni_node_end(i)) &
+            )
+end do
+```
+
+One practical issue is that a `tanh` patch can only contain an integer number of cells. I wrote a small Python helper to adjust the segment boundaries until the continuous patch length and integer cell count agreed closely enough.
+
+```python
+# generate_tanh_mesh.py
+N_float = L_old / x_avg
+N_int = max(1, round(N_float))
+L_new = N_int * x_avg
+
+delta = L_new - L_old
+left.x_end -= delta/2/deceleration
+patch.x_start = left.x_end
+patch.x_end += delta/2/deceleration
+right.x_start = patch.x_end
 ```
 
 <div class="row justify-content-sm-center">
@@ -153,29 +185,37 @@ end if
   </div>
 </div>
 <div class="caption">
-  The bump mesh was denser around the geometry change and near the lower wall. In the report, the combined improvements reduced convergence iterations to about 15 percent of the basic solver.
+  Bump-case mesh diagnostic: cells are concentrated where the wall shape changes and where the near-wall flow is sensitive.
 </div>
 
-## Tunnel Start-Up
+## Mesh Diagnosis For The Tunnel
 
-The tunnel case was sensitive because numerical diffusion acted like a stagnation-pressure loss. With too much loss in the first nozzle, the second nozzle choked before the normal shock entered the working section, causing a no-start. The successful mesh focused i-direction density and cell aspect ratio in the first-nozzle diffuser, working section, and around the sharp second nozzle.
+The tunnel did not start just because I made the mesh larger. It started because the cells became better placed. The key region was the first-nozzle diffuser and the second nozzle, where bad aspect ratio and coarse spacing made artificial viscosity remove too much stagnation pressure.
 
 <div class="row justify-content-sm-center">
-  <div class="col-sm-10 mt-3 mt-md-0">
-    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-og-success-mesh.png" title="Successful wind tunnel mesh" class="img-fluid rounded z-depth-1" %}
+  <div class="col-sm-6 mt-3 mt-md-0">
+    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-og-success-mesh-zoomed.png" title="Successful tunnel mesh near the first throat" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm-6 mt-3 mt-md-0">
+    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-og-failed-mesh-zoomed.png" title="No-start mesh diagnostic near the first throat" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">
-  Successful tunnel mesh. The close-to-square cells in key regions reduced artificial-viscosity losses enough for the tunnel to start.
+  Mesh diagnosis: the successful case uses better cell aspect ratio in the sensitive diffuser region. The no-start case loses too much stagnation pressure before the working section can start.
 </div>
 
-The start-up sequence in the final report is:
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-og-success-mesh.png" title="Full successful wind tunnel mesh" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Full mesh used for the successful original wind tunnel start-up.
+</div>
 
-- At high back pressure, the initial transients die away and the flow remains largely subsonic.
-- As back pressure drops, a shock moves down the first nozzle and into the working section.
-- At about `P_out/P_0 = 0.405`, a normal shock forms in the working section with pre-shock Mach number about 2.49.
-- The shock passes the second nozzle, after which the tunnel reaches a continuously working state.
-- Raising back pressure sends the normal shock back through the second throat and eventually shuts the tunnel down.
+## Tunnel Result
+
+With the higher-order time stepping, residual smoothing, and diagnostic mesh refinement together, I could run the original tunnel geometry through the full transient sequence.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-4 mt-3 mt-md-0">
@@ -189,23 +229,21 @@ The start-up sequence in the final report is:
   </div>
 </div>
 <div class="caption">
-  Start-up to shut-down: shock motion through the working section, fully started flow, and reverse shock motion during shut-down.
+  Three moments from the transient run: shock in the working section, fully started tunnel, and shut-down.
 </div>
 
-## Why The Mesh Mattered
-
-The report's key physical diagnosis was that the no-start case was not just a numerical annoyance. A coarser or poorly shaped mesh introduced enough artificial stagnation-pressure loss that the second throat became the limiting choke point. In the no-start comparison, the stagnation pressure dropped by about 8 percent in the diverging part of the first nozzle, enough to make the would-be fully started state incompatible with the second-nozzle mass-flow limit.
+The diagnostic no-start case is useful because it shows what the method was fighting. In that case the second nozzle chokes too early, so the working section never reaches the intended started state.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-6 mt-3 mt-md-0">
     {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-no-start-mach.png" title="No-start Mach contour" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm-6 mt-3 mt-md-0">
-    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-no-start-conservation.png" title="No-start conservation plot" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid loading="lazy" path="assets/img/projects/4a2-supersonic-wind-tunnel/tunnel-no-start-conservation.png" title="No-start conservation diagnostic" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">
-  No-start case: excessive numerical loss prevents the original tunnel from reaching the intended started state.
+  No-start diagnostic: the solver result exposes the artificial stagnation-pressure loss that stops the tunnel from starting.
 </div>
 
 <div class="row justify-content-sm-center">
@@ -214,10 +252,10 @@ The report's key physical diagnosis was that the no-start case was not just a nu
   </div>
 </div>
 <div class="caption">
-  Convergence history across the full transient tunnel simulation. The start-up and shut-down parts are not symmetric because the shock path and back-pressure ramp differ.
+  Residual history across the unsteady start-up and shut-down run.
 </div>
 
 ## Highlights To Fill In
 
-- TODO: add the short personal note on what felt most satisfying or painful while tuning the tunnel case.
-- TODO: add exact runtime or machine details if I want this page to read more like an engineering postmortem.
+- TODO: add one sentence on what I personally found most satisfying about getting the original tunnel to start.
+- TODO: add one sentence on the tuning pain point: artificial viscosity, mesh aspect ratio, or pressure ramp rate.
