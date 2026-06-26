@@ -610,9 +610,9 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   .retrieval-flowchart__map {
     display: grid;
     grid-template-columns: max-content max-content max-content max-content;
-    grid-template-rows: repeat(5, minmax(2.55rem, auto));
-    gap: 2.1rem 4.2rem;
-    min-height: 24rem;
+    grid-template-rows: repeat(4, minmax(2.55rem, auto));
+    gap: 2.05rem 2.85rem;
+    min-height: 19.5rem;
     align-items: center;
     justify-content: center;
     padding: 0.55rem 0.1rem;
@@ -641,22 +641,22 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   }
 
   .flow-block[data-node="videoFrames"] {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  .flow-block[data-node="aspTracking"] {
     grid-column: 2;
     grid-row: 1;
   }
 
-  .flow-block[data-node="cloudMask"] {
-    grid-column: 2;
+  .flow-block[data-node="aspTracking"] {
+    grid-column: 1;
     grid-row: 2;
   }
 
+  .flow-block[data-node="cloudMask"] {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
   .flow-block[data-node="manualTracking"] {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 4;
   }
 
@@ -671,8 +671,8 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   }
 
   .flow-block[data-node="lutCurves"] {
-    grid-column: 3;
-    grid-row: 5;
+    grid-column: 4;
+    grid-row: 1;
   }
 
   .flow-block[data-node="singleRetrieval"] {
@@ -700,6 +700,18 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     border-color: var(--flow-brown);
     color: var(--flow-green);
     background: var(--flow-green-fill);
+  }
+
+  @media (min-width: 901px) {
+    .flow-block[data-node="aspTracking"],
+    .flow-block[data-node="cloudMask"],
+    .flow-block[data-node="manualTracking"] {
+      transform: translateX(1.75rem);
+    }
+
+    .flow-block[data-node="perPixelSignal"] {
+      transform: translateX(-1.05rem);
+    }
   }
 
   .flow-tooltip {
@@ -1342,8 +1354,9 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     .retrieval-flowchart__map {
       grid-template-columns: 1fr;
       grid-template-rows: none;
-      gap: 0.8rem;
+      gap: 0.95rem;
       min-height: 0;
+      padding-top: 0.15rem;
       padding-right: 5.2rem;
       justify-items: center;
     }
@@ -1355,6 +1368,8 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
 
     .flow-block[data-node="videoFrames"] {
       grid-row: 1;
+      margin-bottom: 2.45rem;
+      transform: translateY(-0.55rem);
     }
 
     .flow-block[data-node="aspTracking"] {
@@ -1369,11 +1384,11 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       grid-row: 4;
     }
 
-    .flow-block[data-node="cameraCalibration"] {
+    .flow-block[data-node="perPixelSignal"] {
       grid-row: 5;
     }
 
-    .flow-block[data-node="perPixelSignal"] {
+    .flow-block[data-node="cameraCalibration"] {
       grid-row: 6;
     }
 
@@ -1425,56 +1440,8 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       padding: 0.75rem;
     }
 
-    .retrieval-flowchart__map {
-      grid-template-columns: 1fr;
-      grid-template-rows: none;
-      gap: 0.8rem;
-      min-height: 0;
-      padding-right: 5.2rem;
-    }
-
     .flow-edge-label {
       font-size: 0.64rem;
-    }
-
-    .flow-block[data-node] {
-      grid-column: 1;
-    }
-
-    .flow-block[data-node="videoFrames"] {
-      grid-row: 1;
-    }
-
-    .flow-block[data-node="aspTracking"] {
-      grid-row: 2;
-    }
-
-    .flow-block[data-node="cloudMask"] {
-      grid-row: 3;
-    }
-
-    .flow-block[data-node="manualTracking"] {
-      grid-row: 4;
-    }
-
-    .flow-block[data-node="cameraCalibration"] {
-      grid-row: 5;
-    }
-
-    .flow-block[data-node="perPixelSignal"] {
-      grid-row: 6;
-    }
-
-    .flow-block[data-node="lutCurves"] {
-      grid-row: 7;
-    }
-
-    .flow-block[data-node="singleRetrieval"] {
-      grid-row: 8;
-    }
-
-    .flow-block[data-node="multiRetrieval"] {
-      grid-row: 9;
     }
 
     .flow-block {
@@ -1551,18 +1518,18 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     const svgNS = "http://www.w3.org/2000/svg";
 
     const edges = [
-      { id: "frames-asp", from: "videoFrames", to: "aspTracking", type: "raw", label: "8-bit 45-135", mobileLabel: "8b 45-135", fromPort: ["right", 0.22], toPort: ["left", 0.5], breakOrder: 3, mobileLane: 0 },
-      { id: "frames-mask", from: "videoFrames", to: "cloudMask", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.4], toPort: ["left", 0.5], breakOrder: 1, mobileLane: 1 },
-      { id: "frames-manual", from: "videoFrames", to: "manualTracking", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.78], toPort: ["left", 0.5], breakOrder: 2, mobileLane: 2 },
-      { id: "frames-per-pixel", from: "videoFrames", to: "perPixelSignal", type: "raw", label: "12-bit all angles", mobileLabel: "12b all", fromPort: ["right", 0.6], toPort: ["left", 0.36], breakOrder: 0, mobileLane: 3 },
-      { id: "asp-per-pixel", from: "aspTracking", to: "perPixelSignal", type: "geometry", label: "ASP centre", mobileLabel: "ASP", fromPort: ["right", 0.5], toPort: ["left", 0.24], mobileLane: 4 },
-      { id: "mask-per-pixel", from: "cloudMask", to: "perPixelSignal", type: "raw", label: "cloud pixels", mobileLabel: "cloud", fromPort: ["right", 0.5], toPort: ["left", 0.58], mobileLane: 5 },
-      { id: "calibration-per-pixel", from: "cameraCalibration", to: "perPixelSignal", type: "geometry", label: "ray map", mobileLabel: "ray map", fromPort: ["bottom", 0.5], toPort: ["top", 0.5], mobileLane: 6 },
-      { id: "per-pixel-single", from: "perPixelSignal", to: "singleRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", fromPort: ["right", 0.4], toPort: ["left", 0.46], bundle: "single-fit", bundleIndex: 0, bundleCount: 2, mobileLane: 7 },
-      { id: "lut-single", from: "lutCurves", to: "singleRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", fromPort: ["right", 0.38], toPort: ["left", 0.54], bundle: "single-fit", bundleIndex: 1, bundleCount: 2, mobileLane: 8 },
-      { id: "per-pixel-multi", from: "perPixelSignal", to: "multiRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", fromPort: ["right", 0.6], toPort: ["left", 0.42], bundle: "multi-fit", bundleIndex: 0, bundleCount: 3, mobileLane: 9 },
-      { id: "manual-multi", from: "manualTracking", to: "multiRetrieval", type: "raw", label: "same cloud patch", mobileLabel: "same patch", fromPort: ["right", 0.5], toPort: ["left", 0.5], bundle: "multi-fit", bundleIndex: 1, bundleCount: 3, mobileLane: 10 },
-      { id: "lut-multi", from: "lutCurves", to: "multiRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", fromPort: ["right", 0.62], toPort: ["left", 0.58], bundle: "multi-fit", bundleIndex: 2, bundleCount: 3, mobileLane: 11 }
+      { id: "frames-mask", from: "videoFrames", to: "cloudMask", type: "raw", label: "8-bit 45°", mobileLabel: "8b 45°", labelGroup: "raw45", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "frames-manual", from: "videoFrames", to: "manualTracking", type: "raw", label: "8-bit 45°", mobileLabel: "8b 45°", labelGroup: "raw45", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "frames-asp", from: "videoFrames", to: "aspTracking", type: "raw", label: "8-bit 45°–135°", mobileLabel: "8b 45°–135°", desktopLabelSegment: 1, mobileLabelSegment: 1 },
+      { id: "frames-per-pixel", from: "videoFrames", to: "perPixelSignal", type: "raw", label: "12-bit, all angles", mobileLabel: "12b all angles", desktopLabelSegment: 1, mobileLabelSegment: 1 },
+      { id: "asp-per-pixel", from: "aspTracking", to: "perPixelSignal", type: "geometry", label: "ASP centre", mobileLabel: "ASP", desktopLabelSegment: 1, mobileLabelSegment: 1 },
+      { id: "mask-per-pixel", from: "cloudMask", to: "perPixelSignal", type: "raw", label: "cloud pixels", mobileLabel: "cloud", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "calibration-per-pixel", from: "cameraCalibration", to: "perPixelSignal", type: "geometry", label: "ray map", mobileLabel: "ray map", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "per-pixel-single", from: "perPixelSignal", to: "singleRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", desktopLabelSegment: 1, mobileLabelSegment: 1 },
+      { id: "per-pixel-multi", from: "perPixelSignal", to: "multiRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", desktopLabelSegment: 1, mobileLabelSegment: 1 },
+      { id: "manual-multi", from: "manualTracking", to: "multiRetrieval", type: "retrieval", label: "same cloud patch", mobileLabel: "same patch", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "lut-single", from: "lutCurves", to: "singleRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", labelGroup: "lutTheory", desktopLabelSegment: 0, mobileLabelSegment: 1 },
+      { id: "lut-multi", from: "lutCurves", to: "multiRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", labelGroup: "lutTheory", desktopLabelSegment: 0, mobileLabelSegment: 1 }
     ];
 
     const parents = new Map();
@@ -1621,67 +1588,209 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       }));
     };
 
-    const lineOffset = (edge) => {
-      if (!edge.bundleCount || edge.bundleCount < 2) return 0;
-      return (edge.bundleIndex - (edge.bundleCount - 1) / 2) * 4.2;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const snap = (value, step = 6) => Math.round(value / step) * step;
+
+    const routeFromPoints = (points, isMobile) => {
+      const clean = dedupe(points);
+      return { points: clean, segments: segmentsFromPoints(clean), isMobile, isNarrow: isMobile };
     };
 
-    const offsetPoints = (points, offset) => {
-      if (!offset) return points;
-      return points.map((point) => ({ x: point.x, y: point.y + offset }));
+    const getNodeRects = (chartRect) => {
+      const rects = {};
+      nodeElements.forEach((_, node) => {
+        rects[node] = nodeRect(node, chartRect);
+      });
+      return rects;
+    };
+
+    const port = (rects, node, side, ratio = 0.5) => pointFor(rects[node], side, ratio);
+
+    const getDesktopGrid = (rects, chartRect) => {
+      const leftMost = Math.min(...Object.values(rects).map((rect) => rect.left));
+      const rightMost = Math.max(...Object.values(rects).map((rect) => rect.right));
+      return {
+        raw45RailX: snap(clamp(Math.min(rects.videoFrames.left - 30, rects.aspTracking.left - 24), 12, chartRect.width - 12)),
+        raw12RailX: snap(clamp(Math.min(rects.cameraCalibration.left - 26, rects.videoFrames.right + 30), rects.videoFrames.right + 16, chartRect.width - 12)),
+        leftJoinX: snap(clamp((rects.aspTracking.right + rects.perPixelSignal.left) / 2, rects.aspTracking.right + 18, rects.perPixelSignal.left - 18)),
+        fitSingleX: snap(clamp(rects.singleRetrieval.left - 44, rects.perPixelSignal.right + 18, rects.singleRetrieval.left - 16)),
+        fitMultiX: snap(clamp(rects.multiRetrieval.left - 70, rects.perPixelSignal.right + 30, rects.multiRetrieval.left - 20)),
+        lutRailX: snap(clamp(rects.lutCurves.right + 28, rightMost + 12, chartRect.width - 12)),
+        chartLeftRailX: snap(clamp(leftMost - 40, 12, chartRect.width - 12))
+      };
+    };
+
+    const getMobileGrid = (rects, chartRect) => {
+      const leftMost = Math.min(...Object.values(rects).map((rect) => rect.left));
+      const rightMost = Math.max(...Object.values(rects).map((rect) => rect.right));
+      const leftLane = (offset) => snap(clamp(leftMost - 22 - offset, 8, chartRect.width - 12));
+      const rightLane = (offset) => snap(clamp(rightMost + 18 + offset, 8, chartRect.width - 12));
+      return {
+        rawAspRailX: rightLane(0),
+        raw45RailX: rightLane(20),
+        raw12RailX: rightLane(40),
+        geometryRailX: leftLane(0),
+        maskRailX: leftLane(14),
+        manualRailX: leftLane(28),
+        retrievalRailX: rightLane(60),
+        retrievalRailX2: rightLane(78),
+        lutRailX: rightLane(96)
+      };
+    };
+
+    const routeDesktop = (edge, rects, chartRect) => {
+      const grid = getDesktopGrid(rects, chartRect);
+      const midY = (a, b) => snap((a + b) / 2);
+
+      switch (edge.id) {
+        case "frames-mask": {
+          const source = port(rects, "videoFrames", "left", 0.5);
+          const target = port(rects, "cloudMask", "left", 0.5);
+          return [source, { x: grid.raw45RailX, y: source.y }, { x: grid.raw45RailX, y: target.y }, target];
+        }
+        case "frames-manual": {
+          const source = port(rects, "videoFrames", "left", 0.5);
+          const target = port(rects, "manualTracking", "left", 0.5);
+          return [source, { x: grid.raw45RailX, y: source.y }, { x: grid.raw45RailX, y: target.y }, target];
+        }
+        case "frames-asp": {
+          const source = port(rects, "videoFrames", "bottom", 0.5);
+          const target = port(rects, "aspTracking", "top", 0.5);
+          const y = midY(rects.videoFrames.bottom, rects.aspTracking.top);
+          return [source, { x: source.x, y }, { x: target.x, y }, target];
+        }
+        case "frames-per-pixel": {
+          const source = port(rects, "videoFrames", "right", 0.52);
+          const target = port(rects, "perPixelSignal", "top", 0.34);
+          return [source, { x: grid.raw12RailX, y: source.y }, { x: grid.raw12RailX, y: target.y }, target];
+        }
+        case "asp-per-pixel": {
+          const source = port(rects, "aspTracking", "right", 0.5);
+          const target = port(rects, "perPixelSignal", "left", 0.24);
+          return [source, { x: grid.leftJoinX, y: source.y }, { x: grid.leftJoinX, y: target.y }, target];
+        }
+        case "mask-per-pixel": {
+          const source = port(rects, "cloudMask", "right", 0.5);
+          const target = port(rects, "perPixelSignal", "left", 0.58);
+          return [source, target];
+        }
+        case "calibration-per-pixel": {
+          const source = port(rects, "cameraCalibration", "bottom", 0.5);
+          const target = port(rects, "perPixelSignal", "top", 0.70);
+          const y = midY(rects.cameraCalibration.bottom, rects.perPixelSignal.top);
+          return [source, { x: source.x, y }, { x: target.x, y }, target];
+        }
+        case "per-pixel-single": {
+          const source = port(rects, "perPixelSignal", "right", 0.50);
+          const target = port(rects, "singleRetrieval", "left", 0.50);
+          return [source, { x: grid.fitSingleX, y: source.y }, { x: grid.fitSingleX, y: target.y }, target];
+        }
+        case "per-pixel-multi": {
+          const source = port(rects, "perPixelSignal", "right", 0.50);
+          const target = port(rects, "multiRetrieval", "left", 0.42);
+          return [source, { x: grid.fitMultiX, y: source.y }, { x: grid.fitMultiX, y: target.y }, target];
+        }
+        case "manual-multi": {
+          const source = port(rects, "manualTracking", "right", 0.55);
+          const target = port(rects, "multiRetrieval", "left", 0.62);
+          return [source, target];
+        }
+        case "lut-single": {
+          const source = port(rects, "lutCurves", "right", 0.50);
+          const target = port(rects, "singleRetrieval", "right", 0.46);
+          return [source, { x: grid.lutRailX, y: source.y }, { x: grid.lutRailX, y: target.y }, target];
+        }
+        case "lut-multi": {
+          const source = port(rects, "lutCurves", "right", 0.50);
+          const target = port(rects, "multiRetrieval", "right", 0.56);
+          return [source, { x: grid.lutRailX, y: source.y }, { x: grid.lutRailX, y: target.y }, target];
+        }
+        default:
+          return [port(rects, edge.from, "right", 0.5), port(rects, edge.to, "left", 0.5)];
+      }
+    };
+
+    const routeMobile = (edge, rects, chartRect) => {
+      const grid = getMobileGrid(rects, chartRect);
+
+      switch (edge.id) {
+        case "frames-mask": {
+          const source = port(rects, "videoFrames", "right", 0.50);
+          const target = port(rects, "cloudMask", "right", 0.5);
+          return [source, { x: grid.raw45RailX, y: source.y }, { x: grid.raw45RailX, y: target.y }, target];
+        }
+        case "frames-manual": {
+          const source = port(rects, "videoFrames", "right", 0.50);
+          const target = port(rects, "manualTracking", "right", 0.5);
+          return [source, { x: grid.raw45RailX, y: source.y }, { x: grid.raw45RailX, y: target.y }, target];
+        }
+        case "frames-asp": {
+          const source = port(rects, "videoFrames", "right", 0.50);
+          const target = port(rects, "aspTracking", "right", 0.5);
+          return [source, { x: grid.rawAspRailX, y: source.y }, { x: grid.rawAspRailX, y: target.y }, target];
+        }
+        case "frames-per-pixel": {
+          const source = port(rects, "videoFrames", "right", 0.50);
+          const target = port(rects, "perPixelSignal", "right", 0.30);
+          return [source, { x: grid.raw12RailX, y: source.y }, { x: grid.raw12RailX, y: target.y }, target];
+        }
+        case "asp-per-pixel": {
+          const source = port(rects, "aspTracking", "left", 0.5);
+          const target = port(rects, "perPixelSignal", "left", 0.24);
+          return [source, { x: grid.geometryRailX, y: source.y }, { x: grid.geometryRailX, y: target.y }, target];
+        }
+        case "mask-per-pixel": {
+          const source = port(rects, "cloudMask", "left", 0.5);
+          const target = port(rects, "perPixelSignal", "left", 0.52);
+          return [source, { x: grid.maskRailX, y: source.y }, { x: grid.maskRailX, y: target.y }, target];
+        }
+        case "calibration-per-pixel": {
+          const source = port(rects, "cameraCalibration", "left", 0.5);
+          const target = port(rects, "perPixelSignal", "left", 0.76);
+          return [source, { x: grid.geometryRailX, y: source.y }, { x: grid.geometryRailX, y: target.y }, target];
+        }
+        case "per-pixel-single": {
+          const source = port(rects, "perPixelSignal", "right", 0.50);
+          const target = port(rects, "singleRetrieval", "right", 0.50);
+          return [source, { x: grid.retrievalRailX, y: source.y }, { x: grid.retrievalRailX, y: target.y }, target];
+        }
+        case "per-pixel-multi": {
+          const source = port(rects, "perPixelSignal", "right", 0.50);
+          const target = port(rects, "multiRetrieval", "right", 0.42);
+          return [source, { x: grid.retrievalRailX2, y: source.y }, { x: grid.retrievalRailX2, y: target.y }, target];
+        }
+        case "manual-multi": {
+          const source = port(rects, "manualTracking", "left", 0.5);
+          const target = port(rects, "multiRetrieval", "left", 0.58);
+          return [source, { x: grid.manualRailX, y: source.y }, { x: grid.manualRailX, y: target.y }, target];
+        }
+        case "lut-single": {
+          const source = port(rects, "lutCurves", "right", 0.50);
+          const target = port(rects, "singleRetrieval", "right", 0.38);
+          return [source, { x: grid.lutRailX, y: source.y }, { x: grid.lutRailX, y: target.y }, target];
+        }
+        case "lut-multi": {
+          const source = port(rects, "lutCurves", "right", 0.50);
+          const target = port(rects, "multiRetrieval", "right", 0.62);
+          return [source, { x: grid.lutRailX, y: source.y }, { x: grid.lutRailX, y: target.y }, target];
+        }
+        default:
+          return [port(rects, edge.from, "right", 0.5), port(rects, edge.to, "right", 0.5)];
+      }
     };
 
     const routeEdge = (edge, chartRect) => {
-      const source = nodeRect(edge.from, chartRect);
-      const target = nodeRect(edge.to, chartRect);
-      const sourcePoint = edgePoint(edge.from, edge.fromPort, chartRect);
-      const targetPoint = edgePoint(edge.to, edge.toPort, chartRect);
-      const isNarrow = chartRect.width < 700;
-
-      if (isNarrow) {
-        const sourceExit = pointFor(source, "right", 0.5);
-        const targetEntry = pointFor(target, "right", 0.5);
-        const railInset = 18 + edge.mobileLane * 6;
-        const railX = Math.max(source.right + 10, chartRect.width - railInset);
-        const points = [sourceExit, { x: railX, y: sourceExit.y }, { x: railX, y: targetEntry.y }, targetEntry];
-        return { points, segments: segmentsFromPoints(points), isNarrow };
-      }
-
-      if (edge.id.startsWith("frames-")) {
-        const requestedBreak = sourcePoint.x + 18 + (edge.breakOrder ?? 0) * 8;
-        const breakX = Math.min(targetPoint.x - 12, requestedBreak);
-        const points = [
-          sourcePoint,
-          { x: breakX, y: sourcePoint.y },
-          { x: breakX, y: targetPoint.y },
-          targetPoint
-        ];
-        return { points, segments: segmentsFromPoints(points), isNarrow };
-      }
-
-      if (edge.id === "calibration-per-pixel") {
-        const points = [sourcePoint, targetPoint];
-        return { points, segments: segmentsFromPoints(points), isNarrow };
-      }
-
-      const mergeX = edge.bundle?.includes("single")
-        ? target.left - 54
-        : edge.bundle?.includes("multi")
-          ? target.left - 66
-          : source.right + (target.left - source.right) * 0.5;
-      const points = [
-        sourcePoint,
-        { x: mergeX, y: sourcePoint.y },
-        { x: mergeX, y: targetPoint.y },
-        targetPoint
-      ];
-      return { points: offsetPoints(points, lineOffset(edge)), segments: segmentsFromPoints(offsetPoints(points, lineOffset(edge))), isNarrow };
+      const rects = getNodeRects(chartRect);
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+      const points = isMobile ? routeMobile(edge, rects, chartRect) : routeDesktop(edge, rects, chartRect);
+      return routeFromPoints(points, isMobile);
     };
 
     const labelBox = (text, x, y, angle) => {
       const width = Math.max(34, text.length * 6.1);
-      const height = 14;
-      if (Math.abs(angle) === 90) {
+      const height = 15;
+      const isVertical = Math.abs(angle) === 90;
+      if (isVertical) {
         return { left: x - height / 2, right: x + height / 2, top: y - width / 2, bottom: y + width / 2 };
       }
       return { left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
@@ -1691,34 +1800,51 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad
     );
 
-    const chooseLabel = (edge, route, chartRect, placedLabels) => {
-      const label = route.isNarrow ? edge.mobileLabel || edge.label : edge.label;
-      const blockBoxes = [...nodeElements.values()].map((element) => relativeRect(element, chartRect));
-      const segments = [...route.segments].sort((a, b) => b.length - a.length);
-      const offsets = [0, -12, 12, -22, 22, -32, 32];
+    const segmentAngle = (segment) => {
+      const dx = segment.x2 - segment.x1;
+      const dy = segment.y2 - segment.y1;
+      return Math.abs(dy) > Math.abs(dx) ? (dy >= 0 ? 90 : -90) : 0;
+    };
 
-      for (const segment of segments) {
-        if (segment.length < 28) continue;
-        const isVertical = Math.abs(segment.x2 - segment.x1) < Math.abs(segment.y2 - segment.y1);
-        const angle = 0;
-        for (const offset of offsets) {
-          const x = (segment.x1 + segment.x2) / 2 + (isVertical ? offset : 0);
-          const y = (segment.y1 + segment.y2) / 2 + (isVertical ? 0 : offset - 4);
-          const box = labelBox(label, x, y, angle);
+    const pointOnSegment = (segment, t) => ({
+      x: segment.x1 + (segment.x2 - segment.x1) * t,
+      y: segment.y1 + (segment.y2 - segment.y1) * t
+    });
+
+    const chooseLabel = (edge, route, chartRect, placedLabels) => {
+      const label = route.isMobile ? edge.mobileLabel || edge.label : edge.label;
+      const blockBoxes = [...nodeElements.values()].map((element) => relativeRect(element, chartRect));
+      const preferredSegmentIndex = route.isMobile ? edge.mobileLabelSegment : edge.desktopLabelSegment;
+      const indexedSegments = route.segments.map((segment, index) => ({ ...segment, index }));
+      const preferred = indexedSegments.filter((segment) => segment.index === preferredSegmentIndex);
+      const remaining = indexedSegments
+        .filter((segment) => segment.index !== preferredSegmentIndex)
+        .sort((a, b) => b.length - a.length);
+      const candidates = [...preferred, ...remaining];
+      const labelWidth = Math.max(34, label.length * 6.1);
+      const fractions = [0.5, 0.36, 0.64, 0.24, 0.76, 0.14, 0.86];
+
+      for (const segment of candidates) {
+        const angle = segmentAngle(segment);
+        const minimumLength = Math.abs(angle) === 90 ? Math.min(labelWidth * 0.58, 54) : Math.min(labelWidth * 0.55, 64);
+        if (segment.length < minimumLength) continue;
+        for (const fraction of fractions) {
+          const point = pointOnSegment(segment, fraction);
+          const box = labelBox(label, point.x, point.y, angle);
           const inBounds = box.left > 2 && box.right < chartRect.width - 2 && box.top > 2 && box.bottom < chartRect.height - 2;
           if (!inBounds) continue;
-          if (blockBoxes.some((block) => intersects(box, block, 6))) continue;
-          if (placedLabels.some((placed) => intersects(box, placed, 3))) continue;
+          if (blockBoxes.some((block) => intersects(box, block, 4))) continue;
+          if (placedLabels.some((placed) => intersects(box, placed, 2))) continue;
           placedLabels.push(box);
-          return { label, x, y, angle };
+          return { label, x: point.x, y: point.y, angle };
         }
       }
 
-      const fallback = route.segments[0] || { x1: 0, y1: 0, x2: chartRect.width, y2: 0 };
-      const x = (fallback.x1 + fallback.x2) / 2;
-      const y = (fallback.y1 + fallback.y2) / 2 - 12;
-      placedLabels.push(labelBox(label, x, y, 0));
-      return { label, x, y, angle: 0 };
+      const fallback = candidates.find((segment) => segment.length > 8) || { x1: 0, y1: 0, x2: chartRect.width, y2: 0 };
+      const angle = segmentAngle(fallback);
+      const point = pointOnSegment(fallback, 0.5);
+      placedLabels.push(labelBox(label, point.x, point.y, angle));
+      return { label, x: point.x, y: point.y, angle };
     };
 
     const showTooltip = (element) => {
@@ -1781,6 +1907,7 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       portLayer.textContent = "";
 
       const placedLabels = [];
+      const drawnLabelGroups = new Set();
       const routeCache = new Map();
       const drawErrors = [];
 
@@ -1795,14 +1922,18 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
           createPort(route.points[0], edge);
           createPort(route.points[route.points.length - 1], edge);
 
-          if (edge.label) {
+          const labelKey = edge.labelGroup || edge.id;
+          if (edge.label && !drawnLabelGroups.has(labelKey)) {
+            drawnLabelGroups.add(labelKey);
             const labelPosition = chooseLabel(edge, route, chartRect, placedLabels);
             const text = document.createElementNS(svgNS, "text");
             text.classList.add("flow-edge-label", `flow-edge-label--${edge.type}`);
             text.dataset.edgeLabel = edge.id;
+            if (edge.labelGroup) text.dataset.edgeLabelGroup = edge.labelGroup;
             text.setAttribute("x", labelPosition.x.toFixed(1));
             text.setAttribute("y", labelPosition.y.toFixed(1));
             text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dominant-baseline", "middle");
             if (labelPosition.angle) {
               text.setAttribute("transform", `rotate(${labelPosition.angle} ${labelPosition.x.toFixed(1)} ${labelPosition.y.toFixed(1)})`);
             }
@@ -1863,9 +1994,13 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
 
       nodes.forEach((node) => nodeElements.get(node)?.classList.add("is-highlighted"));
       edgeIds.forEach((edgeId) => {
+        const edge = edges.find((candidate) => candidate.id === edgeId);
         chart.querySelector(`[data-edge="${edgeId}"]`)?.classList.add("is-highlighted");
         chart.querySelectorAll(`[data-edge="${edgeId}"]`).forEach((element) => element.classList.add("is-highlighted"));
-        chart.querySelector(`[data-edge-label="${edgeId}"]`)?.classList.add("is-highlighted");
+        chart.querySelectorAll(`[data-edge-label="${edgeId}"]`).forEach((element) => element.classList.add("is-highlighted"));
+        if (edge?.labelGroup) {
+          chart.querySelectorAll(`[data-edge-label-group="${edge.labelGroup}"]`).forEach((element) => element.classList.add("is-highlighted"));
+        }
         chart.querySelectorAll(`[data-edge-port="${edgeId}"]`).forEach((element) => element.classList.add("is-highlighted"));
       });
     };
