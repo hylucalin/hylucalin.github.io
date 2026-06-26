@@ -114,9 +114,9 @@ ninja.data = [{
           description: "A CUES-sponsored personal drone payload for measuring near-ground temperature, humidity, and wind profiles.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/11_atmospheric_profiling_drone/";
-            },},{id: "projects-measuring-cloud-droplets-from-a-drone",
-          title: 'Measuring Cloud Droplets From a Drone',
-          description: "An accessible case study about using drones, polarised light, data storage, and code to measure tiny cloud droplets.",
+            },},{id: "projects-outreach-activity-measuring-cloud-droplets-from-a-drone",
+          title: 'Outreach Activity: Measuring Cloud Droplets From a Drone',
+          description: "An accessible case study about using drones to record polarised light, and to measure tiny cloud droplets with these information.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/12_drone_cloud_droplet_measurement/";
             },},{id: "projects-climate-and-nature-research-showcase-poster",
