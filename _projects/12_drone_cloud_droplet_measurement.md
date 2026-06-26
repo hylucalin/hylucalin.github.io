@@ -136,124 +136,62 @@ The retrieval needs an angular profile: linear polarisation intensity plotted ag
 
 The report used the convention that the ASP provides the reference for a 180 degree scattering angle. If the camera ray to a cloud pixel is separated from the ASP ray by an angle gamma, then the scattering angle is approximately 180 degrees minus gamma.
 
-<div class="retrieval-flowchart-wrap">
-  <svg class="retrieval-flowchart" viewBox="0 0 1280 760" role="img" aria-label="Flowchart showing how video pre-processing, camera calibration, and lookup-table fitting data products combine">
+<div class="retrieval-flowchart" id="retrieval-flowchart" aria-label="Interactive retrieval pipeline flowchart">
+  <svg class="retrieval-flowchart__arrows" aria-hidden="true">
     <defs>
-      <marker id="arrow-video" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      <marker id="flow-arrow-raw" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
       </marker>
-      <marker id="arrow-calibration" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      <marker id="flow-arrow-geometry" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
       </marker>
-      <marker id="arrow-lut" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      <marker id="flow-arrow-mask" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
       </marker>
-      <marker id="arrow-fit" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
-        <path d="M 0 0 L 10 5 L 0 10 z"></path>
+      <marker id="flow-arrow-tracking" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
+      </marker>
+      <marker id="flow-arrow-lut" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
+      </marker>
+      <marker id="flow-arrow-retrieval" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M 0 0 L 12 6 L 0 12 z"></path>
       </marker>
     </defs>
-
-    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 110 V 210" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 280 V 210" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 110 V 315" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 210 150 V 180 H 280 V 315" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 110 268 V 420" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 280 268 V 420" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 110 373 V 535" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 280 373 V 535" marker-end="url(#arrow-video)"></path>
-
-    <path class="flow-arrow flow-arrow--calibration" d="M 650 150 V 210" marker-end="url(#arrow-calibration)"></path>
-    <path class="flow-arrow flow-arrow--calibration" d="M 650 268 V 335" marker-end="url(#arrow-calibration)"></path>
-    <path class="flow-arrow flow-arrow--calibration" d="M 650 413 V 480" marker-end="url(#arrow-calibration)"></path>
-
-    <path class="flow-arrow flow-arrow--lut" d="M 1070 150 V 210" marker-end="url(#arrow-lut)"></path>
-    <path class="flow-arrow flow-arrow--lut" d="M 1070 268 V 335" marker-end="url(#arrow-lut)"></path>
-    <path class="flow-arrow flow-arrow--lut" d="M 1070 393 V 610" marker-end="url(#arrow-lut)"></path>
-
-    <path class="flow-arrow flow-arrow--video" d="M 190 452 H 435 V 514 H 500" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 360 452 H 425 V 646 H 500" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 190 567 H 415 V 646 H 500" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--video" d="M 360 567 H 425 V 646 H 500" marker-end="url(#arrow-video)"></path>
-    <path class="flow-arrow flow-arrow--calibration" d="M 650 548 V 610" marker-end="url(#arrow-calibration)"></path>
-    <path class="flow-arrow flow-arrow--fit" d="M 650 548 V 585 H 500 V 610" marker-end="url(#arrow-fit)"></path>
-    <path class="flow-arrow flow-arrow--fit" d="M 800 646 H 910" marker-end="url(#arrow-fit)"></path>
-    <path class="flow-arrow flow-arrow--fit" d="M 1070 678 V 705" marker-end="url(#arrow-fit)"></path>
-
-    <foreignObject x="35" y="20" width="360" height="48">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--video">Video pre-processing</div>
-    </foreignObject>
-    <foreignObject x="475" y="20" width="350" height="48">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--calibration">Camera calibration</div>
-    </foreignObject>
-    <foreignObject x="900" y="20" width="340" height="48">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-title flow-title--lut">Lookup table</div>
-    </foreignObject>
-
-    <foreignObject x="60" y="92" width="300" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Raw 12-bit polarisation video</div>
-    </foreignObject>
-    <foreignObject x="35" y="210" width="150" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">45-135 channel</div>
-    </foreignObject>
-    <foreignObject x="205" y="210" width="150" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Single image channel</div>
-    </foreignObject>
-    <foreignObject x="35" y="315" width="150" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Manual cloud tracking</div>
-    </foreignObject>
-    <foreignObject x="205" y="315" width="150" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">All polariser angles</div>
-    </foreignObject>
-    <foreignObject x="35" y="420" width="150" height="64">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">NCC ASP tracking</div>
-    </foreignObject>
-    <foreignObject x="205" y="420" width="150" height="64">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Cloud mask and horizon</div>
-    </foreignObject>
-    <foreignObject x="35" y="535" width="150" height="64">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Same cloud patch over time</div>
-    </foreignObject>
-    <foreignObject x="205" y="535" width="150" height="64">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Linear polarisation intensity</div>
-    </foreignObject>
-
-    <foreignObject x="510" y="92" width="280" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Calibration pattern images</div>
-    </foreignObject>
-    <foreignObject x="510" y="210" width="280" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Distortion correction</div>
-    </foreignObject>
-    <foreignObject x="510" y="335" width="280" height="78">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Distortion-free frame information and camera ray map</div>
-    </foreignObject>
-    <foreignObject x="500" y="480" width="300" height="68">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--join">Scattering angle at each cloud pixel</div>
-    </foreignObject>
-
-    <foreignObject x="930" y="92" width="280" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Grid of possible DSDs</div>
-    </foreignObject>
-    <foreignObject x="930" y="210" width="280" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card">Mie-scattering calculation</div>
-    </foreignObject>
-    <foreignObject x="930" y="335" width="280" height="58">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--result">Theoretical polarisation curves</div>
-    </foreignObject>
-
-    <foreignObject x="500" y="610" width="300" height="68">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--join">Measured cloudbow profile</div>
-    </foreignObject>
-    <foreignObject x="910" y="610" width="320" height="68">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--fit">Fit measured profile to theoretical LUT curves</div>
-    </foreignObject>
-    <foreignObject x="930" y="705" width="280" height="44">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="flow-card flow-card--output">Effective radius and effective variance</div>
-    </foreignObject>
+    <g data-flow-bundles></g>
+    <g data-flow-edges></g>
+    <g data-flow-labels></g>
+    <g data-flow-ports></g>
   </svg>
+
+  <div class="retrieval-flowchart__body">
+    <div class="retrieval-flowchart__map" aria-label="Metro-map style retrieval dependencies">
+      <button type="button" class="flow-block flow-block--source" data-node="videoFrames" data-explain="Raw polarisation video is the shared evidence. Lighter 8-bit versions are fast enough for tracking and masking; the 12-bit data are kept for the final polarisation calculation.">Raw polarisation video</button>
+      <button type="button" class="flow-block flow-block--result" data-node="aspTracking" data-explain="The anti-solar point is the centre of the cloudbow rings. Tracking it gives the angular reference needed for scattering angle.">ASP tracking</button>
+      <button type="button" class="flow-block flow-block--result" data-node="cloudMask" data-explain="The cloud mask keeps cloud pixels and rejects sky, horizon, and ground so the fitted profile is actually a cloud signal.">Cloud mask</button>
+      <button type="button" class="flow-block flow-block--result" data-node="manualTracking" data-explain="Manual tracking follows the same cloud patch through several frames. Only the multi-frame retrieval uses this extra time information.">Manual tracking</button>
+      <button type="button" class="flow-block flow-block--result" data-node="cameraCalibration" data-explain="Camera calibration removes lens distortion and converts pixel positions into viewing rays. Those rays are needed to calculate scattering angle.">Camera calibration</button>
+      <button type="button" class="flow-block flow-block--join" data-node="perPixelSignal" data-explain="This join step combines 12-bit polarisation data, ASP position, the cloud mask, and calibrated viewing rays. The output is a polarisation intensity and scattering angle for each useful cloud pixel.">Per-pixel polarisation intensity<br><small>and scattering angle</small></button>
+      <button type="button" class="flow-block flow-block--fit" data-node="lutCurves" data-explain="The lookup table contains theoretical polarisation curves for many possible droplet size distributions. The retrieval asks which curve best matches the measured cloudbow profile.">LUT curves</button>
+      <button type="button" class="flow-block flow-block--profile" data-node="singleRetrieval" data-explain="Single-frame retrieval fits one frame's per-pixel polarisation profile to the LUT. It does not use manual cloud tracking.">Single-frame retrieval</button>
+      <button type="button" class="flow-block flow-block--profile flow-block--multi" data-node="multiRetrieval" data-explain="Multi-frame retrieval fits LUT curves after adding manual tracking, so the same cloud patch can build a richer angular profile over time.">Multi-frame retrieval</button>
+    </div>
+
+    <div class="flow-legend" aria-label="Highlight data paths">
+      <button type="button" data-flow-filter="raw"><span></span>Video data</button>
+      <button type="button" data-flow-filter="geometry"><span></span>Geometry</button>
+      <button type="button" data-flow-filter="lut"><span></span>LUT theory</button>
+      <button type="button" data-flow-filter="retrieval"><span></span>Measured profile</button>
+      <button type="button" data-flow-filter="single"><span></span>Single-frame</button>
+      <button type="button" data-flow-filter="multi"><span></span>Multi-frame</button>
+      <button type="button" data-flow-filter="all">Clear highlight</button>
+    </div>
+    <div class="flow-tooltip" role="tooltip" aria-hidden="true"></div>
+  </div>
 </div>
 
 <div class="caption">
-  Figure 3a. Equivalent three-pipeline retrieval flowchart, showing how video pre-processing, camera calibration, and lookup-table fitting combine to produce droplet-size estimates.
+  Figure 3a. Interactive retrieval flowchart. Hover over a panel for why it matters; click a panel, arrow, or route to trace its dependencies.
 </div>
 
 <div class="row justify-content-sm-center">
@@ -330,8 +268,8 @@ A camera does not see the world as a perfect flat grid. The lens bends rays slig
 Once each cloud pixel has a scattering angle and a linear polarisation signal, the retrieval becomes curve fitting. I compared the measured cloudbow profile with a lookup table of simulated profiles and chose the closest match.
 
 <details class="cloud-case-details">
-  <summary>Go deeper: P12, Mie scattering, and the LUT grid</summary>
-  <p>The LUT grid covered effective radius from <strong>1 micrometre to 40.77 micrometres</strong> on a logarithmic grid, and effective variance from <strong>0.01 to 0.325</strong>. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>. The measured scattering-plane signal was compared with many simulated <code>P12(theta)</code> curves. The fitting allows scale and background terms, then looks for the effective radius and effective variance whose curve has the lowest error against the measured cloudbow profile.</p>
+  <summary>Go deeper: <span class="math-inline">P<sub>12</sub></span>, Mie scattering, and the LUT grid</summary>
+  <p>The LUT grid covered effective radius from <strong>1 micrometre to 40.77 micrometres</strong> on a logarithmic grid, and effective variance from <strong>0.01 to 0.325</strong>. For each pair of effective radius and effective variance, Mie-scattering calculations produced a theoretical polarisation curve <a class="ref-link" href="#ref-bohren1983">[3]</a><a class="ref-link" href="#ref-miepython2026">[8]</a>. The measured scattering-plane signal was compared with many simulated <span class="math-inline">P<sub>12</sub>(&theta;)</span> curves. The fitting allows scale and background terms, then looks for the effective radius and effective variance whose curve has the lowest error against the measured cloudbow profile.</p>
 </details>
 
 <a id="flying-system"></a>
@@ -564,6 +502,13 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     background: var(--global-card-bg-color);
   }
 
+  img.img-fluid,
+  video.img-fluid,
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
   .cloud-question p {
     margin-bottom: 0.75rem;
   }
@@ -625,117 +570,363 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   }
 
   .retrieval-flowchart {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
+    --flow-purple: #7a3ea1;
+    --flow-purple-fill: #f1e7f6;
+    --flow-blue: #2f7fbf;
+    --flow-blue-fill: #e5f1fa;
+    --flow-green: #5f8f2f;
+    --flow-green-fill: #edf5e6;
+    --flow-brown: #9a6428;
+    --flow-text: #24303d;
+    position: relative;
+    isolation: isolate;
+    border: 1px solid var(--global-divider-color, #d7dce2);
+    border-radius: 8px;
+    padding: 0.8rem;
     margin: 1.25rem 0 0.6rem;
-    align-items: stretch;
+    background: var(--global-card-bg-color, #fff);
+    color: var(--flow-text);
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    overflow: visible;
   }
 
-  .flow-lane,
-  .flow-merge {
-    position: relative;
-    border: 1px solid var(--global-divider-color);
-    border-radius: 8px;
-    padding: 0.85rem;
-    background: var(--global-card-bg-color);
-  }
-
-  .flow-lane::after {
+  .retrieval-flowchart__arrows {
     position: absolute;
-    right: -0.62rem;
-    top: 50%;
+    inset: 0;
     z-index: 1;
-    width: 1rem;
-    height: 1rem;
-    border-top: 2px solid var(--global-theme-color);
-    border-right: 2px solid var(--global-theme-color);
-    content: "";
-    transform: translateY(-50%) rotate(45deg);
-    background: var(--global-card-bg-color);
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    overflow: visible;
   }
 
-  .flow-lane--lut::after {
-    display: none;
-  }
-
-  .flow-lane h4 {
-    margin: 0 0 0.65rem;
-    font-size: 1rem;
-  }
-
-  .flow-lane--video {
-    border-top: 4px solid #3b82a6;
-  }
-
-  .flow-lane--calibration {
-    border-top: 4px solid #2f9d68;
-  }
-
-  .flow-lane--lut {
-    border-top: 4px solid #b57a2a;
-  }
-
-  .flow-node {
-    border: 1px solid var(--global-divider-color);
-    border-radius: 8px;
-    padding: 0.55rem 0.65rem;
-    margin: 0.45rem 0;
-    background: rgba(127, 127, 127, 0.07);
-    line-height: 1.35;
-  }
-
-  .flow-node + .flow-node {
+  .retrieval-flowchart__body {
     position: relative;
+    z-index: 3;
+    display: grid;
+    gap: 1rem;
   }
 
-  .flow-node + .flow-node::before {
+  .retrieval-flowchart__map {
+    display: grid;
+    grid-template-columns: minmax(112px, 0.95fr) minmax(116px, 1fr) minmax(150px, 1.08fr) minmax(130px, 1fr);
+    grid-template-rows: repeat(5, minmax(2.55rem, auto));
+    gap: 2.1rem 2.45rem;
+    min-height: 24rem;
+    align-items: center;
+    padding: 0.55rem 0.1rem;
+  }
+
+  .flow-block {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 0;
+    border: 1.5px solid currentColor;
+    border-radius: 8px;
+    padding: 0.34rem 0.52rem;
+    background: var(--flow-purple-fill);
+    color: var(--flow-purple);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 650;
+    line-height: 1.18;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease, transform 160ms ease;
+  }
+
+  .flow-block[data-node="videoFrames"] {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .flow-block[data-node="aspTracking"] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .flow-block[data-node="cloudMask"] {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .flow-block[data-node="manualTracking"] {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .flow-block[data-node="cameraCalibration"] {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .flow-block[data-node="perPixelSignal"] {
+    grid-column: 3;
+    grid-row: 3;
+  }
+
+  .flow-block[data-node="lutCurves"] {
+    grid-column: 3;
+    grid-row: 5;
+  }
+
+  .flow-block[data-node="singleRetrieval"] {
+    grid-column: 4;
+    grid-row: 2;
+  }
+
+  .flow-block[data-node="multiRetrieval"] {
+    grid-column: 4;
+    grid-row: 4;
+  }
+
+  .flow-block[data-node="cameraCalibration"] {
+    color: var(--flow-blue);
+    background: var(--flow-blue-fill);
+  }
+
+  .flow-block[data-node="lutCurves"] {
+    color: var(--flow-green);
+    background: var(--flow-green-fill);
+  }
+
+  .flow-block[data-node="singleRetrieval"],
+  .flow-block[data-node="multiRetrieval"] {
+    border-color: var(--flow-brown);
+    color: var(--flow-green);
+    background: var(--flow-green-fill);
+  }
+
+  .flow-tooltip {
     position: absolute;
-    left: 50%;
-    top: -0.48rem;
-    width: 2px;
-    height: 0.48rem;
-    background: var(--global-divider-color);
-    content: "";
-  }
-
-  .flow-branches {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.45rem;
-    margin-top: 0.45rem;
-  }
-
-  .flow-node--small {
-    margin: 0;
-    font-size: 0.88rem;
-  }
-
-  .flow-merge {
-    display: grid;
-    align-content: start;
-    min-height: 100%;
-  }
-
-  .flow-merge strong {
-    display: block;
-    margin-bottom: 0.3rem;
-  }
-
-  .flow-merge span {
+    left: 0;
+    top: 0;
+    z-index: 30;
+    width: min(280px, 78vw);
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--global-divider-color, #d7dce2);
+    border-radius: 8px;
+    background: var(--global-card-bg-color, #fff);
+    box-shadow: 0 0.65rem 1.8rem rgba(0, 0, 0, 0.2);
+    color: var(--global-text-color, #1f2933);
+    font-size: 0.78rem;
+    font-weight: 400;
     line-height: 1.35;
+    opacity: 0;
+    pointer-events: none;
+    text-align: left;
+    transform: translateY(0.25rem);
+    transition: opacity 140ms ease, transform 140ms ease;
   }
 
-  .flow-merge--geometry {
-    border-top: 4px solid #4f7dbb;
+  .flow-block:hover,
+  .flow-block:focus-visible {
+    box-shadow: 0 0 0 3px rgba(122, 62, 161, 0.18);
+    outline: none;
   }
 
-  .flow-merge--profile {
-    border-top: 4px solid #8b66b0;
+  .flow-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  .flow-merge--fit {
-    border-top: 4px solid #7b8f2a;
+  .flow-block small {
+    display: block;
+    margin-top: 0.12rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.18;
+  }
+
+  .math-inline {
+    white-space: nowrap;
+  }
+
+  .flow-edge {
+    fill: none;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.7;
+    pointer-events: stroke;
+    transition: opacity 160ms ease, stroke-width 160ms ease;
+  }
+
+  .flow-bundle {
+    fill: none;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .flow-port {
+    opacity: 0.55;
+    stroke: var(--global-card-bg-color, #fff);
+    stroke-width: 1.5;
+    transition: opacity 160ms ease, r 160ms ease;
+  }
+
+  .flow-edge:hover {
+    opacity: 1;
+    stroke-width: 4.2;
+  }
+
+  .flow-edge-label {
+    cursor: pointer;
+    opacity: 0.92;
+    fill: var(--global-text-color, #1f2933);
+    font-size: 0.68rem;
+    font-weight: 700;
+    pointer-events: visiblePainted;
+    paint-order: stroke;
+    stroke: var(--global-card-bg-color, #fff);
+    stroke-linejoin: round;
+    stroke-width: 5.5px;
+    transition: opacity 160ms ease;
+  }
+
+  .flow-edge--raw {
+    stroke: var(--flow-purple);
+    marker-end: url(#flow-arrow-raw);
+  }
+
+  .flow-edge--geometry {
+    stroke: var(--flow-blue);
+    marker-end: url(#flow-arrow-geometry);
+  }
+
+  .flow-edge--lut {
+    stroke: var(--flow-green);
+    marker-end: url(#flow-arrow-lut);
+  }
+
+  .flow-edge--retrieval {
+    stroke: var(--flow-brown);
+    marker-end: url(#flow-arrow-retrieval);
+  }
+
+  #flow-arrow-raw path {
+    fill: var(--flow-purple);
+  }
+
+  #flow-arrow-geometry path {
+    fill: var(--flow-blue);
+  }
+
+  #flow-arrow-lut path {
+    fill: var(--flow-green);
+  }
+
+  #flow-arrow-retrieval path {
+    fill: var(--flow-brown);
+  }
+
+  .flow-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    border-top: 1px solid var(--global-divider-color, #d7dce2);
+    padding-top: 0.8rem;
+  }
+
+  .flow-legend button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid var(--global-divider-color, #d7dce2);
+    border-radius: 6px;
+    background: var(--global-card-bg-color, #fff);
+    color: var(--global-text-color, #1f2933);
+    padding: 0.38rem 0.58rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .flow-legend button:hover,
+  .flow-legend button:focus-visible,
+  .flow-legend button.is-selected {
+    border-color: var(--global-theme-color, #2769a6);
+    box-shadow: 0 0 0 3px rgba(76, 154, 208, 0.14);
+    outline: none;
+  }
+
+  .flow-legend span {
+    width: 0.8rem;
+    height: 0.2rem;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .flow-legend [data-flow-filter="raw"] span {
+    color: var(--flow-purple);
+  }
+
+  .flow-legend [data-flow-filter="geometry"] span {
+    color: var(--flow-blue);
+  }
+
+  .flow-legend [data-flow-filter="lut"] span {
+    color: var(--flow-green);
+  }
+
+  .flow-legend [data-flow-filter="retrieval"] span,
+  .flow-legend [data-flow-filter="single"] span,
+  .flow-legend [data-flow-filter="multi"] span {
+    color: var(--flow-brown);
+  }
+
+  .retrieval-flowchart.is-filtering .flow-block {
+    opacity: 0.22;
+  }
+
+  .retrieval-flowchart.is-filtering .flow-edge {
+    opacity: 0.06;
+  }
+
+  .retrieval-flowchart.is-filtering .flow-bundle {
+    opacity: 0.05;
+  }
+
+  .retrieval-flowchart.is-filtering .flow-port {
+    opacity: 0.1;
+  }
+
+  .retrieval-flowchart.is-filtering .flow-edge-label {
+    opacity: 0.18;
+  }
+
+  .retrieval-flowchart.is-filtering .flow-block.is-highlighted {
+    opacity: 1;
+  }
+
+  .flow-block.is-highlighted {
+    box-shadow: 0 0 0 3px rgba(122, 62, 161, 0.18);
+  }
+
+  .flow-edge.is-highlighted,
+  .flow-bundle.is-highlighted {
+    opacity: 1 !important;
+  }
+
+  .flow-edge.is-highlighted {
+    stroke-width: 4.4;
+  }
+
+  .flow-edge-label.is-highlighted {
+    opacity: 1;
+  }
+
+  .flow-port.is-highlighted {
+    opacity: 1;
+    r: 4.2;
   }
 
   .ref-link {
@@ -1125,6 +1316,56 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     margin: 0.35rem 0 0.55rem;
   }
 
+  @media (max-width: 900px) {
+    .retrieval-flowchart__map {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      gap: 0.8rem;
+      min-height: 0;
+      padding-right: 5.2rem;
+    }
+
+    .flow-block[data-node] {
+      grid-column: 1;
+    }
+
+    .flow-block[data-node="videoFrames"] {
+      grid-row: 1;
+    }
+
+    .flow-block[data-node="aspTracking"] {
+      grid-row: 2;
+    }
+
+    .flow-block[data-node="cloudMask"] {
+      grid-row: 3;
+    }
+
+    .flow-block[data-node="manualTracking"] {
+      grid-row: 4;
+    }
+
+    .flow-block[data-node="cameraCalibration"] {
+      grid-row: 5;
+    }
+
+    .flow-block[data-node="perPixelSignal"] {
+      grid-row: 6;
+    }
+
+    .flow-block[data-node="lutCurves"] {
+      grid-row: 7;
+    }
+
+    .flow-block[data-node="singleRetrieval"] {
+      grid-row: 8;
+    }
+
+    .flow-block[data-node="multiRetrieval"] {
+      grid-row: 9;
+    }
+  }
+
   @media (max-width: 576px) {
     .polarisation-demo__scene,
     .cloudbow-lab,
@@ -1156,16 +1397,64 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       grid-row: auto;
     }
 
-    .retrieval-flowchart,
-    .flow-branches {
-      grid-template-columns: 1fr;
+    .retrieval-flowchart {
+      padding: 0.75rem;
     }
 
-    .flow-lane::after {
-      right: 50%;
-      top: auto;
-      bottom: -0.65rem;
-      transform: translateX(50%) rotate(135deg);
+    .retrieval-flowchart__map {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      gap: 0.8rem;
+      min-height: 0;
+      padding-right: 5.2rem;
+    }
+
+    .flow-edge-label {
+      font-size: 0.64rem;
+    }
+
+    .flow-block[data-node] {
+      grid-column: 1;
+    }
+
+    .flow-block[data-node="videoFrames"] {
+      grid-row: 1;
+    }
+
+    .flow-block[data-node="aspTracking"] {
+      grid-row: 2;
+    }
+
+    .flow-block[data-node="cloudMask"] {
+      grid-row: 3;
+    }
+
+    .flow-block[data-node="manualTracking"] {
+      grid-row: 4;
+    }
+
+    .flow-block[data-node="cameraCalibration"] {
+      grid-row: 5;
+    }
+
+    .flow-block[data-node="perPixelSignal"] {
+      grid-row: 6;
+    }
+
+    .flow-block[data-node="lutCurves"] {
+      grid-row: 7;
+    }
+
+    .flow-block[data-node="singleRetrieval"] {
+      grid-row: 8;
+    }
+
+    .flow-block[data-node="multiRetrieval"] {
+      grid-row: 9;
+    }
+
+    .flow-block {
+      font-size: 0.8rem;
     }
   }
 </style>
@@ -1197,23 +1486,454 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   })();
 
   (() => {
-    const arLink = document.querySelector(".ar-link");
-    if (!arLink) return;
+    try {
+      const arLink = document.querySelector(".ar-link");
+      if (!arLink) return;
 
-    const platform = navigator.platform || "";
-    const userAgent = navigator.userAgent || "";
-    const hasTouchMac = platform === "MacIntel" && navigator.maxTouchPoints > 1;
-    const isAppleAR = /iPhone|iPad|iPod/.test(userAgent) || hasTouchMac;
+      const platform = navigator.platform || "";
+      const userAgent = navigator.userAgent || "";
+      const hasTouchMac = platform === "MacIntel" && navigator.maxTouchPoints > 1;
+      const isAppleAR = /iPhone|iPad|iPod/.test(userAgent) || hasTouchMac;
 
-    if (!isAppleAR) {
-      arLink.classList.add("is-disabled");
-      arLink.removeAttribute("rel");
-      arLink.setAttribute("aria-disabled", "true");
-      arLink.querySelector("span").textContent = "AR preview available on iPhone or iPad";
-      arLink.addEventListener("click", (event) => {
-        event.preventDefault();
-      });
+      if (!isAppleAR) {
+        arLink.classList.add("is-disabled");
+        arLink.removeAttribute("rel");
+        arLink.setAttribute("aria-disabled", "true");
+        const arLabel = arLink.querySelector("span");
+        if (arLabel) arLabel.textContent = "AR preview available on iPhone or iPad";
+        arLink.addEventListener("click", (event) => {
+          event.preventDefault();
+        });
+      }
+    } catch (error) {
+      document.documentElement.dataset.arSetupError = error.message;
     }
+  })();
+
+  (() => {
+    const chart = document.getElementById("retrieval-flowchart");
+    if (!chart) return;
+
+    const bundleLayer = chart.querySelector("[data-flow-bundles]");
+    const edgeLayer = chart.querySelector("[data-flow-edges]");
+    const labelLayer = chart.querySelector("[data-flow-labels]");
+    const portLayer = chart.querySelector("[data-flow-ports]");
+    const svg = chart.querySelector(".retrieval-flowchart__arrows");
+    const tooltip = chart.querySelector(".flow-tooltip");
+    const nodeElements = new Map(
+      [...chart.querySelectorAll("[data-node]")].map((element) => [element.dataset.node, element])
+    );
+    const legendButtons = [...chart.querySelectorAll("[data-flow-filter]")];
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    const edges = [
+      { id: "frames-asp", from: "videoFrames", to: "aspTracking", type: "raw", label: "8-bit 45-135", mobileLabel: "8b 45-135", fromPort: ["right", 0.25], toPort: ["left", 0.5], mobileLane: 0 },
+      { id: "frames-mask", from: "videoFrames", to: "cloudMask", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.42], toPort: ["left", 0.5], mobileLane: 1 },
+      { id: "frames-manual", from: "videoFrames", to: "manualTracking", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.74], toPort: ["left", 0.5], mobileLane: 2 },
+      { id: "frames-per-pixel", from: "videoFrames", to: "perPixelSignal", type: "raw", label: "12-bit all angles", mobileLabel: "12b all", fromPort: ["right", 0.58], toPort: ["left", 0.36], mobileLane: 3 },
+      { id: "asp-per-pixel", from: "aspTracking", to: "perPixelSignal", type: "geometry", label: "ASP centre", mobileLabel: "ASP", fromPort: ["right", 0.5], toPort: ["left", 0.24], mobileLane: 4 },
+      { id: "mask-per-pixel", from: "cloudMask", to: "perPixelSignal", type: "raw", label: "cloud pixels", mobileLabel: "cloud", fromPort: ["right", 0.5], toPort: ["left", 0.58], mobileLane: 5 },
+      { id: "calibration-per-pixel", from: "cameraCalibration", to: "perPixelSignal", type: "geometry", label: "ray map", mobileLabel: "ray map", fromPort: ["bottom", 0.5], toPort: ["top", 0.5], mobileLane: 6 },
+      { id: "per-pixel-single", from: "perPixelSignal", to: "singleRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", fromPort: ["right", 0.4], toPort: ["left", 0.46], bundle: "single-fit", bundleIndex: 0, bundleCount: 2, mobileLane: 7 },
+      { id: "lut-single", from: "lutCurves", to: "singleRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", fromPort: ["right", 0.38], toPort: ["left", 0.54], bundle: "single-fit", bundleIndex: 1, bundleCount: 2, mobileLane: 8 },
+      { id: "per-pixel-multi", from: "perPixelSignal", to: "multiRetrieval", type: "retrieval", label: "measured profile", mobileLabel: "profile", fromPort: ["right", 0.6], toPort: ["left", 0.42], bundle: "multi-fit", bundleIndex: 0, bundleCount: 3, mobileLane: 9 },
+      { id: "manual-multi", from: "manualTracking", to: "multiRetrieval", type: "raw", label: "same cloud patch", mobileLabel: "same patch", fromPort: ["right", 0.5], toPort: ["left", 0.5], bundle: "multi-fit", bundleIndex: 1, bundleCount: 3, mobileLane: 10 },
+      { id: "lut-multi", from: "lutCurves", to: "multiRetrieval", type: "lut", label: "theoretical curves", mobileLabel: "LUT", fromPort: ["right", 0.62], toPort: ["left", 0.58], bundle: "multi-fit", bundleIndex: 2, bundleCount: 3, mobileLane: 11 }
+    ];
+
+    const parents = new Map();
+    for (const edge of edges) {
+      if (!parents.has(edge.to)) parents.set(edge.to, []);
+      parents.get(edge.to).push(edge);
+    }
+
+    const typeToMarker = {
+      raw: "raw",
+      geometry: "geometry",
+      lut: "lut",
+      retrieval: "retrieval"
+    };
+
+    const pointFor = (rect, side, ratio = 0.5) => {
+      if (side === "top") return { x: rect.left + rect.width * ratio, y: rect.top };
+      if (side === "bottom") return { x: rect.left + rect.width * ratio, y: rect.bottom };
+      if (side === "left") return { x: rect.left, y: rect.top + rect.height * ratio };
+      if (side === "right") return { x: rect.right, y: rect.top + rect.height * ratio };
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    };
+
+    const relativeRect = (element, chartRect) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        left: rect.left - chartRect.left,
+        right: rect.right - chartRect.left,
+        top: rect.top - chartRect.top,
+        bottom: rect.bottom - chartRect.top,
+        width: rect.width,
+        height: rect.height
+      };
+    };
+
+    const nodeRect = (node, chartRect) => relativeRect(nodeElements.get(node), chartRect);
+    const edgePoint = (node, port, chartRect) => pointFor(nodeRect(node, chartRect), port[0], port[1]);
+    const dedupe = (points) => points.filter((point, index) => {
+      const previous = points[index - 1];
+      return !previous || Math.abs(previous.x - point.x) > 0.1 || Math.abs(previous.y - point.y) > 0.1;
+    });
+
+    const pathFromPoints = (points) => {
+      const clean = dedupe(points);
+      return clean.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+    };
+
+    const segmentsFromPoints = (points) => {
+      const clean = dedupe(points);
+      return clean.slice(1).map((point, index) => ({
+        x1: clean[index].x,
+        y1: clean[index].y,
+        x2: point.x,
+        y2: point.y,
+        length: Math.hypot(point.x - clean[index].x, point.y - clean[index].y)
+      }));
+    };
+
+    const lineOffset = (edge) => {
+      if (!edge.bundleCount || edge.bundleCount < 2) return 0;
+      return (edge.bundleIndex - (edge.bundleCount - 1) / 2) * 4.2;
+    };
+
+    const offsetPoints = (points, offset) => {
+      if (!offset) return points;
+      return points.map((point) => ({ x: point.x, y: point.y + offset }));
+    };
+
+    const routeEdge = (edge, chartRect) => {
+      const source = nodeRect(edge.from, chartRect);
+      const target = nodeRect(edge.to, chartRect);
+      const sourcePoint = edgePoint(edge.from, edge.fromPort, chartRect);
+      const targetPoint = edgePoint(edge.to, edge.toPort, chartRect);
+      const isNarrow = chartRect.width < 700;
+
+      if (isNarrow) {
+        const sourceExit = pointFor(source, "right", 0.5);
+        const targetEntry = pointFor(target, "right", 0.5);
+        const railInset = 18 + (edge.mobileLane % 4) * 9;
+        const railX = Math.max(source.right + 10, chartRect.width - railInset);
+        const points = [sourceExit, { x: railX, y: sourceExit.y }, { x: railX, y: targetEntry.y }, targetEntry];
+        return { points, segments: segmentsFromPoints(points), isNarrow };
+      }
+
+      if (edge.id.startsWith("frames-")) {
+        const splitX = source.right + 28;
+        const splitY = pointFor(source, "right", 0.5).y;
+        const branchX = target.left - 26;
+        const points = [
+          sourcePoint,
+          { x: splitX, y: sourcePoint.y },
+          { x: splitX, y: splitY },
+          { x: branchX, y: splitY },
+          { x: branchX, y: targetPoint.y },
+          targetPoint
+        ];
+        return { points, segments: segmentsFromPoints(points), isNarrow };
+      }
+
+      if (edge.id === "calibration-per-pixel") {
+        const points = [sourcePoint, targetPoint];
+        return { points, segments: segmentsFromPoints(points), isNarrow };
+      }
+
+      const mergeX = edge.bundle?.includes("single")
+        ? target.left - 34
+        : edge.bundle?.includes("multi")
+          ? target.left - 46
+          : source.right + (target.left - source.right) * 0.5;
+      const points = [
+        sourcePoint,
+        { x: mergeX, y: sourcePoint.y },
+        { x: mergeX, y: targetPoint.y },
+        targetPoint
+      ];
+      return { points: offsetPoints(points, lineOffset(edge)), segments: segmentsFromPoints(offsetPoints(points, lineOffset(edge))), isNarrow };
+    };
+
+    const labelBox = (text, x, y, angle) => {
+      const width = Math.max(34, text.length * 6.1);
+      const height = 14;
+      if (Math.abs(angle) === 90) {
+        return { left: x - height / 2, right: x + height / 2, top: y - width / 2, bottom: y + width / 2 };
+      }
+      return { left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
+    };
+
+    const intersects = (a, b, pad = 4) => (
+      a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad
+    );
+
+    const chooseLabel = (edge, route, chartRect, placedLabels) => {
+      const label = route.isNarrow ? edge.mobileLabel || edge.label : edge.label;
+      const blockBoxes = [...nodeElements.values()].map((element) => relativeRect(element, chartRect));
+      const segments = [...route.segments].sort((a, b) => b.length - a.length);
+      const offsets = [0, -12, 12, -22, 22, -32, 32];
+
+      for (const segment of segments) {
+        if (segment.length < 28) continue;
+        const isVertical = Math.abs(segment.x2 - segment.x1) < Math.abs(segment.y2 - segment.y1);
+        const angle = 0;
+        for (const offset of offsets) {
+          const x = (segment.x1 + segment.x2) / 2 + (isVertical ? offset : 0);
+          const y = (segment.y1 + segment.y2) / 2 + (isVertical ? 0 : offset - 4);
+          const box = labelBox(label, x, y, angle);
+          const inBounds = box.left > 2 && box.right < chartRect.width - 2 && box.top > 2 && box.bottom < chartRect.height - 2;
+          if (!inBounds) continue;
+          if (blockBoxes.some((block) => intersects(box, block, 6))) continue;
+          if (placedLabels.some((placed) => intersects(box, placed, 3))) continue;
+          placedLabels.push(box);
+          return { label, x, y, angle };
+        }
+      }
+
+      const fallback = route.segments[0] || { x1: 0, y1: 0, x2: chartRect.width, y2: 0 };
+      const x = (fallback.x1 + fallback.x2) / 2;
+      const y = (fallback.y1 + fallback.y2) / 2 - 12;
+      placedLabels.push(labelBox(label, x, y, 0));
+      return { label, x, y, angle: 0 };
+    };
+
+    const showTooltip = (element) => {
+      if (!tooltip) return;
+      tooltip.textContent = element.dataset.explain || "";
+      tooltip.setAttribute("aria-hidden", "false");
+      tooltip.classList.add("is-visible");
+
+      const chartRect = chart.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const tipRect = tooltip.getBoundingClientRect();
+      let left = elementRect.left - chartRect.left + elementRect.width / 2 - tipRect.width / 2;
+      let top = elementRect.top - chartRect.top - tipRect.height - 10;
+      if (top < 8) top = elementRect.bottom - chartRect.top + 10;
+      left = Math.max(8, Math.min(left, chartRect.width - tipRect.width - 8));
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    };
+
+    const hideTooltip = () => {
+      if (!tooltip) return;
+      tooltip.classList.remove("is-visible");
+      tooltip.setAttribute("aria-hidden", "true");
+    };
+
+    const createPath = (route, edge, className, layer) => {
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", pathFromPoints(route.points));
+      path.classList.add(className, `${className}--${edge.type}`, `flow-edge--${edge.type}`);
+      path.dataset.edge = edge.id;
+      path.dataset.from = edge.from;
+      path.dataset.to = edge.to;
+      path.dataset.type = edge.type;
+      if (className === "flow-edge") {
+        path.setAttribute("marker-end", `url(#flow-arrow-${typeToMarker[edge.type]})`);
+        path.addEventListener("click", () => applyHighlight("edge", edge.id));
+      }
+      layer.appendChild(path);
+      return path;
+    };
+
+    const createPort = (point, edge) => {
+      const circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", point.x.toFixed(1));
+      circle.setAttribute("cy", point.y.toFixed(1));
+      circle.setAttribute("r", "3.3");
+      circle.classList.add("flow-port", `flow-edge--${edge.type}`);
+      circle.dataset.edgePort = edge.id;
+      portLayer.appendChild(circle);
+    };
+
+    const drawEdges = () => {
+      const chartRect = chart.getBoundingClientRect();
+      svg.setAttribute("viewBox", `0 0 ${chartRect.width} ${chartRect.height}`);
+      svg.setAttribute("width", chartRect.width);
+      svg.setAttribute("height", chartRect.height);
+      bundleLayer.textContent = "";
+      edgeLayer.textContent = "";
+      labelLayer.textContent = "";
+      portLayer.textContent = "";
+
+      const placedLabels = [];
+      const routeCache = new Map();
+      const drawErrors = [];
+
+      for (const edge of edges) {
+        try {
+          if (!nodeElements.has(edge.from) || !nodeElements.has(edge.to)) continue;
+          const route = routeEdge(edge, chartRect);
+          routeCache.set(edge.id, route);
+          createPath(route, edge, "flow-bundle", bundleLayer);
+          createPath(route, edge, "flow-edge", edgeLayer);
+
+          createPort(route.points[0], edge);
+          createPort(route.points[route.points.length - 1], edge);
+
+          if (edge.label) {
+            const labelPosition = chooseLabel(edge, route, chartRect, placedLabels);
+            const text = document.createElementNS(svgNS, "text");
+            text.classList.add("flow-edge-label", `flow-edge-label--${edge.type}`);
+            text.dataset.edgeLabel = edge.id;
+            text.setAttribute("x", labelPosition.x.toFixed(1));
+            text.setAttribute("y", labelPosition.y.toFixed(1));
+            text.setAttribute("text-anchor", "middle");
+            if (labelPosition.angle) {
+              text.setAttribute("transform", `rotate(${labelPosition.angle} ${labelPosition.x.toFixed(1)} ${labelPosition.y.toFixed(1)})`);
+            }
+            text.textContent = labelPosition.label;
+            text.addEventListener("click", () => applyHighlight("edge", edge.id));
+            labelLayer.appendChild(text);
+          }
+        } catch (error) {
+          drawErrors.push(`${edge.id}: ${error.message}`);
+        }
+      }
+
+      if (drawErrors.length) {
+        chart.dataset.flowErrors = drawErrors.join(" | ");
+      } else {
+        delete chart.dataset.flowErrors;
+      }
+
+      if (chart.dataset.activeMode) {
+        applyHighlight(chart.dataset.activeMode, chart.dataset.activeValue);
+      };
+    };
+
+    const collectAncestors = (targets) => {
+      const nodes = new Set(targets);
+      const edgeIds = new Set();
+      const stack = [...targets];
+
+      while (stack.length) {
+        const target = stack.pop();
+        for (const edge of parents.get(target) || []) {
+          edgeIds.add(edge.id);
+          if (!nodes.has(edge.from)) {
+            nodes.add(edge.from);
+            stack.push(edge.from);
+          }
+        }
+      }
+
+      return { nodes, edgeIds };
+    };
+
+    const clearHighlight = () => {
+      chart.classList.remove("is-filtering");
+      delete chart.dataset.activeMode;
+      delete chart.dataset.activeValue;
+      chart.querySelectorAll(".is-highlighted").forEach((element) => element.classList.remove("is-highlighted"));
+      legendButtons.forEach((button) => button.classList.remove("is-selected"));
+    };
+
+    const setHighlights = ({ nodes, edgeIds }, selectedLegend) => {
+      chart.classList.add("is-filtering");
+      chart.querySelectorAll(".is-highlighted").forEach((element) => element.classList.remove("is-highlighted"));
+      legendButtons.forEach((button) => {
+        const isSelected = selectedLegend ? button === selectedLegend : button.dataset.flowFilter === chart.dataset.activeValue;
+        button.classList.toggle("is-selected", isSelected);
+      });
+
+      nodes.forEach((node) => nodeElements.get(node)?.classList.add("is-highlighted"));
+      edgeIds.forEach((edgeId) => {
+        chart.querySelector(`[data-edge="${edgeId}"]`)?.classList.add("is-highlighted");
+        chart.querySelectorAll(`[data-edge="${edgeId}"]`).forEach((element) => element.classList.add("is-highlighted"));
+        chart.querySelector(`[data-edge-label="${edgeId}"]`)?.classList.add("is-highlighted");
+        chart.querySelectorAll(`[data-edge-port="${edgeId}"]`).forEach((element) => element.classList.add("is-highlighted"));
+      });
+    };
+
+    const applyHighlight = (mode, value, selectedLegend = null) => {
+      if (!mode || value === "all") {
+        clearHighlight();
+        return;
+      }
+
+      chart.dataset.activeMode = mode;
+      chart.dataset.activeValue = value;
+
+      if (mode === "node") {
+        const highlight = collectAncestors([value]);
+        highlight.nodes.add(value);
+        setHighlights(highlight, selectedLegend);
+        return;
+      }
+
+      if (value === "single") {
+        const highlight = collectAncestors(["singleRetrieval"]);
+        setHighlights(highlight, selectedLegend);
+        return;
+      }
+
+      if (value === "multi") {
+        const highlight = collectAncestors(["multiRetrieval"]);
+        setHighlights(highlight, selectedLegend);
+        return;
+      }
+
+      if (value === "retrieval") {
+        const matchingEdges = edges.filter((edge) => edge.type === "retrieval");
+        const nodes = new Set();
+        const edgeIds = new Set();
+        matchingEdges.forEach((edge) => {
+          nodes.add(edge.from);
+          nodes.add(edge.to);
+          edgeIds.add(edge.id);
+        });
+        setHighlights({ nodes, edgeIds }, selectedLegend);
+        return;
+      }
+
+      if (mode === "edge") {
+        const edge = edges.find((candidate) => candidate.id === value);
+        if (!edge) return;
+        const highlight = collectAncestors([edge.to]);
+        highlight.edgeIds.add(edge.id);
+        setHighlights(highlight, selectedLegend);
+        return;
+      }
+
+      const matchingEdges = edges.filter((edge) => edge.type === value);
+      const nodes = new Set();
+      const edgeIds = new Set();
+      matchingEdges.forEach((edge) => {
+        nodes.add(edge.from);
+        nodes.add(edge.to);
+        edgeIds.add(edge.id);
+      });
+      setHighlights({ nodes, edgeIds }, selectedLegend);
+    };
+
+    nodeElements.forEach((element, node) => {
+      element.addEventListener("click", () => applyHighlight("node", node));
+      element.addEventListener("mouseenter", () => showTooltip(element));
+      element.addEventListener("mousemove", () => showTooltip(element));
+      element.addEventListener("focus", () => showTooltip(element));
+      element.addEventListener("mouseleave", hideTooltip);
+      element.addEventListener("blur", hideTooltip);
+    });
+
+    legendButtons.forEach((button) => {
+      button.addEventListener("click", () => applyHighlight("legend", button.dataset.flowFilter, button));
+    });
+
+    const scheduleDraw = () => window.requestAnimationFrame(drawEdges);
+    window.addEventListener("resize", scheduleDraw);
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(scheduleDraw);
+      observer.observe(chart);
+      nodeElements.forEach((element) => observer.observe(element));
+    }
+    if (document.fonts?.ready) document.fonts.ready.then(scheduleDraw);
+    drawEdges();
+    window.setTimeout(drawEdges, 0);
+    scheduleDraw();
   })();
 
   (() => {
