@@ -609,11 +609,12 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
 
   .retrieval-flowchart__map {
     display: grid;
-    grid-template-columns: minmax(112px, 0.95fr) minmax(116px, 1fr) minmax(150px, 1.08fr) minmax(130px, 1fr);
+    grid-template-columns: max-content max-content max-content max-content;
     grid-template-rows: repeat(5, minmax(2.55rem, auto));
-    gap: 2.1rem 2.45rem;
+    gap: 2.1rem 4.2rem;
     min-height: 24rem;
     align-items: center;
+    justify-content: center;
     padding: 0.55rem 0.1rem;
   }
 
@@ -622,7 +623,8 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     z-index: 5;
     display: grid;
     place-items: center;
-    width: 100%;
+    width: max-content;
+    max-width: 15rem;
     min-height: 0;
     border: 1.5px solid currentColor;
     border-radius: 8px;
@@ -779,7 +781,7 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
   .flow-edge-label {
     cursor: pointer;
     opacity: 0.92;
-    fill: var(--global-text-color, #1f2933);
+    fill: var(--flow-text);
     font-size: 0.68rem;
     font-weight: 700;
     pointer-events: visiblePainted;
@@ -790,23 +792,43 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     transition: opacity 160ms ease;
   }
 
+  .flow-edge-label--raw {
+    fill: var(--flow-purple);
+  }
+
+  .flow-edge-label--geometry {
+    fill: var(--flow-blue);
+  }
+
+  .flow-edge-label--lut {
+    fill: var(--flow-green);
+  }
+
+  .flow-edge-label--retrieval {
+    fill: var(--flow-brown);
+  }
+
   .flow-edge--raw {
     stroke: var(--flow-purple);
+    color: var(--flow-purple);
     marker-end: url(#flow-arrow-raw);
   }
 
   .flow-edge--geometry {
     stroke: var(--flow-blue);
+    color: var(--flow-blue);
     marker-end: url(#flow-arrow-geometry);
   }
 
   .flow-edge--lut {
     stroke: var(--flow-green);
+    color: var(--flow-green);
     marker-end: url(#flow-arrow-lut);
   }
 
   .flow-edge--retrieval {
     stroke: var(--flow-brown);
+    color: var(--flow-brown);
     marker-end: url(#flow-arrow-retrieval);
   }
 
@@ -1323,10 +1345,12 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       gap: 0.8rem;
       min-height: 0;
       padding-right: 5.2rem;
+      justify-items: center;
     }
 
     .flow-block[data-node] {
       grid-column: 1;
+      width: min(100%, 21rem);
     }
 
     .flow-block[data-node="videoFrames"] {
@@ -1527,10 +1551,10 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
     const svgNS = "http://www.w3.org/2000/svg";
 
     const edges = [
-      { id: "frames-asp", from: "videoFrames", to: "aspTracking", type: "raw", label: "8-bit 45-135", mobileLabel: "8b 45-135", fromPort: ["right", 0.25], toPort: ["left", 0.5], mobileLane: 0 },
-      { id: "frames-mask", from: "videoFrames", to: "cloudMask", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.42], toPort: ["left", 0.5], mobileLane: 1 },
-      { id: "frames-manual", from: "videoFrames", to: "manualTracking", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.74], toPort: ["left", 0.5], mobileLane: 2 },
-      { id: "frames-per-pixel", from: "videoFrames", to: "perPixelSignal", type: "raw", label: "12-bit all angles", mobileLabel: "12b all", fromPort: ["right", 0.58], toPort: ["left", 0.36], mobileLane: 3 },
+      { id: "frames-asp", from: "videoFrames", to: "aspTracking", type: "raw", label: "8-bit 45-135", mobileLabel: "8b 45-135", fromPort: ["right", 0.22], toPort: ["left", 0.5], breakOrder: 3, mobileLane: 0 },
+      { id: "frames-mask", from: "videoFrames", to: "cloudMask", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.4], toPort: ["left", 0.5], breakOrder: 1, mobileLane: 1 },
+      { id: "frames-manual", from: "videoFrames", to: "manualTracking", type: "raw", label: "8-bit 45", mobileLabel: "8b 45", fromPort: ["right", 0.78], toPort: ["left", 0.5], breakOrder: 2, mobileLane: 2 },
+      { id: "frames-per-pixel", from: "videoFrames", to: "perPixelSignal", type: "raw", label: "12-bit all angles", mobileLabel: "12b all", fromPort: ["right", 0.6], toPort: ["left", 0.36], breakOrder: 0, mobileLane: 3 },
       { id: "asp-per-pixel", from: "aspTracking", to: "perPixelSignal", type: "geometry", label: "ASP centre", mobileLabel: "ASP", fromPort: ["right", 0.5], toPort: ["left", 0.24], mobileLane: 4 },
       { id: "mask-per-pixel", from: "cloudMask", to: "perPixelSignal", type: "raw", label: "cloud pixels", mobileLabel: "cloud", fromPort: ["right", 0.5], toPort: ["left", 0.58], mobileLane: 5 },
       { id: "calibration-per-pixel", from: "cameraCalibration", to: "perPixelSignal", type: "geometry", label: "ray map", mobileLabel: "ray map", fromPort: ["bottom", 0.5], toPort: ["top", 0.5], mobileLane: 6 },
@@ -1617,22 +1641,19 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       if (isNarrow) {
         const sourceExit = pointFor(source, "right", 0.5);
         const targetEntry = pointFor(target, "right", 0.5);
-        const railInset = 18 + (edge.mobileLane % 4) * 9;
+        const railInset = 18 + edge.mobileLane * 6;
         const railX = Math.max(source.right + 10, chartRect.width - railInset);
         const points = [sourceExit, { x: railX, y: sourceExit.y }, { x: railX, y: targetEntry.y }, targetEntry];
         return { points, segments: segmentsFromPoints(points), isNarrow };
       }
 
       if (edge.id.startsWith("frames-")) {
-        const splitX = source.right + 28;
-        const splitY = pointFor(source, "right", 0.5).y;
-        const branchX = target.left - 26;
+        const requestedBreak = sourcePoint.x + 18 + (edge.breakOrder ?? 0) * 8;
+        const breakX = Math.min(targetPoint.x - 12, requestedBreak);
         const points = [
           sourcePoint,
-          { x: splitX, y: sourcePoint.y },
-          { x: splitX, y: splitY },
-          { x: branchX, y: splitY },
-          { x: branchX, y: targetPoint.y },
+          { x: breakX, y: sourcePoint.y },
+          { x: breakX, y: targetPoint.y },
           targetPoint
         ];
         return { points, segments: segmentsFromPoints(points), isNarrow };
@@ -1644,9 +1665,9 @@ Hover over highlighted terms in the case study for a quick reminder. This list g
       }
 
       const mergeX = edge.bundle?.includes("single")
-        ? target.left - 34
+        ? target.left - 54
         : edge.bundle?.includes("multi")
-          ? target.left - 46
+          ? target.left - 66
           : source.right + (target.left - source.right) * 0.5;
       const points = [
         sourcePoint,
