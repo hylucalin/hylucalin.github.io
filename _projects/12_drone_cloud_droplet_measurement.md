@@ -191,16 +191,7 @@ The report used the convention that the ASP provides the reference for a 180 deg
 </div>
 
 <div class="caption">
-  Figure 3a. Interactive retrieval flowchart. Hover over a panel for why it matters; click a panel, arrow, or route to trace its dependencies.
-</div>
-
-<div class="row justify-content-sm-center">
-  <div class="col-sm-10 mt-3 mt-md-0">
-    {% include figure.liquid loading="eager" path="assets/img/projects/drone-cloud-droplet-measurement/main-retrieval-flowchart.jpg" title="Main retrieval flowchart" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-<div class="caption">
-  Figure 3b. Original report-style retrieval workflow, kept here for comparison with the webpage-native flowchart above.
+  Figure 3. Interactive retrieval flowchart. Hover over a panel for why it matters; click a panel, arrow, or route to trace its dependencies.
 </div>
 
 ### 2.3 Video Pre-processing
