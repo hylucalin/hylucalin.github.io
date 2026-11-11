@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: University of Cambridge | Lucy Cavendish College | hl667@cam.ac.uk 
+subtitle: University of Cambridge | Master of Engineering (Distinction) | Lucy Cavendish College | hl667@cam.ac.uk
 
 profile:
   align: right
@@ -23,6 +23,6 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
-I’m a vibrant and adventurous engineer studying for an MEng degree at University of Cambridge. I am currently in the last year of my degree (graduating in Summer 2026) and I major in aerospace and mechanical engineering. Inspired by my eight-year experience in photography drones, my study and research experience focus on the application of drones for innovative and sustainable uses. My fourth-year project is about cloud droplet size distribution retrieval using UAV polarimetric imagery in the context of marine cloud brightening (MCB). Prior to commencing study in Cambridge, I spent two years at The University of Hong Kong (2021-2022), where I studied Mechanical Engineering and researched into the use of drones in the atmospheric boundary layer (ABL).
+I’m a vibrant and adventurous engineer. I graduated with Distinction from the University of Cambridge in 2026 with an MEng and BA in Engineering, specialising in control systems, mechanical and aerospace engineering. Inspired by my eight-year experience in photography drones, my study and research experience focus on the application of drones for innovative and sustainable uses. My fourth-year project was about cloud droplet size distribution retrieval using UAV polarimetric imagery in the context of marine cloud brightening (MCB). Prior to commencing study in Cambridge, I spent two years at The University of Hong Kong (2021-2023), where I studied Mechanical Engineering (minor in ECE) and researched the use of drones in the atmospheric boundary layer (ABL).
 
-I am keen to apply my engineering knowledge to a number of coding, design, and simulation projects. In the last term of my third year, I used MATLAB to optimise wing sections using the panel method and Simulink to design a state-feedback controller for a chemical production plant. Outside of the classroom, I have actively participated in drone, space flight and robotics societies, where many interesting projects take place!
+I am keen to apply my engineering knowledge to a number of coding, design, and simulation projects. I love to carry out fun little projects as a hobby to help me and people around me enjoy life better. Making things smarter is my goal. From genuinely smart smart-home accessories (I am looking forward to publish a design of mine here soon) all the way to Physical AI... Let's do more fun engineering!

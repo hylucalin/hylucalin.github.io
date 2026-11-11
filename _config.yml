@@ -9,7 +9,7 @@ last_name: Lin
 contact_note: >
   Click the email icon to get in contact.
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  Luca (Hongyan) Lin is an MEng aerospace and mechanical engineering student at the University of Cambridge working on drones, cloud droplet sensing, atmospheric profiling, fluid dynamics, CFD, and engineering software.
+  Luca (Hongyan) Lin is a University of Cambridge engineering graduate with Distinction, specialising in aerospace and mechanical engineering and working on drones, cloud droplet sensing, atmospheric profiling, fluid dynamics, CFD, and engineering software.
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
